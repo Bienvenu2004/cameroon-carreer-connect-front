@@ -1,0 +1,138 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ===========================================================================
+   JobConnect Cameroun - Emerald Civic design system
+   Primary  : Cameroon emerald  #0D6E5B
+   Accent   : Refined gold      #D4AF37
+   Danger   : Restrained crimson #C0392B
+   =========================================================================== */
+
+@layer base {
+  :root {
+    /* surfaces */
+    --background: 220 24% 98%;
+    --foreground: 222 47% 11%;
+    --card: 0 0% 100%;
+    --card-foreground: 222 47% 11%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 222 47% 11%;
+
+    /* brand */
+    --primary: 167 78% 24%;        /* #0D6E5B */
+    --primary-foreground: 0 0% 100%;
+    --primary-50: 168 50% 95%;
+    --primary-100: 167 60% 88%;
+    --primary-200: 167 60% 78%;
+    --primary-500: 167 75% 30%;
+    --primary-600: 167 78% 24%;
+    --primary-700: 167 80% 18%;
+    --primary-900: 167 84% 11%;
+
+    /* gold accent */
+    --gold: 46 60% 52%;             /* #D4AF37 */
+    --gold-foreground: 30 70% 14%;
+
+    /* secondary, muted */
+    --secondary: 210 25% 95%;
+    --secondary-foreground: 222 47% 11%;
+    --muted: 210 25% 96%;
+    --muted-foreground: 215 16% 46%;
+
+    /* accent (used by hover states / badges) */
+    --accent: 167 50% 96%;
+    --accent-foreground: 167 78% 18%;
+
+    /* status */
+    --destructive: 4 65% 47%;       /* #C0392B */
+    --destructive-foreground: 0 0% 100%;
+    --success: 152 60% 36%;
+    --success-foreground: 0 0% 100%;
+    --warning: 36 90% 50%;
+    --warning-foreground: 28 70% 14%;
+
+    /* form & focus */
+    --border: 215 16% 88%;
+    --input: 215 16% 88%;
+    --ring: 167 78% 24%;
+
+    --radius: 0.75rem;
+  }
+
+  .dark {
+    --background: 222 30% 8%;
+    --foreground: 210 25% 98%;
+    --card: 222 28% 12%;
+    --card-foreground: 210 25% 98%;
+    --popover: 222 28% 12%;
+    --popover-foreground: 210 25% 98%;
+
+    --primary: 167 60% 45%;
+    --primary-foreground: 222 30% 8%;
+    --primary-50: 167 50% 18%;
+    --primary-100: 167 50% 24%;
+    --primary-200: 167 55% 32%;
+    --primary-500: 167 60% 45%;
+    --primary-600: 167 65% 55%;
+    --primary-700: 167 70% 65%;
+    --primary-900: 167 50% 80%;
+
+    --gold: 46 65% 60%;
+    --gold-foreground: 30 70% 10%;
+
+    --secondary: 222 22% 18%;
+    --secondary-foreground: 210 25% 98%;
+    --muted: 222 22% 18%;
+    --muted-foreground: 215 16% 65%;
+
+    --accent: 167 35% 22%;
+    --accent-foreground: 167 60% 80%;
+
+    --destructive: 4 60% 55%;
+    --destructive-foreground: 0 0% 100%;
+    --success: 152 60% 50%;
+    --success-foreground: 222 30% 8%;
+    --warning: 36 80% 60%;
+    --warning-foreground: 28 70% 10%;
+
+    --border: 222 22% 22%;
+    --input: 222 22% 22%;
+    --ring: 167 60% 45%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground antialiased;
+    font-feature-settings: "ss01", "cv11";
+  }
+  html {
+    -webkit-tap-highlight-color: transparent;
+    -webkit-font-smoothing: antialiased;
+  }
+  ::selection {
+    background: hsl(var(--primary) / 0.2);
+    color: hsl(var(--primary-900));
+  }
+  h1, h2, h3, h4 {
+    @apply font-display tracking-tight text-foreground;
+  }
+}
+
+/* utility: subtle elevation reusable on cards */
+@layer components {
+  .elev-1 {
+    box-shadow:
+      0 1px 2px hsl(222 47% 11% / 0.04),
+      0 1px 3px hsl(222 47% 11% / 0.06);
+  }
+  .elev-2 {
+    box-shadow:
+      0 4px 12px hsl(222 47% 11% / 0.06),
+      0 1px 3px hsl(222 47% 11% / 0.04);
+  }
+}
