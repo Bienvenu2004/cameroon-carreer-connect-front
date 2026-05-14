@@ -100,7 +100,8 @@
     "saveJob": "Save",
     "unsaveJob": "Unsave",
     "noJobsFound": "No jobs match your search.",
-    "createSavedSearch": "Create alert"
+    "createSavedSearch": "Create alert",
+    "seekerOnlyAction": "Only job seekers can apply to or save jobs."
   },
   "auth": {
     "loginTitle": "Welcome back",

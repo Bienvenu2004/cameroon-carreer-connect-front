@@ -243,14 +243,14 @@ function CandidateProfileDialog({
                 <div className="flex items-center justify-between gap-3">
                   <div className="flex items-center gap-2 min-w-0">
                     <FileText className="h-4 w-4 shrink-0 text-primary" />
-                    <span className="truncate text-sm">{profile.resume.fileName ?? "resume"}</span>
+                    <span className="truncate text-sm">{profile.resume.name ?? "resume"}</span>
                   </div>
                   <Button asChild size="sm" variant="outline">
                     <a
                       href={profile.resume.url}
                       target="_blank"
                       rel="noreferrer noopener"
-                      download={profile.resume.fileName ?? undefined}
+                      download={profile.resume.name ?? undefined}
                     >
                       <Download className="h-4 w-4" /> {t("profile.downloadResume")}
                     </a>

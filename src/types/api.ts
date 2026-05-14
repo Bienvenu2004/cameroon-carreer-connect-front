@@ -62,12 +62,23 @@ export interface AddressDto {
   phone?: string;
 }
 
+/**
+ * Mirrors the backend's com.hostdesign24.jobportal.dto.file.FileDto
+ * (note: `name` and `type` — not `fileName` / `contentType`). The backend's
+ * FileMapper.buildFullUrl populates `url` with the publicly-servable URL
+ * (publicUrl prefix + stored relative path).
+ */
 export interface FileDto {
   id: string;
-  fileName: string;
+  /** Original upload filename, e.g. "alice-cv.pdf". */
+  name?: string;
+  /** Full public URL, e.g. "http://localhost:8080/storage/foo.pdf". */
   url?: string;
-  contentType?: string;
+  /** MIME content-type, e.g. "application/pdf". */
+  type?: string;
   size?: number;
+  ownerId?: string;
+  ownerType?: string;
 }
 
 export interface PageResponse<T> {

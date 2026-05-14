@@ -45,13 +45,30 @@ export function JobDetailPage() {
   }
 
   const company = job.company;
+
+  // Apply/Save are reserved for JOB_SEEKERs (and unauthenticated visitors
+  // get bounced to the login page, where they can register as a seeker).
+  // Recruiters and admins see a small notice instead of the action buttons.
+  const canActOnJob = !user || user.role === "JOB_SEEKER";
+
   const handleApply = () => {
     if (!user) { nav(`/login?redirect=/jobs/${id}`); return; }
     if (user.role !== "JOB_SEEKER") {
-      toast({ title: t("common.errorOccurred"), description: t("auth.jobSeeker"), variant: "destructive" });
+      // Defensive — the buttons are hidden for non-seekers, this only
+      // fires if someone bypasses the UI.
+      toast({ title: t("common.errorOccurred"), description: t("jobs.seekerOnlyAction"), variant: "destructive" });
       return;
     }
     apply.mutate();
+  };
+
+  const handleSave = () => {
+    if (!user) { nav(`/login?redirect=/jobs/${id}`); return; }
+    if (user.role !== "JOB_SEEKER") {
+      toast({ title: t("common.errorOccurred"), description: t("jobs.seekerOnlyAction"), variant: "destructive" });
+      return;
+    }
+    saveJob.mutate();
   };
 
   return (
@@ -107,12 +124,23 @@ export function JobDetailPage() {
 
         <aside className="lg:sticky lg:top-24 lg:self-start">
           <div className="rounded-2xl border border-border/60 bg-card p-6 elev-1">
-            <Button size="lg" className="w-full" loading={apply.isPending} onClick={handleApply}>
-              <Heart className="h-4 w-4" /> {t("jobs.applyToJob")}
-            </Button>
-            <Button size="lg" variant="outline" className="mt-2 w-full" loading={saveJob.isPending} onClick={() => user ? saveJob.mutate() : nav(`/login?redirect=/jobs/${id}`)}>
-              <Bookmark className="h-4 w-4" /> {t("jobs.saveJob")}
-            </Button>
+            {canActOnJob ? (
+              <>
+                <Button size="lg" className="w-full" loading={apply.isPending} onClick={handleApply}>
+                  <Heart className="h-4 w-4" /> {t("jobs.applyToJob")}
+                </Button>
+                <Button size="lg" variant="outline" className="mt-2 w-full" loading={saveJob.isPending} onClick={handleSave}>
+                  <Bookmark className="h-4 w-4" /> {t("jobs.saveJob")}
+                </Button>
+              </>
+            ) : (
+              // Non-seeker authenticated users (RECRUITER / SYSTEM_ADMIN):
+              // intentionally no action buttons. A short notice clarifies
+              // why so the page doesn't look broken.
+              <div className="rounded-md border border-border/40 bg-muted/30 p-3 text-xs text-muted-foreground">
+                {t("jobs.seekerOnlyAction")}
+              </div>
+            )}
           </div>
 
           {company && (

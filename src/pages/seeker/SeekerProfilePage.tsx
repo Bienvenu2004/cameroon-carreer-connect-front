@@ -205,7 +205,7 @@ function ProfileView({ profile }: { profile: JobSeekerProfileDto }) {
               <div className="flex min-w-0 items-center gap-2">
                 <FileText className="h-4 w-4 shrink-0 text-primary" />
                 <span className="truncate text-sm font-medium">
-                  {profile.resume.fileName ?? "resume"}
+                  {profile.resume.name ?? "resume"}
                 </span>
               </div>
               <Button asChild size="sm" variant="outline">
@@ -213,7 +213,7 @@ function ProfileView({ profile }: { profile: JobSeekerProfileDto }) {
                   href={profile.resume.url}
                   target="_blank"
                   rel="noreferrer noopener"
-                  download={profile.resume.fileName ?? undefined}
+                  download={profile.resume.name ?? undefined}
                 >
                   <Download className="h-4 w-4" /> {t("profile.downloadResume")}
                 </a>
@@ -541,16 +541,23 @@ function ProfileEditForm({
             <span>{resumeFile?.name ?? t("profile.uploadResume")}</span>
             <input
               type="file"
-              accept=".pdf,.doc,.docx"
+              // Backend FileServiceImpl.ALLOWED_FILES currently only permits
+              // application/pdf for documents — keep the picker honest so
+              // users don't get a server-side rejection after selecting
+              // a Word doc.
+              accept="application/pdf,.pdf"
               className="sr-only"
               onChange={(e) =>
                 setResumeFile(e.target.files?.[0] ?? null)
               }
             />
           </label>
-          {!resumeFile && profile.resume?.fileName && (
+          <p className="text-xs text-muted-foreground">
+            PDF only · max 50 MB
+          </p>
+          {!resumeFile && profile.resume?.name && (
             <p className="text-xs text-muted-foreground">
-              {t("profile.currentResume")}: {profile.resume.fileName}
+              {t("profile.currentResume")}: {profile.resume.name}
             </p>
           )}
           {resumeFile && (

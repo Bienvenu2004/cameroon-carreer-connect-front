@@ -100,7 +100,8 @@
     "saveJob": "Sauvegarder",
     "unsaveJob": "Retirer",
     "noJobsFound": "Aucune offre ne correspond à votre recherche.",
-    "createSavedSearch": "Créer une alerte"
+    "createSavedSearch": "Créer une alerte",
+    "seekerOnlyAction": "Seuls les candidats peuvent postuler ou sauvegarder une offre."
   },
   "auth": {
     "loginTitle": "Bon retour parmi nous",
