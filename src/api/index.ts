@@ -3,7 +3,8 @@ import type {
   AdminPlatformStatsDto, AdminUserDto, AuthResponseDto, AuthResponseRaw,
   CompanyDto, CreationResponse,
   DashboardDto, JobApplicationDto, JobDto, JobSeekerSaveDto, JobsFilter,
-  JobSeekerProfileDto, PageResponse, RecruiterProfileDto, SavedSearchDto,
+  JobSeekerProfileDto, PageResponse, RecruiterProfileDto, RegionalStatsDto,
+  SavedSearchDto,
   UserDto, UserRole, ApplicationStatus, CompanyStatus, VerificationType,
 } from "@/types/api";
 
@@ -210,6 +211,8 @@ export const AdminApi = {
 /* ---------------- ANALYTICS ---------------- */
 export const AnalyticsApi = {
   dashboard: () => unwrap<DashboardDto>(api.get("/api/hjp/analytics/dashboard")),
+  /** Admin-only — regional trending dashboard. */
+  regional: () => unwrap<RegionalStatsDto>(api.get("/api/hjp/analytics/regional")),
 };
 
 /* ---------------- SEEKER PROFILE ----------------

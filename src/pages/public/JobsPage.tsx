@@ -11,8 +11,8 @@ import { JobCard } from "@/components/common/JobCard";
 import { Pagination } from "@/components/common/Pagination";
 import { JobsApi } from "@/api";
 import {
-  ALL_INDUSTRIES, ALL_JOB_SITES, ALL_JOB_TYPES, ALL_REGIONS,
-  type Industry, type JobSite, type JobType, type Region,
+  ALL_INDUSTRIES, ALL_JOB_LANGUAGES, ALL_JOB_SITES, ALL_JOB_TYPES, ALL_REGIONS,
+  type Industry, type JobLanguage, type JobSite, type JobType, type Region,
 } from "@/types/api";
 
 const ALL = "ALL" as const;
@@ -25,6 +25,9 @@ export function JobsPage() {
   const [industry, setIndustry] = useState<Industry | typeof ALL>((params.get("industry") as Industry) || ALL);
   const [jobType, setJobType] = useState<JobType | typeof ALL>((params.get("type") as JobType) || ALL);
   const [site, setSite] = useState<JobSite | typeof ALL>((params.get("site") as JobSite) || ALL);
+  const [language, setLanguage] = useState<JobLanguage | typeof ALL>(
+    (params.get("lang") as JobLanguage) || ALL
+  );
   const [page, setPage] = useState(0);
 
   const filter = {
@@ -36,9 +39,10 @@ export function JobsPage() {
     industry: industry === ALL ? undefined : industry,
     jobType: jobType === ALL ? undefined : jobType,
     jobSite: site === ALL ? undefined : site,
+    requiredLanguage: language === ALL ? undefined : language,
   };
 
-  useEffect(() => { setPage(0); }, [keyword, region, industry, jobType, site]);
+  useEffect(() => { setPage(0); }, [keyword, region, industry, jobType, site, language]);
 
   const { data, isLoading } = useQuery({
     queryKey: ["jobs", filter],
@@ -46,7 +50,7 @@ export function JobsPage() {
   });
 
   const clear = () => {
-    setKeyword(""); setRegion(ALL); setIndustry(ALL); setJobType(ALL); setSite(ALL);
+    setKeyword(""); setRegion(ALL); setIndustry(ALL); setJobType(ALL); setSite(ALL); setLanguage(ALL);
     setParams({});
   };
 
@@ -58,6 +62,7 @@ export function JobsPage() {
     if (industry !== ALL) p.set("industry", industry);
     if (jobType !== ALL) p.set("type", jobType);
     if (site !== ALL) p.set("site", site);
+    if (language !== ALL) p.set("lang", language);
     setParams(p);
   };
 
@@ -93,6 +98,15 @@ export function JobsPage() {
             options={[{ v: ALL, l: t("jobs.all") }, ...ALL_JOB_TYPES.map((s) => ({ v: s, l: t(`jobTypes.${s}`) }))]} />
           <FilterSelect value={site} onValueChange={(v) => setSite(v as JobSite | typeof ALL)} placeholder={t("jobs.jobSite")}
             options={[{ v: ALL, l: t("jobs.all") }, ...ALL_JOB_SITES.map((s) => ({ v: s, l: t(`jobSites.${s}`) }))]} />
+          <FilterSelect
+            value={language}
+            onValueChange={(v) => setLanguage(v as JobLanguage | typeof ALL)}
+            placeholder={t("jobs.language")}
+            options={[
+              { v: ALL, l: t("jobs.all") },
+              ...ALL_JOB_LANGUAGES.map((lng) => ({ v: lng, l: t(`jobs.languages.${lng}`) })),
+            ]}
+          />
         </div>
         <div className="mt-3 flex justify-end">
           <Button type="submit" size="sm">{t("common.search")}</Button>

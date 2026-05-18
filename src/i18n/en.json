@@ -101,7 +101,13 @@
     "unsaveJob": "Unsave",
     "noJobsFound": "No jobs match your search.",
     "createSavedSearch": "Create alert",
-    "seekerOnlyAction": "Only job seekers can apply to or save jobs."
+    "seekerOnlyAction": "Only job seekers can apply to or save jobs.",
+    "language": "Working language",
+    "languages": {
+      "FRENCH": "French",
+      "ENGLISH": "English",
+      "BILINGUAL": "Bilingual"
+    }
   },
   "auth": {
     "loginTitle": "Welcome back",
@@ -199,7 +205,16 @@
     "skillsPlaceholder": "Type a skill and press Enter",
     "noResume": "No resume uploaded yet.",
     "saveChanges": "Save changes",
-    "fullName": "Full name"
+    "fullName": "Full name",
+    "spokenLanguages": "Spoken languages",
+    "spokenLanguagesHint": "Type a language and press Enter (e.g. French, English).",
+    "portfolioLinks": "Portfolio & social links",
+    "githubUrl": "GitHub",
+    "linkedinUrl": "LinkedIn",
+    "websiteUrl": "Personal website",
+    "portfolioUrl": "Portfolio",
+    "twitterUrl": "X / Twitter",
+    "facebookUrl": "Facebook"
   },
   "company": {
     "listTitle": "My companies",
@@ -214,6 +229,11 @@
     "size": "Size",
     "website": "Website",
     "description": "Description",
+    "about": "About / Culture",
+    "aboutHint": "Tell candidates about your mission, values, and what makes your team unique.",
+    "promoVideoUrl": "Promotional video URL",
+    "promoVideoHint": "YouTube, Vimeo, or any direct video link.",
+    "promoVideoLabel": "Watch our company video",
     "logo": "Logo",
     "uploadLogo": "Upload a logo",
     "address": "Address",
@@ -241,7 +261,10 @@
     "site": "Work site",
     "salary": "Salary (XAF)",
     "city": "City",
-    "region": "Region"
+    "region": "Region",
+    "requiredLanguage": "Required working language",
+    "requiredLanguageHint": "Which language the candidate needs to operate in for this role.",
+    "requiredLanguagePlaceholder": "Select a language"
   },
   "admin": {
     "title": "Administration",
@@ -269,7 +292,14 @@
     "suspendUser": "Suspend user",
     "reactivateUser": "Reactivate user",
     "softDeleteUser": "Soft-delete",
-    "lastLogin": "Last login"
+    "lastLogin": "Last login",
+    "regional": "Regional trends",
+    "regionalSubtitle": "Hiring activity and demand across Cameroon's 10 regions.",
+    "languageDistribution": "Language distribution",
+    "applicationsByRegion": "Applications by region",
+    "topSkillsByRegion": "Most in-demand skills by region",
+    "topCompaniesByRegion": "Most active companies by region",
+    "noDataYet": "No data yet."
   },
   "regions": {
     "ADAMAOUA": "Adamaoua",

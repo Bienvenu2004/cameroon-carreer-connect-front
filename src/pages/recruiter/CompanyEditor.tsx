@@ -40,6 +40,10 @@ export function CompanyEditor({ mode }: { mode: "create" | "edit" }) {
 
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
+  // Long-form employer-branding "About / Culture" section, optional.
+  const [about, setAbout] = useState("");
+  // Optional YouTube/Vimeo/direct video URL for the company page.
+  const [promoVideoUrl, setPromoVideoUrl] = useState("");
   const [website, setWebsite] = useState("");
   const [industry, setIndustry] = useState<Industry | "">("");
   const [size, setSize] = useState<CompanySize | "">("");
@@ -53,6 +57,8 @@ export function CompanyEditor({ mode }: { mode: "create" | "edit" }) {
     if (!c) return;
     setName(c.name);
     setDescription(c.description ?? "");
+    setAbout(c.about ?? "");
+    setPromoVideoUrl(c.promoVideoUrl ?? "");
     setWebsite(c.website ?? "");
     setIndustry((c.industry as Industry) ?? "");
     setSize((c.size as CompanySize) ?? "");
@@ -65,6 +71,8 @@ export function CompanyEditor({ mode }: { mode: "create" | "edit" }) {
       const fd = new FormData();
       fd.append("name", name);
       fd.append("description", description);
+      fd.append("about", about);
+      fd.append("promoVideoUrl", promoVideoUrl);
       fd.append("website", website);
       if (industry) fd.append("industry", industry);
       if (size) fd.append("size", size);
@@ -136,7 +144,22 @@ export function CompanyEditor({ mode }: { mode: "create" | "edit" }) {
         </div>
         <div className="space-y-2">
           <Label>{t("company.description")}</Label>
-          <Textarea rows={4} value={description} onChange={(e) => setDescription(e.target.value)} />
+          <Textarea rows={3} value={description} onChange={(e) => setDescription(e.target.value)} />
+        </div>
+        <div className="space-y-2">
+          <Label>{t("company.about")}</Label>
+          <Textarea rows={5} value={about} onChange={(e) => setAbout(e.target.value)} />
+          <p className="text-xs text-muted-foreground">{t("company.aboutHint")}</p>
+        </div>
+        <div className="space-y-2">
+          <Label>{t("company.promoVideoUrl")}</Label>
+          <Input
+            type="url"
+            value={promoVideoUrl}
+            onChange={(e) => setPromoVideoUrl(e.target.value)}
+            placeholder="https://youtube.com/watch?v=..."
+          />
+          <p className="text-xs text-muted-foreground">{t("company.promoVideoHint")}</p>
         </div>
         <div className="grid gap-4 sm:grid-cols-2">
           <div className="space-y-2">

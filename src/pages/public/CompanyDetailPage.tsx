@@ -1,7 +1,7 @@
 import { useTranslation } from "react-i18next";
 import { Link, useParams } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
-import { ArrowLeft, BadgeCheck, Building2, ExternalLink, MapPin } from "lucide-react";
+import { ArrowLeft, BadgeCheck, Building2, ExternalLink, MapPin, PlayCircle } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -55,7 +55,23 @@ export function CompanyDetailPage() {
           )}
         </div>
         {c.description && <p className="mt-6 max-w-3xl text-foreground/85 leading-relaxed">{c.description}</p>}
+        {c.promoVideoUrl && (
+          <Button asChild variant="outline" size="sm" className="mt-4">
+            <a href={c.promoVideoUrl} target="_blank" rel="noreferrer noopener">
+              <PlayCircle className="h-4 w-4" /> {t("company.promoVideoLabel")}
+            </a>
+          </Button>
+        )}
       </div>
+
+      {c.about && (
+        <section className="mt-6 rounded-2xl border border-border/60 bg-card p-8 elev-1">
+          <h2 className="font-display text-xl font-semibold">{t("company.about")}</h2>
+          <p className="mt-3 max-w-3xl whitespace-pre-line text-foreground/85 leading-relaxed">
+            {c.about}
+          </p>
+        </section>
+      )}
 
       <h2 className="mt-10 font-display text-xl font-semibold">{t("nav.jobs")}</h2>
       <div className="mt-4 grid gap-4 md:grid-cols-2 lg:grid-cols-3">

@@ -1,7 +1,7 @@
 import { useTranslation } from "react-i18next";
 import { Link, useParams, useNavigate } from "react-router-dom";
 import { useMutation, useQuery } from "@tanstack/react-query";
-import { ArrowLeft, BadgeCheck, Bookmark, Briefcase, Building2, Heart, MapPin } from "lucide-react";
+import { ArrowLeft, BadgeCheck, Bookmark, Briefcase, Building2, Heart, Languages, MapPin } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -83,6 +83,12 @@ export function JobDetailPage() {
             <div className="flex flex-wrap items-center gap-2">
               {job.type && <Badge variant="default">{t(`jobTypes.${job.type}`)}</Badge>}
               {job.site && <Badge variant="outline">{t(`jobSites.${job.site}`)}</Badge>}
+              {job.requiredLanguage && (
+                <Badge variant="outline" className="gap-1">
+                  <Languages className="h-3 w-3" />
+                  {t(`jobs.languages.${job.requiredLanguage}`)}
+                </Badge>
+              )}
               {company?.status === "APPROVED" && (
                 <Badge variant="success" className="gap-1"><BadgeCheck className="h-3 w-3" /> Verified</Badge>
               )}

@@ -2,7 +2,8 @@ import { useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
-  Briefcase, Download, FileText, Mail, MapPin, Pencil, Phone,
+  Briefcase, Download, Facebook, FileText, Github, Globe, Languages,
+  Linkedin, Link as LinkIcon, Mail, MapPin, Pencil, Phone, Twitter,
   Upload, User as UserIcon, X,
 } from "lucide-react";
 
@@ -196,6 +197,46 @@ function ProfileView({ profile }: { profile: JobSeekerProfileDto }) {
         )}
       </Card>
 
+      {/* Spoken languages -------------------------------------------------- */}
+      <Card>
+        <SectionHeader title={t("profile.spokenLanguages")} />
+        {(() => {
+          const langs = parseSpokenLanguages(profile.spokenLanguages);
+          return langs.length > 0 ? (
+            <div className="mt-3 flex flex-wrap gap-2">
+              {langs.map((l, i) => (
+                <Badge key={`${l}-${i}`} variant="secondary" className="gap-1">
+                  <Languages className="h-3 w-3" /> {l}
+                </Badge>
+              ))}
+            </div>
+          ) : (
+            <div className="mt-3 text-sm text-muted-foreground">
+              {t("profile.notSet")}
+            </div>
+          );
+        })()}
+      </Card>
+
+      {/* Portfolio & social ------------------------------------------------ */}
+      <Card>
+        <SectionHeader title={t("profile.portfolioLinks")} />
+        {hasAnyLink(profile) ? (
+          <div className="mt-3 grid gap-2 sm:grid-cols-2">
+            <LinkRow icon={Github}   label={t("profile.githubUrl")}    url={profile.githubUrl} />
+            <LinkRow icon={Linkedin} label={t("profile.linkedinUrl")}  url={profile.linkedinUrl} />
+            <LinkRow icon={Globe}    label={t("profile.websiteUrl")}   url={profile.websiteUrl} />
+            <LinkRow icon={LinkIcon} label={t("profile.portfolioUrl")} url={profile.portfolioUrl} />
+            <LinkRow icon={Twitter}  label={t("profile.twitterUrl")}   url={profile.twitterUrl} />
+            <LinkRow icon={Facebook} label={t("profile.facebookUrl")}  url={profile.facebookUrl} />
+          </div>
+        ) : (
+          <div className="mt-3 text-sm text-muted-foreground">
+            {t("profile.notSet")}
+          </div>
+        )}
+      </Card>
+
       {/* Documents --------------------------------------------------------- */}
       <Card>
         <SectionHeader title={t("profile.documents")} />
@@ -290,6 +331,28 @@ function ProfileEditForm({
     setSkillDraft("");
   };
 
+  // Spoken languages — same tag-input pattern as skills, persisted as a
+  // comma-separated string in JobSeekerProfile.spokenLanguages.
+  const [spokenLanguages, setSpokenLanguages] = useState<string[]>(
+    parseSpokenLanguages(profile.spokenLanguages)
+  );
+  const [languageDraft, setLanguageDraft] = useState("");
+  const addLanguage = (raw: string) => {
+    const name = raw.trim();
+    if (!name) return;
+    if (spokenLanguages.some((s) => s.toLowerCase() === name.toLowerCase())) return;
+    setSpokenLanguages([...spokenLanguages, name]);
+    setLanguageDraft("");
+  };
+
+  // Portfolio / social links — plain URL inputs, all optional.
+  const [githubUrl, setGithubUrl]       = useState(profile.githubUrl ?? "");
+  const [linkedinUrl, setLinkedinUrl]   = useState(profile.linkedinUrl ?? "");
+  const [websiteUrl, setWebsiteUrl]     = useState(profile.websiteUrl ?? "");
+  const [portfolioUrl, setPortfolioUrl] = useState(profile.portfolioUrl ?? "");
+  const [twitterUrl, setTwitterUrl]     = useState(profile.twitterUrl ?? "");
+  const [facebookUrl, setFacebookUrl]   = useState(profile.facebookUrl ?? "");
+
   const save = useMutation({
     mutationFn: async () => {
       // Client-side validation — required name fields. Anything else can be
@@ -310,6 +373,17 @@ function ProfileEditForm({
       fd.append("address.country", country.trim());
       fd.append("workAuthorization", workAuthorization.trim());
       fd.append("employmentType", employmentType.trim());
+
+      // Spoken languages — stored on the backend as a comma-separated string.
+      fd.append("spokenLanguages", spokenLanguages.join(","));
+
+      // Portfolio / social URLs — always send (empty string clears the value).
+      fd.append("githubUrl",    githubUrl.trim());
+      fd.append("linkedinUrl",  linkedinUrl.trim());
+      fd.append("websiteUrl",   websiteUrl.trim());
+      fd.append("portfolioUrl", portfolioUrl.trim());
+      fd.append("twitterUrl",   twitterUrl.trim());
+      fd.append("facebookUrl",  facebookUrl.trim());
 
       // Files: only attach if the user picked a new one. Empty
       // MultipartFiles are guarded server-side, but skipping the field
@@ -532,6 +606,94 @@ function ProfileEditForm({
         </div>
       </Card>
 
+      {/* Spoken languages ------------------------------------------------- */}
+      <Card>
+        <SectionHeader title={t("profile.spokenLanguages")} />
+        <div className="mt-3 space-y-3">
+          <Input
+            value={languageDraft}
+            onChange={(e) => setLanguageDraft(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") {
+                e.preventDefault();
+                addLanguage(languageDraft);
+              }
+            }}
+            placeholder={t("profile.spokenLanguagesHint")}
+          />
+          <div className="flex flex-wrap gap-2">
+            {spokenLanguages.map((s, i) => (
+              <Badge
+                key={`${s}-${i}`}
+                variant="secondary"
+                className="gap-1"
+              >
+                <Languages className="h-3 w-3" /> {s}
+                <button
+                  type="button"
+                  className="rounded-full hover:bg-muted-foreground/20"
+                  onClick={() =>
+                    setSpokenLanguages(spokenLanguages.filter((_, j) => j !== i))
+                  }
+                  aria-label={t("common.delete")}
+                >
+                  <X className="h-3 w-3" />
+                </button>
+              </Badge>
+            ))}
+          </div>
+        </div>
+      </Card>
+
+      {/* Portfolio / social ----------------------------------------------- */}
+      <Card>
+        <SectionHeader title={t("profile.portfolioLinks")} />
+        <div className="mt-3 grid gap-4 sm:grid-cols-2">
+          <UrlInput
+            icon={Github}
+            label={t("profile.githubUrl")}
+            value={githubUrl}
+            onChange={setGithubUrl}
+            placeholder="https://github.com/..."
+          />
+          <UrlInput
+            icon={Linkedin}
+            label={t("profile.linkedinUrl")}
+            value={linkedinUrl}
+            onChange={setLinkedinUrl}
+            placeholder="https://linkedin.com/in/..."
+          />
+          <UrlInput
+            icon={Globe}
+            label={t("profile.websiteUrl")}
+            value={websiteUrl}
+            onChange={setWebsiteUrl}
+            placeholder="https://..."
+          />
+          <UrlInput
+            icon={LinkIcon}
+            label={t("profile.portfolioUrl")}
+            value={portfolioUrl}
+            onChange={setPortfolioUrl}
+            placeholder="https://..."
+          />
+          <UrlInput
+            icon={Twitter}
+            label={t("profile.twitterUrl")}
+            value={twitterUrl}
+            onChange={setTwitterUrl}
+            placeholder="https://x.com/..."
+          />
+          <UrlInput
+            icon={Facebook}
+            label={t("profile.facebookUrl")}
+            value={facebookUrl}
+            onChange={setFacebookUrl}
+            placeholder="https://facebook.com/..."
+          />
+        </div>
+      </Card>
+
       {/* Resume ----------------------------------------------------------- */}
       <Card>
         <SectionHeader title={t("profile.uploadResume")} />
@@ -651,5 +813,89 @@ function Field({
         )}
       </div>
     </div>
+  );
+}
+
+/* ----------------------- profile-only utility helpers -------------------- */
+
+/** Split the backend's comma-separated spokenLanguages string into a trimmed
+ *  array, dropping empty tokens. Safe for null/undefined input. */
+function parseSpokenLanguages(raw?: string | null): string[] {
+  if (!raw) return [];
+  return raw
+    .split(",")
+    .map((s) => s.trim())
+    .filter((s) => s.length > 0);
+}
+
+/** Whether any of the optional social/portfolio URLs are present on the
+ *  profile — drives whether we render the section or a "Not set" placeholder. */
+function hasAnyLink(p: JobSeekerProfileDto): boolean {
+  return Boolean(
+    p.githubUrl || p.linkedinUrl || p.websiteUrl ||
+    p.portfolioUrl || p.twitterUrl || p.facebookUrl
+  );
+}
+
+/** Small labelled URL input used by the Portfolio & social links section
+ *  in edit mode. type=url gives free browser validation but we don't
+ *  enforce required so users can clear a field by submitting an empty value. */
+function UrlInput({
+  icon: Icon,
+  label,
+  value,
+  onChange,
+  placeholder,
+}: {
+  icon: typeof Phone;
+  label: string;
+  value: string;
+  onChange: (v: string) => void;
+  placeholder?: string;
+}) {
+  return (
+    <div className="space-y-2">
+      <Label className="inline-flex items-center gap-1.5">
+        <Icon className="h-3.5 w-3.5 text-primary" /> {label}
+      </Label>
+      <Input
+        type="url"
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        placeholder={placeholder}
+      />
+    </div>
+  );
+}
+
+/** One row in the Portfolio & social links section — only renders if a URL
+ *  is present. Opens the link in a new tab with safe rel attributes. */
+function LinkRow({
+  icon: Icon,
+  label,
+  url,
+}: {
+  icon: typeof Phone;
+  label: string;
+  url?: string | null;
+}) {
+  if (!url || url.trim().length === 0) return null;
+  return (
+    <a
+      href={url}
+      target="_blank"
+      rel="noreferrer noopener"
+      className="group flex items-center gap-3 rounded-md border border-border/40 bg-card p-3 text-sm transition-colors hover:border-primary/40 hover:bg-accent/40"
+    >
+      <Icon className="h-4 w-4 shrink-0 text-primary" />
+      <div className="min-w-0 flex-1">
+        <div className="text-xs uppercase tracking-wider text-muted-foreground">
+          {label}
+        </div>
+        <div className="truncate font-medium text-foreground group-hover:text-primary">
+          {url}
+        </div>
+      </div>
+    </a>
   );
 }

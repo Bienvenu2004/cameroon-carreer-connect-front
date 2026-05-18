@@ -11,8 +11,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { useToast } from "@/components/ui/toast-provider";
 import { apiErrorMessage } from "@/lib/api";
 import {
-  ALL_JOB_SITES, ALL_JOB_TYPES, ALL_REGIONS,
-  type JobSite, type JobType, type Region,
+  ALL_JOB_LANGUAGES, ALL_JOB_SITES, ALL_JOB_TYPES, ALL_REGIONS,
+  type JobLanguage, type JobSite, type JobType, type Region,
 } from "@/types/api";
 
 export function JobEditor({ mode }: { mode: "create" | "edit" }) {
@@ -40,6 +40,9 @@ export function JobEditor({ mode }: { mode: "create" | "edit" }) {
   const [benefits, setBenefits] = useState("");
   const [type, setType] = useState<JobType>("FULL_TIME");
   const [site, setSite] = useState<JobSite>("ONSITE");
+  // Required working language for the role — drives the language badge
+  // and the language filter on the public jobs listing.
+  const [requiredLanguage, setRequiredLanguage] = useState<JobLanguage | "">("");
   const [salary, setSalary] = useState("");
   const [city, setCity] = useState("");
   const [region, setRegion] = useState<Region>("CENTRE");
@@ -53,6 +56,7 @@ export function JobEditor({ mode }: { mode: "create" | "edit" }) {
       setBenefits(j.benefits ?? "");
       if (j.type) setType(j.type);
       if (j.site) setSite(j.site);
+      if (j.requiredLanguage) setRequiredLanguage(j.requiredLanguage);
       setSalary(j.salary?.toString() ?? "");
       setCity(j.location?.city ?? "");
       if (j.location?.region) setRegion(j.location.region);
@@ -80,6 +84,7 @@ export function JobEditor({ mode }: { mode: "create" | "edit" }) {
       if (benefits) fd.append("benefits", benefits);
       fd.append("type", type);
       fd.append("site", site);
+      if (requiredLanguage) fd.append("requiredLanguage", requiredLanguage);
       if (salary) fd.append("salary", salary);
       fd.append("salaryCurrency", "XAF");
       if (companyId) fd.append("companyId", companyId);
@@ -135,6 +140,27 @@ export function JobEditor({ mode }: { mode: "create" | "edit" }) {
               </SelectContent>
             </Select>
           </div>
+        </div>
+        <div className="space-y-2">
+          <Label>{t("jobEditor.requiredLanguage")}</Label>
+          <Select
+            value={requiredLanguage}
+            onValueChange={(v) => setRequiredLanguage(v as JobLanguage)}
+          >
+            <SelectTrigger>
+              <SelectValue placeholder={t("jobEditor.requiredLanguagePlaceholder")} />
+            </SelectTrigger>
+            <SelectContent>
+              {ALL_JOB_LANGUAGES.map((lng) => (
+                <SelectItem key={lng} value={lng}>
+                  {t(`jobs.languages.${lng}`)}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+          <p className="text-xs text-muted-foreground">
+            {t("jobEditor.requiredLanguageHint")}
+          </p>
         </div>
         <div className="grid gap-4 sm:grid-cols-3">
           <div className="space-y-2">

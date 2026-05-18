@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import { Briefcase, MapPin, BadgeCheck } from "lucide-react";
+import { Briefcase, Languages, MapPin, BadgeCheck } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { formatXAF, relativeTime } from "@/lib/utils";
 import type { JobDto } from "@/types/api";
@@ -28,7 +28,15 @@ export function JobCard({ job }: { job: JobDto }) {
             )}
           </div>
         </div>
-        {job.type && <Badge variant="default">{t(`jobTypes.${job.type}`)}</Badge>}
+        <div className="flex flex-wrap items-center gap-2">
+          {job.type && <Badge variant="default">{t(`jobTypes.${job.type}`)}</Badge>}
+          {job.requiredLanguage && (
+            <Badge variant="outline" className="gap-1">
+              <Languages className="h-3 w-3" />
+              {t(`jobs.languages.${job.requiredLanguage}`)}
+            </Badge>
+          )}
+        </div>
       </div>
 
       <div className="mt-4 flex flex-wrap items-center gap-4 text-sm text-muted-foreground">

@@ -101,7 +101,13 @@
     "unsaveJob": "Retirer",
     "noJobsFound": "Aucune offre ne correspond à votre recherche.",
     "createSavedSearch": "Créer une alerte",
-    "seekerOnlyAction": "Seuls les candidats peuvent postuler ou sauvegarder une offre."
+    "seekerOnlyAction": "Seuls les candidats peuvent postuler ou sauvegarder une offre.",
+    "language": "Langue de travail",
+    "languages": {
+      "FRENCH": "Français",
+      "ENGLISH": "Anglais",
+      "BILINGUAL": "Bilingue"
+    }
   },
   "auth": {
     "loginTitle": "Bon retour parmi nous",
@@ -199,7 +205,16 @@
     "skillsPlaceholder": "Saisissez une compétence et appuyez sur Entrée",
     "noResume": "Aucun CV téléversé pour l'instant.",
     "saveChanges": "Enregistrer",
-    "fullName": "Nom complet"
+    "fullName": "Nom complet",
+    "spokenLanguages": "Langues parlées",
+    "spokenLanguagesHint": "Saisissez une langue et appuyez sur Entrée (ex. Français, Anglais).",
+    "portfolioLinks": "Portfolio et réseaux sociaux",
+    "githubUrl": "GitHub",
+    "linkedinUrl": "LinkedIn",
+    "websiteUrl": "Site personnel",
+    "portfolioUrl": "Portfolio",
+    "twitterUrl": "X / Twitter",
+    "facebookUrl": "Facebook"
   },
   "company": {
     "listTitle": "Mes entreprises",
@@ -214,6 +229,11 @@
     "size": "Taille",
     "website": "Site web",
     "description": "Description",
+    "about": "À propos / Culture",
+    "aboutHint": "Présentez votre mission, vos valeurs et ce qui distingue votre équipe.",
+    "promoVideoUrl": "URL de la vidéo promotionnelle",
+    "promoVideoHint": "YouTube, Vimeo ou tout lien vidéo direct.",
+    "promoVideoLabel": "Voir notre vidéo d'entreprise",
     "logo": "Logo",
     "uploadLogo": "Téléverser un logo",
     "address": "Adresse",
@@ -241,7 +261,10 @@
     "site": "Lieu de travail",
     "salary": "Salaire (XAF)",
     "city": "Ville",
-    "region": "Région"
+    "region": "Région",
+    "requiredLanguage": "Langue de travail requise",
+    "requiredLanguageHint": "Langue dans laquelle le candidat doit travailler pour ce poste.",
+    "requiredLanguagePlaceholder": "Choisir une langue"
   },
   "admin": {
     "title": "Administration",
@@ -269,7 +292,14 @@
     "suspendUser": "Suspendre l'utilisateur",
     "reactivateUser": "Réactiver l'utilisateur",
     "softDeleteUser": "Supprimer (réversible)",
-    "lastLogin": "Dernière connexion"
+    "lastLogin": "Dernière connexion",
+    "regional": "Tendances régionales",
+    "regionalSubtitle": "Activité de recrutement et demande dans les 10 régions du Cameroun.",
+    "languageDistribution": "Répartition des langues",
+    "applicationsByRegion": "Candidatures par région",
+    "topSkillsByRegion": "Compétences les plus demandées par région",
+    "topCompaniesByRegion": "Entreprises les plus actives par région",
+    "noDataYet": "Aucune donnée pour l'instant."
   },
   "regions": {
     "ADAMAOUA": "Adamaoua",

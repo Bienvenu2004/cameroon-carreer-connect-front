@@ -36,6 +36,13 @@ export const ALL_JOB_TYPES: JobType[] = [
 export type JobSite = "REMOTE" | "ONSITE" | "HYBRID";
 export const ALL_JOB_SITES: JobSite[] = ["REMOTE","ONSITE","HYBRID"];
 
+/**
+ * Required working language for a job posting. Mirrors the backend's
+ * com.hostdesign24.jobportal.model.enums.JobLanguage enum.
+ */
+export type JobLanguage = "FRENCH" | "ENGLISH" | "BILINGUAL";
+export const ALL_JOB_LANGUAGES: JobLanguage[] = ["FRENCH", "ENGLISH", "BILINGUAL"];
+
 export type CompanyStatus = "PENDING" | "APPROVED" | "REJECTED" | "SUSPENDED";
 export type CompanySize = "MICRO" | "SMALL" | "MEDIUM" | "LARGE" | "ENTERPRISE";
 
@@ -141,6 +148,18 @@ export interface JobSeekerProfileDto {
   address?: AddressDto;
   workAuthorization?: string;
   employmentType?: string;
+
+  /** Comma-separated list of spoken languages, e.g. "French,English". */
+  spokenLanguages?: string;
+
+  /* Optional portfolio / social URLs. */
+  githubUrl?: string;
+  linkedinUrl?: string;
+  websiteUrl?: string;
+  portfolioUrl?: string;
+  twitterUrl?: string;
+  facebookUrl?: string;
+
   resume?: FileDto | null;
   profilePhoto?: FileDto | null;
   skills?: SkillDto[];
@@ -171,6 +190,8 @@ export interface JobDto {
   benefits?: string;
   type?: JobType;
   site?: JobSite;
+  /** Required working language — drives the language badge / filter. */
+  requiredLanguage?: JobLanguage;
   salary?: number | string;
   salaryCurrency?: string;
   postedDate?: string;
@@ -187,6 +208,8 @@ export interface JobUpsertDto {
   benefits?: string;
   type: JobType;
   site: JobSite;
+  /** Required working language for the role. */
+  requiredLanguage?: JobLanguage;
   salary?: number;
   salaryCurrency?: string;
   companyId: string;
@@ -233,6 +256,10 @@ export interface CompanyDto {
   id: string;
   name: string;
   description?: string;
+  /** Long-form "About / Culture" content for the company detail page. */
+  about?: string;
+  /** Optional promotional video URL (YouTube, Vimeo, etc.). */
+  promoVideoUrl?: string;
   website?: string;
   industry?: Industry;
   size?: CompanySize;
@@ -319,6 +346,18 @@ export interface DashboardDto {
   applicationsByMonth?: Record<string, number>;
 }
 
+/**
+ * Mirrors backend RegionalStatsDto. All maps are keyed by Region enum name
+ * (e.g. "CENTRE") so the frontend can translate via `regions.{REGION}`.
+ */
+export interface RegionalStatsDto {
+  jobsByRegion: Record<string, number>;
+  applicationsByRegion: Record<string, number>;
+  languageDistribution: Record<string, number>;
+  topSkillsByRegion: Record<string, { name: string; count: number }[]>;
+  topCompaniesByRegion: Record<string, { name: string; count: number }[]>;
+}
+
 /* ---------------- Filters ---------------- */
 
 export interface JobsFilter {
@@ -331,6 +370,8 @@ export interface JobsFilter {
   industry?: Industry;
   jobType?: JobType;
   jobSite?: JobSite;
+  /** Filter on required working language. */
+  requiredLanguage?: JobLanguage;
   salaryMin?: number;
   salaryMax?: number;
   companyName?: string;
