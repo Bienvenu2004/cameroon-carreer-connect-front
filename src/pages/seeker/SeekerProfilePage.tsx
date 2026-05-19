@@ -7,7 +7,9 @@ import {
   Upload, User as UserIcon, X,
 } from "lucide-react";
 
-import { SeekerApi } from "@/api";
+import { SeekerApi, SkillsApi } from "@/api";
+import { SPOKEN_LANGUAGES } from "@/data/spokenLanguages";
+import { TagAutocomplete } from "@/components/common/TagAutocomplete";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -318,32 +320,59 @@ function ProfileEditForm({
     };
   }, [photoPreviewUrl]);
 
+  // Selected skill tags.
   const [skills, setSkills] = useState<string[]>(
     profile.skills?.map((s) => s.name).filter(Boolean) ?? []
   );
-  const [skillDraft, setSkillDraft] = useState("");
+  // Current text in the skills input — drives the suggestion fetch below.
+  const [skillQuery, setSkillQuery] = useState("");
+  // Suggestions fetched from /api/hjp/skills/suggest. Debounced.
+  const [skillSuggestions, setSkillSuggestions] = useState<string[]>([]);
+  const [skillsLoading, setSkillsLoading] = useState(false);
 
-  const addSkill = (raw: string) => {
-    const name = raw.trim();
-    if (!name) return;
-    if (skills.some((s) => s.toLowerCase() === name.toLowerCase())) return;
-    setSkills([...skills, name]);
-    setSkillDraft("");
-  };
+  // Debounced server-side autocomplete for skills. We wait 250 ms after the
+  // last keystroke before hitting the API so typing doesn't fire one
+  // request per character. AbortController cancels stale in-flight calls
+  // when the query changes faster than the network.
+  useEffect(() => {
+    const q = skillQuery.trim();
+    if (q.length === 0) {
+      setSkillSuggestions([]);
+      setSkillsLoading(false);
+      return;
+    }
+    const ac = new AbortController();
+    const handle = window.setTimeout(async () => {
+      setSkillsLoading(true);
+      try {
+        const result = await SkillsApi.suggest(q, 8);
+        if (!ac.signal.aborted) setSkillSuggestions(result);
+      } catch {
+        if (!ac.signal.aborted) setSkillSuggestions([]);
+      } finally {
+        if (!ac.signal.aborted) setSkillsLoading(false);
+      }
+    }, 250);
+    return () => {
+      window.clearTimeout(handle);
+      ac.abort();
+    };
+  }, [skillQuery]);
 
-  // Spoken languages — same tag-input pattern as skills, persisted as a
-  // comma-separated string in JobSeekerProfile.spokenLanguages.
+  // Selected language tags — persisted as comma-separated string in
+  // JobSeekerProfile.spokenLanguages.
   const [spokenLanguages, setSpokenLanguages] = useState<string[]>(
     parseSpokenLanguages(profile.spokenLanguages)
   );
-  const [languageDraft, setLanguageDraft] = useState("");
-  const addLanguage = (raw: string) => {
-    const name = raw.trim();
-    if (!name) return;
-    if (spokenLanguages.some((s) => s.toLowerCase() === name.toLowerCase())) return;
-    setSpokenLanguages([...spokenLanguages, name]);
-    setLanguageDraft("");
-  };
+  const [languageQuery, setLanguageQuery] = useState("");
+  // Filter the static SPOKEN_LANGUAGES list by the current input.
+  // useMemo so we don't reallocate the array on every keystroke that
+  // doesn't change the query (e.g. focus, blur).
+  const languageSuggestions = useMemo(() => {
+    const q = languageQuery.trim().toLowerCase();
+    if (q.length === 0) return [...SPOKEN_LANGUAGES];
+    return SPOKEN_LANGUAGES.filter((l) => l.toLowerCase().includes(q));
+  }, [languageQuery]);
 
   // Portfolio / social links — plain URL inputs, all optional.
   const [githubUrl, setGithubUrl]       = useState(profile.githubUrl ?? "");
@@ -570,78 +599,36 @@ function ProfileEditForm({
       {/* Skills ----------------------------------------------------------- */}
       <Card>
         <SectionHeader title={t("profile.skills")} />
-        <div className="mt-3 space-y-3">
-          <Input
-            value={skillDraft}
-            onChange={(e) => setSkillDraft(e.target.value)}
-            onKeyDown={(e) => {
-              if (e.key === "Enter") {
-                e.preventDefault();
-                addSkill(skillDraft);
-              }
-            }}
+        <div className="mt-3">
+          {/* Server-side autocomplete: parent debounces skillQuery into a
+              call to SkillsApi.suggest and feeds the results into the
+              component. Free-form values are still accepted on Enter. */}
+          <TagAutocomplete
+            values={skills}
+            onChange={setSkills}
+            options={skillSuggestions}
+            loading={skillsLoading}
+            onInputChange={setSkillQuery}
             placeholder={t("profile.skillsPlaceholder")}
           />
-          <div className="flex flex-wrap gap-2">
-            {skills.map((s, i) => (
-              <Badge
-                key={`${s}-${i}`}
-                variant="secondary"
-                className="gap-1"
-              >
-                {s}
-                <button
-                  type="button"
-                  className="rounded-full hover:bg-muted-foreground/20"
-                  onClick={() =>
-                    setSkills(skills.filter((_, j) => j !== i))
-                  }
-                  aria-label={t("common.delete")}
-                >
-                  <X className="h-3 w-3" />
-                </button>
-              </Badge>
-            ))}
-          </div>
         </div>
       </Card>
 
       {/* Spoken languages ------------------------------------------------- */}
       <Card>
         <SectionHeader title={t("profile.spokenLanguages")} />
-        <div className="mt-3 space-y-3">
-          <Input
-            value={languageDraft}
-            onChange={(e) => setLanguageDraft(e.target.value)}
-            onKeyDown={(e) => {
-              if (e.key === "Enter") {
-                e.preventDefault();
-                addLanguage(languageDraft);
-              }
-            }}
+        <div className="mt-3">
+          {/* Static autocomplete: filtered locally against the curated
+              SPOKEN_LANGUAGES list. Custom values are still accepted on
+              Enter so users can add a language we didn't preload. */}
+          <TagAutocomplete
+            values={spokenLanguages}
+            onChange={setSpokenLanguages}
+            options={languageSuggestions}
+            onInputChange={setLanguageQuery}
             placeholder={t("profile.spokenLanguagesHint")}
+            badgeIcon={Languages}
           />
-          <div className="flex flex-wrap gap-2">
-            {spokenLanguages.map((s, i) => (
-              <Badge
-                key={`${s}-${i}`}
-                variant="secondary"
-                className="gap-1"
-              >
-                <Languages className="h-3 w-3" /> {s}
-                <button
-                  type="button"
-                  className="rounded-full hover:bg-muted-foreground/20"
-                  onClick={() =>
-                    setSpokenLanguages(spokenLanguages.filter((_, j) => j !== i))
-                  }
-                  aria-label={t("common.delete")}
-                >
-                  <X className="h-3 w-3" />
-                </button>
-              </Badge>
-            ))}
-          </div>
         </div>
       </Card>
 

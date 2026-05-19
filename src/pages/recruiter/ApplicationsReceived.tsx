@@ -3,7 +3,8 @@ import { useTranslation } from "react-i18next";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Link } from "react-router-dom";
 import {
-  Briefcase, Download, FileText, Mail, MapPin, Phone, UserCircle2,
+  Briefcase, Download, Facebook, FileText, Github, Globe, Languages,
+  Linkedin, Link as LinkIcon, Mail, MapPin, Phone, Twitter, UserCircle2,
 } from "lucide-react";
 
 import { ApplicationsApi, SeekerApi } from "@/api";
@@ -20,7 +21,9 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { useToast } from "@/components/ui/toast-provider";
 import { apiErrorMessage } from "@/lib/api";
 import { initials, relativeTime } from "@/lib/utils";
-import type { ApplicationStatus, JobApplicationDto } from "@/types/api";
+import type {
+  ApplicationStatus, JobApplicationDto, JobSeekerProfileDto,
+} from "@/types/api";
 
 const STATUSES: ApplicationStatus[] = ["APPLIED", "REVIEWED", "INTERVIEW", "HIRED", "REJECTED"];
 
@@ -166,7 +169,10 @@ function CandidateProfileDialog({
 
   return (
     <Dialog open={!!app} onOpenChange={(o) => !o && onClose()}>
-      <DialogContent className="max-w-2xl">
+      {/* max-h + overflow lets the dialog stay scrollable now that we render
+          the FULL JobSeekerProfileResponseDto (avatar, address, languages,
+          work prefs, skills, all 6 portfolio links, resume). */}
+      <DialogContent className="max-w-2xl max-h-[85vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>{t("applications.viewProfile")}</DialogTitle>
           {app?.jobTitle && (
@@ -182,59 +188,113 @@ function CandidateProfileDialog({
 
         {!isLoading && profile && (
           <div className="space-y-6">
-            {/* Header: avatar + name */}
+            {/* Header: avatar + name --------------------------------------- */}
             <div className="flex items-center gap-4">
               <Avatar className="h-16 w-16">
-                {profile.profilePhoto?.url && <AvatarImage src={profile.profilePhoto.url} alt={fullName} />}
+                {profile.profilePhoto?.url && (
+                  <AvatarImage src={profile.profilePhoto.url} alt={fullName} />
+                )}
                 <AvatarFallback className="text-lg">{initials(fullName)}</AvatarFallback>
               </Avatar>
               <div className="min-w-0">
                 <div className="font-display text-xl font-semibold">{fullName}</div>
-                {profile.employmentType && (
-                  <div className="text-xs text-muted-foreground">{profile.employmentType}</div>
+                {(profile.firstName || profile.lastName) && (
+                  <div className="text-xs text-muted-foreground">
+                    {[profile.firstName, profile.lastName].filter(Boolean).join(" ")}
+                  </div>
                 )}
               </div>
             </div>
 
-            {/* Contact + location grid */}
-            <div className="grid gap-3 sm:grid-cols-2">
-              {profile.phoneNumber && (
-                <InfoRow icon={Phone} label={t("profile.phone")} value={profile.phoneNumber} />
-              )}
-              {profile.address?.phone && profile.address.phone !== profile.phoneNumber && (
-                <InfoRow icon={Phone} label={t("profile.phone")} value={profile.address.phone} />
-              )}
-              {(profile.address?.city || profile.address?.country) && (
-                <InfoRow
-                  icon={MapPin}
-                  label={t("profile.city")}
-                  value={[
-                    profile.address?.city,
-                    profile.address?.region ? t(`regions.${profile.address.region}`) : null,
-                    profile.address?.country,
-                  ].filter(Boolean).join(", ")}
-                />
-              )}
-              {profile.workAuthorization && (
-                <InfoRow icon={Mail} label="Work authorization" value={profile.workAuthorization} />
+            {/* Contact + work preferences ---------------------------------- */}
+            <Section title={t("profile.contactSection")}>
+              <InfoRow icon={Phone} label={t("profile.phone")} value={profile.phoneNumber} />
+              <InfoRow
+                icon={Briefcase}
+                label={t("profile.workAuth")}
+                value={profile.workAuthorization}
+              />
+              <InfoRow
+                icon={Mail}
+                label={t("profile.employmentType")}
+                value={profile.employmentType}
+              />
+            </Section>
+
+            {/* Address ------------------------------------------------------ */}
+            <Section title={t("profile.addressSection")}>
+              <InfoRow icon={MapPin} label={t("profile.street")} value={profile.address?.street} />
+              <InfoRow label={t("profile.city")} value={profile.address?.city} />
+              <InfoRow
+                label={t("profile.region")}
+                value={
+                  profile.address?.region
+                    ? t(`regions.${profile.address.region}`)
+                    : undefined
+                }
+              />
+              <InfoRow label={t("profile.country")} value={profile.address?.country} />
+            </Section>
+
+            {/* Spoken languages -------------------------------------------- */}
+            <div>
+              <SectionHeader title={t("profile.spokenLanguages")} />
+              {(() => {
+                const langs = parseSpokenLanguages(profile.spokenLanguages);
+                return langs.length > 0 ? (
+                  <div className="mt-2 flex flex-wrap gap-2">
+                    {langs.map((l, i) => (
+                      <Badge key={`${l}-${i}`} variant="secondary" className="gap-1">
+                        <Languages className="h-3 w-3" /> {l}
+                      </Badge>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="mt-2 text-sm text-muted-foreground italic">
+                    {t("profile.notSet")}
+                  </div>
+                );
+              })()}
+            </div>
+
+            {/* Skills ------------------------------------------------------ */}
+            <div>
+              <SectionHeader title={t("profile.skills")} />
+              {profile.skills && profile.skills.length > 0 ? (
+                <div className="mt-2 flex flex-wrap gap-2">
+                  {profile.skills.map((s, i) => (
+                    <Badge key={s.id ?? `${s.name}-${i}`} variant="secondary">
+                      {s.name}
+                    </Badge>
+                  ))}
+                </div>
+              ) : (
+                <div className="mt-2 text-sm text-muted-foreground italic">
+                  {t("profile.notSet")}
+                </div>
               )}
             </div>
 
-            {/* Skills */}
-            {profile.skills && profile.skills.length > 0 && (
-              <div>
-                <div className="mb-2 text-xs font-medium uppercase tracking-wider text-muted-foreground">
-                  {t("profile.skills")}
+            {/* Portfolio / social ------------------------------------------ */}
+            <div>
+              <SectionHeader title={t("profile.portfolioLinks")} />
+              {hasAnyLink(profile) ? (
+                <div className="mt-2 grid gap-2 sm:grid-cols-2">
+                  <LinkRow icon={Github}   label={t("profile.githubUrl")}    url={profile.githubUrl} />
+                  <LinkRow icon={Linkedin} label={t("profile.linkedinUrl")}  url={profile.linkedinUrl} />
+                  <LinkRow icon={Globe}    label={t("profile.websiteUrl")}   url={profile.websiteUrl} />
+                  <LinkRow icon={LinkIcon} label={t("profile.portfolioUrl")} url={profile.portfolioUrl} />
+                  <LinkRow icon={Twitter}  label={t("profile.twitterUrl")}   url={profile.twitterUrl} />
+                  <LinkRow icon={Facebook} label={t("profile.facebookUrl")}  url={profile.facebookUrl} />
                 </div>
-                <div className="flex flex-wrap gap-2">
-                  {profile.skills.map((s) => (
-                    <Badge key={s.id ?? s.name} variant="secondary">{s.name}</Badge>
-                  ))}
+              ) : (
+                <div className="mt-2 text-sm text-muted-foreground italic">
+                  {t("profile.notSet")}
                 </div>
-              </div>
-            )}
+              )}
+            </div>
 
-            {/* Resume */}
+            {/* Resume ------------------------------------------------------ */}
             <div className="rounded-xl border border-border/60 bg-muted/30 p-4">
               <div className="mb-2 text-xs font-medium uppercase tracking-wider text-muted-foreground">
                 {t("profile.currentResume")}
@@ -257,7 +317,9 @@ function CandidateProfileDialog({
                   </Button>
                 </div>
               ) : (
-                <div className="text-sm text-muted-foreground">—</div>
+                <div className="text-sm text-muted-foreground italic">
+                  {t("profile.noResume")}
+                </div>
               )}
             </div>
           </div>
@@ -271,18 +333,115 @@ function CandidateProfileDialog({
   );
 }
 
-function InfoRow({
-  icon: Icon, label, value,
+/* ============================================================================
+ *  Helper components & utilities used inside CandidateProfileDialog
+ *
+ *  The dialog renders every field of JobSeekerProfileResponseDto, so we
+ *  rely on a few small components below to keep the markup tidy:
+ *    - Section / SectionHeader: titled wrapper around grouped InfoRows
+ *    - InfoRow: one labelled value, with italic "Not set" placeholder
+ *    - LinkRow: clickable URL row (only renders when the link is present)
+ *  Plus two pure helpers for parsing the spokenLanguages CSV and detecting
+ *  whether any portfolio/social URL is set at all.
+ * ============================================================================*/
+
+function SectionHeader({ title }: { title: string }) {
+  return (
+    <div className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+      {title}
+    </div>
+  );
+}
+
+function Section({
+  title,
+  children,
 }: {
-  icon: typeof Phone; label: string; value: string;
+  title: string;
+  children: React.ReactNode;
 }) {
   return (
+    <div>
+      <SectionHeader title={title} />
+      <div className="mt-2 grid gap-2 sm:grid-cols-2">{children}</div>
+    </div>
+  );
+}
+
+function InfoRow({
+  icon: Icon,
+  label,
+  value,
+}: {
+  icon?: typeof Phone;
+  label: string;
+  value?: string | null;
+}) {
+  const { t } = useTranslation();
+  const hasValue = !!value && value.trim().length > 0;
+  return (
     <div className="flex items-start gap-2 rounded-md border border-border/40 bg-card p-3 text-sm">
-      <Icon className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
+      {Icon && <Icon className="mt-0.5 h-4 w-4 shrink-0 text-primary" />}
       <div className="min-w-0">
         <div className="text-xs uppercase tracking-wider text-muted-foreground">{label}</div>
-        <div className="truncate font-medium text-foreground">{value}</div>
+        {hasValue ? (
+          <div className="truncate font-medium text-foreground">{value}</div>
+        ) : (
+          <div className="font-medium italic text-muted-foreground">
+            {t("profile.notSet")}
+          </div>
+        )}
       </div>
     </div>
+  );
+}
+
+/** Split the backend's comma-separated `spokenLanguages` string into a
+ *  trimmed array. Safe for null/undefined input. */
+function parseSpokenLanguages(raw?: string | null): string[] {
+  if (!raw) return [];
+  return raw
+    .split(",")
+    .map((s) => s.trim())
+    .filter((s) => s.length > 0);
+}
+
+/** Whether the profile has any of the optional portfolio/social URLs set. */
+function hasAnyLink(p: JobSeekerProfileDto): boolean {
+  return Boolean(
+    p.githubUrl || p.linkedinUrl || p.websiteUrl ||
+    p.portfolioUrl || p.twitterUrl || p.facebookUrl
+  );
+}
+
+/** One labelled link row — only renders if the URL is non-empty. Opens
+ *  in a new tab with safe rel attributes. */
+function LinkRow({
+  icon: Icon,
+  label,
+  url,
+}: {
+  icon: typeof Phone;
+  label: string;
+  url?: string | null;
+}) {
+  if (!url || url.trim().length === 0) return null;
+  return (
+    <a
+      href={url}
+      target="_blank"
+      rel="noreferrer noopener"
+      className="group flex items-center gap-3 rounded-md border border-border/40 bg-card p-3 text-sm transition-colors hover:border-primary/40 hover:bg-accent/40"
+    >
+      <Icon className="h-4 w-4 shrink-0 text-primary" />
+      <div className="min-w-0 flex-1">
+        <div className="text-xs uppercase tracking-wider text-muted-foreground">
+          {label}
+        </div>
+        <div className="truncate font-medium text-foreground group-hover:text-primary">
+          {url}
+        </div>
+      </div>
+    </a>
   );
 }

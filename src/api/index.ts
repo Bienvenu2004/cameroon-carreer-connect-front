@@ -215,6 +215,17 @@ export const AnalyticsApi = {
   regional: () => unwrap<RegionalStatsDto>(api.get("/api/hjp/analytics/regional")),
 };
 
+/* ---------------- SKILLS ---------------- */
+export const SkillsApi = {
+  /**
+   * Distinct skill-name suggestions matching `q` (case-insensitive
+   * substring). Backed by SkillRepository.findDistinctNamesByQuery — used
+   * by the seeker-profile tag autocomplete. Returns [] for an empty query.
+   */
+  suggest: (q: string, limit = 8) =>
+    unwrap<string[]>(api.get("/api/hjp/skills/suggest", { params: { q, limit } })),
+};
+
 /* ---------------- SEEKER PROFILE ----------------
  * The PATCH endpoint uses @PatchMapping(consumes="multipart/form-data") with
  * no path argument — base path has no trailing slash.
