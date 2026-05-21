@@ -28,6 +28,20 @@ export function CompanyDetailPage() {
         <Link to="/companies"><ArrowLeft className="mr-1 h-4 w-4" /> {t("common.back")}</Link>
       </Button>
 
+      {/* Hero banner — only renders if the company has uploaded one.
+          Sits above the identity card so the page leads visually with
+          employer brand imagery. object-cover crops to a consistent ratio
+          regardless of source aspect. */}
+      {c.banner?.url && (
+        <div className="mb-6 overflow-hidden rounded-2xl border border-border/60 elev-1">
+          <img
+            src={c.banner.url}
+            alt={c.name}
+            className="h-56 w-full object-cover sm:h-72"
+          />
+        </div>
+      )}
+
       <div className="rounded-2xl border border-border/60 bg-card p-8 elev-1">
         <div className="flex flex-wrap items-start justify-between gap-4">
           <div className="flex items-start gap-4">

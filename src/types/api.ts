@@ -264,12 +264,33 @@ export interface CompanyDto {
   industry?: Industry;
   size?: CompanySize;
   logo?: FileDto | null;
+  /** Wide hero banner shown at the top of the company detail page. */
+  banner?: FileDto | null;
   address?: AddressDto;
   status?: CompanyStatus;
   rejectionReason?: string;
   verifiedAt?: string;
   createdAt?: string;
   activeJobs?: number;
+}
+
+/* ---------------- Notifications ---------------- */
+
+/**
+ * Mirrors backend `com.hostdesign24.jobportal.dto.NotificationDto`. Used by
+ * the bell-icon dropdown to render the user's notification feed. Field
+ * names match the backend 1:1.
+ */
+export interface NotificationDto {
+  id: string;
+  message: string;
+  /** e.g. "INFO", "ALERT", "REMINDER" — see NotificationTypes on the backend. */
+  type: string;
+  createdAt?: string;
+  relatedEntityId?: string | null;
+  relatedEntityType?: string | null;
+  readAt?: string | null;
+  read: boolean;
 }
 
 /* ---------------- Saved searches ---------------- */

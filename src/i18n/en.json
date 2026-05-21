@@ -22,6 +22,13 @@
     "login": "Sign in",
     "register": "Sign up"
   },
+  "notifications": {
+    "title": "Notifications",
+    "empty": "You're all caught up.",
+    "markAllAsRead": "Mark all as read",
+    "viewAll": "View all",
+    "unreadCountSr": "{{count}} unread notifications"
+  },
   "common": {
     "search": "Search",
     "loading": "Loading…",
@@ -236,6 +243,9 @@
     "promoVideoLabel": "Watch our company video",
     "logo": "Logo",
     "uploadLogo": "Upload a logo",
+    "banner": "Hero banner",
+    "bannerHint": "A wide image shown at the top of your company page. Landscape works best.",
+    "uploadBanner": "Upload a banner",
     "address": "Address",
     "verificationStatus": "Verification status",
     "verifiedNotice": "Your company is verified. You can post jobs.",

@@ -10,6 +10,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { LanguageToggle } from "@/components/common/LanguageToggle";
 import { Logo } from "@/components/common/Logo";
+import { NotificationBell } from "@/components/common/NotificationBell";
 import { useAuthStore } from "@/stores/auth";
 import { AuthApi } from "@/api";
 import { initials } from "@/lib/utils";
@@ -77,6 +78,9 @@ export function Header() {
         </div>
         <div className="flex items-center gap-2">
           <LanguageToggle />
+          {/* Bell renders nothing when there's no auth user, so it's safe
+              to mount unconditionally here. */}
+          <NotificationBell />
           {user ? (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>

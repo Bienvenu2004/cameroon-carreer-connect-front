@@ -22,6 +22,13 @@
     "login": "Se connecter",
     "register": "S'inscrire"
   },
+  "notifications": {
+    "title": "Notifications",
+    "empty": "Tout est à jour.",
+    "markAllAsRead": "Tout marquer comme lu",
+    "viewAll": "Tout voir",
+    "unreadCountSr": "{{count}} notifications non lues"
+  },
   "common": {
     "search": "Rechercher",
     "loading": "Chargement…",
@@ -236,6 +243,9 @@
     "promoVideoLabel": "Voir notre vidéo d'entreprise",
     "logo": "Logo",
     "uploadLogo": "Téléverser un logo",
+    "banner": "Bannière",
+    "bannerHint": "Image large affichée en haut de votre page d'entreprise. Privilégiez le format paysage.",
+    "uploadBanner": "Téléverser une bannière",
     "address": "Adresse",
     "verificationStatus": "Statut de vérification",
     "verifiedNotice": "Votre entreprise est vérifiée. Vous pouvez publier des offres.",

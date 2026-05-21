@@ -3,8 +3,8 @@ import type {
   AdminPlatformStatsDto, AdminUserDto, AuthResponseDto, AuthResponseRaw,
   CompanyDto, CreationResponse,
   DashboardDto, JobApplicationDto, JobDto, JobSeekerSaveDto, JobsFilter,
-  JobSeekerProfileDto, PageResponse, RecruiterProfileDto, RegionalStatsDto,
-  SavedSearchDto,
+  JobSeekerProfileDto, NotificationDto, PageResponse, RecruiterProfileDto,
+  RegionalStatsDto, SavedSearchDto,
   UserDto, UserRole, ApplicationStatus, CompanyStatus, VerificationType,
 } from "@/types/api";
 
@@ -213,6 +213,29 @@ export const AnalyticsApi = {
   dashboard: () => unwrap<DashboardDto>(api.get("/api/hjp/analytics/dashboard")),
   /** Admin-only — regional trending dashboard. */
   regional: () => unwrap<RegionalStatsDto>(api.get("/api/hjp/analytics/regional")),
+};
+
+/* ---------------- NOTIFICATIONS ----------------
+ * Read-side surface for the bell-icon dropdown. All endpoints are
+ * scoped server-side to the authenticated user — there's no parameter
+ * for "whose notifications" because there cannot be.
+ */
+export const NotificationsApi = {
+  list: (page = 0, size = 10) =>
+    unwrap<PageResponse<NotificationDto>>(
+      api.get("/api/hjp/notifications", {
+        params: { page, size, sortBy: "createdAt", sortOrder: "DESC" },
+      })
+    ),
+
+  unreadCount: () =>
+    unwrap<{ count: number }>(api.get("/api/hjp/notifications/unread-count")),
+
+  markAsRead: (id: string) =>
+    unwrap<void>(api.patch(`/api/hjp/notifications/${id}/read`)),
+
+  markAllAsRead: () =>
+    unwrap<void>(api.patch("/api/hjp/notifications/read-all")),
 };
 
 /* ---------------- SKILLS ---------------- */

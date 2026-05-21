@@ -1,7 +1,7 @@
 import { useTranslation } from "react-i18next";
 import { Link, useParams, useNavigate } from "react-router-dom";
-import { useMutation, useQuery } from "@tanstack/react-query";
-import { ArrowLeft, BadgeCheck, Bookmark, Briefcase, Building2, Heart, Languages, MapPin } from "lucide-react";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { ArrowLeft, BadgeCheck, Bookmark, Briefcase, Building2, Check, Heart, Languages, MapPin } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -18,6 +18,7 @@ export function JobDetailPage() {
   const user = useAuthStore((s) => s.user);
   const nav = useNavigate();
   const { toast } = useToast();
+  const qc = useQueryClient();
 
   const { data: job, isLoading } = useQuery({
     queryKey: ["job", id],
@@ -25,15 +26,47 @@ export function JobDetailPage() {
     enabled: !!id,
   });
 
+  /**
+   * Has the current seeker already applied to THIS job?
+   *
+   * Backend `GET /api/hjp/jobs/applications` supports a `jobId` filter
+   * and auto-scopes to the current user (the spec adds
+   * `createdBy = currentUser` server-side). So a positive totalElements
+   * count means the seeker has at least one application for this job.
+   *
+   * Gated on `user?.role === "JOB_SEEKER"` — anonymous visitors,
+   * recruiters and admins never fire this query.
+   */
+  const myAppForThisJob = useQuery({
+    queryKey: ["my-app-for-job", id, user?.id],
+    queryFn: () => ApplicationsApi.list({ jobId: id, size: 1 }),
+    enabled: !!id && user?.role === "JOB_SEEKER",
+  });
+  const alreadyApplied = (myAppForThisJob.data?.totalElements ?? 0) > 0;
+
   const apply = useMutation({
     mutationFn: () => ApplicationsApi.apply({ jobId: id }),
-    onSuccess: () => toast({ title: t("applications.statuses.APPLIED"), variant: "success" }),
+    onSuccess: () => {
+      toast({ title: t("applications.statuses.APPLIED"), variant: "success" });
+      // Flip the button to its "Already applied" state immediately
+      // without waiting for a manual reload. Also refresh MyApplications
+      // so the new row shows up there.
+      void qc.invalidateQueries({ queryKey: ["my-app-for-job", id] });
+      void qc.invalidateQueries({ queryKey: ["my-applications-full"] });
+    },
     onError: (e) => toast({ title: t("common.errorOccurred"), description: apiErrorMessage(e), variant: "destructive" }),
   });
 
   const saveJob = useMutation({
     mutationFn: () => SavedJobsApi.toggle(id),
-    onSuccess: () => toast({ title: t("common.successSaved"), variant: "success" }),
+    onSuccess: () => {
+      toast({ title: t("common.successSaved"), variant: "success" });
+      // The save endpoint is now a true toggle server-side — invalidate
+      // both saved-job query keys so the SavedJobsPage and the seeker
+      // dashboard stat counter both reflect the new state.
+      void qc.invalidateQueries({ queryKey: ["saved-jobs"] });
+      void qc.invalidateQueries({ queryKey: ["my-saved-jobs"] });
+    },
     onError: (e) => toast({ title: t("common.errorOccurred"), description: apiErrorMessage(e), variant: "destructive" }),
   });
 
@@ -132,9 +165,23 @@ export function JobDetailPage() {
           <div className="rounded-2xl border border-border/60 bg-card p-6 elev-1">
             {canActOnJob ? (
               <>
-                <Button size="lg" className="w-full" loading={apply.isPending} onClick={handleApply}>
-                  <Heart className="h-4 w-4" /> {t("jobs.applyToJob")}
-                </Button>
+                {alreadyApplied ? (
+                  // Replace the Apply CTA with a disabled "Already applied"
+                  // indicator. We keep the Button shape + size so the
+                  // sidebar layout doesn't jump when the state flips.
+                  <Button
+                    size="lg"
+                    variant="outline"
+                    className="w-full cursor-default"
+                    disabled
+                  >
+                    <Check className="h-4 w-4 text-success" /> {t("jobs.alreadyApplied")}
+                  </Button>
+                ) : (
+                  <Button size="lg" className="w-full" loading={apply.isPending} onClick={handleApply}>
+                    <Heart className="h-4 w-4" /> {t("jobs.applyToJob")}
+                  </Button>
+                )}
                 <Button size="lg" variant="outline" className="mt-2 w-full" loading={saveJob.isPending} onClick={handleSave}>
                   <Bookmark className="h-4 w-4" /> {t("jobs.saveJob")}
                 </Button>

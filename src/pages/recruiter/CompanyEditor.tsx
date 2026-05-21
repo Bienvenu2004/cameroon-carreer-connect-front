@@ -50,6 +50,9 @@ export function CompanyEditor({ mode }: { mode: "create" | "edit" }) {
   const [city, setCity] = useState("");
   const [region, setRegion] = useState<Region | "">("");
   const [logo, setLogo] = useState<File | null>(null);
+  // Hero banner — wide image shown at the top of the company detail page.
+  // Independent of the logo (which stays the small square).
+  const [banner, setBanner] = useState<File | null>(null);
 
   // Hydrate form once data loads (edit mode only).
   useEffect(() => {
@@ -80,6 +83,7 @@ export function CompanyEditor({ mode }: { mode: "create" | "edit" }) {
       if (region) fd.append("address.region", region);
       fd.append("address.country", "Cameroon");
       if (logo) fd.append("logo", logo);
+      if (banner) fd.append("banner", banner);
       return mode === "edit" && id ? CompaniesApi.update(id, fd) : CompaniesApi.create(fd);
     },
     onSuccess: () => {
@@ -208,6 +212,30 @@ export function CompanyEditor({ mode }: { mode: "create" | "edit" }) {
           <Label>{t("company.uploadLogo")}</Label>
           <Input type="file" accept="image/*" onChange={(e) => setLogo(e.target.files?.[0] ?? null)} />
         </div>
+
+        {/* Hero banner ---------------------------------------------------- */}
+        <div className="space-y-2">
+          <Label>{t("company.uploadBanner")}</Label>
+          <Input
+            type="file"
+            accept="image/*"
+            onChange={(e) => setBanner(e.target.files?.[0] ?? null)}
+          />
+          <p className="text-xs text-muted-foreground">{t("company.bannerHint")}</p>
+          {/* Live preview: pick a file → see it before saving. Falls back to
+              the persisted banner (if any) so the user knows what's already
+              uploaded. */}
+          {(banner || existing.data?.banner?.url) && (
+            <div className="mt-2 overflow-hidden rounded-md border border-border/40 bg-muted/30">
+              <img
+                src={banner ? URL.createObjectURL(banner) : existing.data!.banner!.url!}
+                alt="Banner preview"
+                className="h-32 w-full object-cover"
+              />
+            </div>
+          )}
+        </div>
+
         <div className="flex justify-end gap-2">
           <Button type="button" variant="ghost" onClick={() => nav("/recruiter/companies")}>
             {t("common.cancel")}
