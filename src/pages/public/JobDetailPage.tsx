@@ -84,6 +84,12 @@ export function JobDetailPage() {
   // Recruiters and admins see a small notice instead of the action buttons.
   const canActOnJob = !user || user.role === "JOB_SEEKER";
 
+  // A job that's been closed (e.g. because a candidate was marked HIRED
+  // and the backend auto-closed it, or the recruiter closed it manually)
+  // can no longer receive applications or be saved. The backend rejects
+  // such attempts; we hide the buttons up-front for clean UX.
+  const isJobClosed = !job.isActive;
+
   const handleApply = () => {
     if (!user) { nav(`/login?redirect=/jobs/${id}`); return; }
     if (user.role !== "JOB_SEEKER") {
@@ -163,7 +169,16 @@ export function JobDetailPage() {
 
         <aside className="lg:sticky lg:top-24 lg:self-start">
           <div className="rounded-2xl border border-border/60 bg-card p-6 elev-1">
-            {canActOnJob ? (
+            {isJobClosed ? (
+              // Position filled / job closed: no actions available at all.
+              // Takes precedence over the "already applied" state so even
+              // a seeker who applied earlier sees the up-to-date status of
+              // the listing. The save button is also hidden because there's
+              // nothing to act on.
+              <div className="rounded-md border border-border/40 bg-muted/30 p-3 text-xs text-muted-foreground">
+                {t("jobs.positionFilled")}
+              </div>
+            ) : canActOnJob ? (
               <>
                 {alreadyApplied ? (
                   // Replace the Apply CTA with a disabled "Already applied"

@@ -109,6 +109,7 @@
     "noJobsFound": "Aucune offre ne correspond à votre recherche.",
     "createSavedSearch": "Créer une alerte",
     "seekerOnlyAction": "Seuls les candidats peuvent postuler ou sauvegarder une offre.",
+    "positionFilled": "Ce poste a été pourvu — il n'accepte plus de candidatures.",
     "language": "Langue de travail",
     "languages": {
       "FRENCH": "Français",
@@ -274,7 +275,10 @@
     "region": "Région",
     "requiredLanguage": "Langue de travail requise",
     "requiredLanguageHint": "Langue dans laquelle le candidat doit travailler pour ce poste.",
-    "requiredLanguagePlaceholder": "Choisir une langue"
+    "requiredLanguagePlaceholder": "Choisir une langue",
+    "noApprovedCompanies": "Vous devez avoir une entreprise approuvée avant de publier des offres.",
+    "manageCompanies": "Gérer mes entreprises",
+    "companyPlaceholder": "Choisir une entreprise"
   },
   "admin": {
     "title": "Administration",

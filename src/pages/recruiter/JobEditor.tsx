@@ -1,7 +1,8 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { useNavigate, useParams } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import { useMutation, useQuery } from "@tanstack/react-query";
+import { AlertCircle } from "lucide-react";
 
 import { CompaniesApi, JobsApi } from "@/api";
 import { Button } from "@/components/ui/button";
@@ -21,13 +22,19 @@ export function JobEditor({ mode }: { mode: "create" | "edit" }) {
   const nav = useNavigate();
   const { toast } = useToast();
 
-  // Recruiter's own companies — used to populate the company picker for the
-  // job. CompaniesApi.mine() returns an array (not a page) of companies the
-  // current recruiter owns, regardless of approval status.
+  // Recruiter's own companies. CompaniesApi.mine() returns all of them
+  // regardless of moderation status; we then filter to APPROVED only so
+  // pending / rejected / suspended companies are never selectable when
+  // posting a job. The backend enforces the same rule independently —
+  // this is purely for UX (no point showing options that would 403).
   const companies = useQuery({
     queryKey: ["my-companies-for-job"],
     queryFn: () => CompaniesApi.mine(),
   });
+  const approvedCompanies = useMemo(
+    () => (companies.data ?? []).filter((c) => c.status === "APPROVED"),
+    [companies.data]
+  );
 
   const existing = useQuery({
     queryKey: ["job-edit", id],
@@ -65,10 +72,13 @@ export function JobEditor({ mode }: { mode: "create" | "edit" }) {
   }, [existing.data, mode]);
 
   useEffect(() => {
-    if (mode === "create" && !companyId && companies.data?.[0]?.id) {
-      setCompanyId(companies.data[0].id);
+    // Auto-select the recruiter's first APPROVED company on create. If
+    // they have none approved yet, leave companyId blank — the empty-state
+    // notice below explains why and the Save button stays disabled.
+    if (mode === "create" && !companyId && approvedCompanies[0]?.id) {
+      setCompanyId(approvedCompanies[0].id);
     }
-  }, [companies.data, mode, companyId]);
+  }, [approvedCompanies, mode, companyId]);
 
   /**
    * The backend expects @ModelAttribute on JobPostActivityUpsertDto with a
@@ -183,18 +193,46 @@ export function JobEditor({ mode }: { mode: "create" | "edit" }) {
         </div>
         <div className="space-y-2">
           <Label>{t("nav.companies")}</Label>
-          <Select value={companyId} onValueChange={setCompanyId}>
-            <SelectTrigger><SelectValue placeholder="—" /></SelectTrigger>
-            <SelectContent>
-              {companies.data?.map((c) => (
-                <SelectItem key={c.id} value={c.id}>{c.name}</SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+          {approvedCompanies.length > 0 ? (
+            <Select value={companyId} onValueChange={setCompanyId}>
+              <SelectTrigger>
+                <SelectValue placeholder={t("jobEditor.companyPlaceholder")} />
+              </SelectTrigger>
+              <SelectContent>
+                {approvedCompanies.map((c) => (
+                  <SelectItem key={c.id} value={c.id}>{c.name}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          ) : (
+            // No approved companies → block job creation with an inline
+            // notice + a CTA back to the My Companies page. Same shape as
+            // the backend's defense (it would 403 otherwise).
+            <div className="flex items-start gap-3 rounded-md border border-warning/40 bg-warning/5 p-3 text-sm">
+              <AlertCircle className="mt-0.5 h-4 w-4 shrink-0 text-warning-foreground" />
+              <div className="flex-1 space-y-2">
+                <p className="text-foreground/85">
+                  {t("jobEditor.noApprovedCompanies")}
+                </p>
+                <Button asChild variant="outline" size="sm">
+                  <Link to="/recruiter/companies">
+                    {t("jobEditor.manageCompanies")}
+                  </Link>
+                </Button>
+              </div>
+            </div>
+          )}
         </div>
         <div className="flex justify-end gap-2">
           <Button type="button" variant="ghost" onClick={() => nav(-1)}>{t("common.cancel")}</Button>
-          <Button type="submit" loading={m.isPending}>
+          <Button
+            type="submit"
+            loading={m.isPending}
+            // Defense in depth: even with a sneakily-retained companyId
+            // from a stale render, block submit when no APPROVED company
+            // is available. The backend would reject too.
+            disabled={!companyId || approvedCompanies.length === 0}
+          >
             {mode === "create" ? t("jobEditor.publishCta") : t("jobEditor.saveCta")}
           </Button>
         </div>

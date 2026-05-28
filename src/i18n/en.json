@@ -109,6 +109,7 @@
     "noJobsFound": "No jobs match your search.",
     "createSavedSearch": "Create alert",
     "seekerOnlyAction": "Only job seekers can apply to or save jobs.",
+    "positionFilled": "This position has been filled — no longer accepting applications.",
     "language": "Working language",
     "languages": {
       "FRENCH": "French",
@@ -274,7 +275,10 @@
     "region": "Region",
     "requiredLanguage": "Required working language",
     "requiredLanguageHint": "Which language the candidate needs to operate in for this role.",
-    "requiredLanguagePlaceholder": "Select a language"
+    "requiredLanguagePlaceholder": "Select a language",
+    "noApprovedCompanies": "You need an approved company before posting jobs.",
+    "manageCompanies": "Manage my companies",
+    "companyPlaceholder": "Select a company"
   },
   "admin": {
     "title": "Administration",
