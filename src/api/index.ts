@@ -3,8 +3,8 @@ import type {
   AdminPlatformStatsDto, AdminUserDto, AuthResponseDto, AuthResponseRaw,
   CompanyDto, CreationResponse,
   DashboardDto, JobApplicationDto, JobDto, JobSeekerSaveDto, JobsFilter,
-  JobSeekerProfileDto, NotificationDto, PageResponse, RecruiterProfileDto,
-  RegionalStatsDto, SavedSearchDto,
+  JobSeekerProfileDto, NotificationDto, PageResponse, RecommendationDto,
+  RecruiterProfileDto, RegionalStatsDto, SavedSearchDto,
   UserDto, UserRole, ApplicationStatus, CompanyStatus, VerificationType,
 } from "@/types/api";
 
@@ -268,6 +268,17 @@ export const SeekerApi = {
     unwrap<JobSeekerProfileDto>(api.patch("/api/hjp/job-seeker-profile", form, {
       headers: { "Content-Type": "multipart/form-data" },
     })),
+};
+
+/* ---------------- AI ASSISTANT ----------------
+ * Backend: /api/hjp/ai/recommendations is JOB_SEEKER-only.
+ * Returns at most 5 ranked jobs. Always returns an array (possibly
+ * empty) — the UI renders an empty state, never an error toast, when
+ * the model can't produce recommendations.
+ */
+export const AiApi = {
+  recommendations: () =>
+    unwrap<RecommendationDto[]>(api.get("/api/hjp/ai/recommendations")),
 };
 
 /* ---------------- RECRUITER PROFILE ----------------

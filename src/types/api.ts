@@ -379,6 +379,20 @@ export interface RegionalStatsDto {
   topCompaniesByRegion: Record<string, { name: string; count: number }[]>;
 }
 
+/* ---------------- AI Recommendations ----------------
+ * Wire shape mirrors backend RecommendationDto (com.hostdesign24.jobportal.dto.ai).
+ * The `job` field reuses JobDto so the existing JobCard component can render it.
+ */
+export interface RecommendationDto {
+  id: string;
+  job: JobDto;
+  /** Model confidence in the match, 0..1. */
+  score: number;
+  /** Short user-facing explanation from the LLM. */
+  reason: string;
+  generatedAt?: string;
+}
+
 /* ---------------- Filters ---------------- */
 
 export interface JobsFilter {

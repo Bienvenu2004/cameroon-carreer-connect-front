@@ -17,7 +17,12 @@ export function DashboardShell({ items, titleKey }: { items: SidebarItem[]; titl
   return (
     <div className="flex min-h-screen flex-col bg-background">
       <Header />
-      <div className="container flex-1 py-8 lg:grid lg:grid-cols-[240px_1fr] lg:gap-10">
+      {/* Dashboards use a wider container than the public pages: data-dense
+          screens benefit from horizontal room, and the Tailwind `container`
+          cap of 1280px left big empty gutters on 1440px+ monitors. We cap
+          at 1600px so the layout still has breathing room on ultra-wide
+          displays instead of stretching edge-to-edge. */}
+      <div className="mx-auto w-full max-w-[1600px] flex-1 px-4 py-8 sm:px-5 lg:grid lg:grid-cols-[200px_1fr] lg:gap-6 lg:px-8">
         <aside className="hidden lg:block">
           <div className="sticky top-24">
             <h2 className="font-display text-xl font-semibold">{t(titleKey)}</h2>

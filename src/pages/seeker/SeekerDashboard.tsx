@@ -6,6 +6,7 @@ import { ArrowRight, Bookmark, FileText, Search as SearchIcon } from "lucide-rea
 import { ApplicationsApi, JobsApi, SavedJobsApi, SavedSearchApi } from "@/api";
 import { useAuthStore } from "@/stores/auth";
 import { JobCard } from "@/components/common/JobCard";
+import { RecommendationsSection } from "@/components/seeker/RecommendationsSection";
 import { Button } from "@/components/ui/button";
 
 export function SeekerDashboard() {
@@ -32,6 +33,8 @@ export function SeekerDashboard() {
         <StatCard icon={Bookmark} label={t("nav.savedJobs")} value={saved.data?.totalElements ?? 0} link="/seeker/saved-jobs" />
         <StatCard icon={SearchIcon} label={t("nav.savedSearches")} value={searches.data?.length ?? 0} link="/seeker/saved-searches" />
       </div>
+
+      <RecommendationsSection />
 
       <section>
         <div className="flex items-end justify-between">

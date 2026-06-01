@@ -9,6 +9,7 @@
     "companies": "Companies",
     "about": "About",
     "dashboard": "Dashboard",
+    "recommendations": "Recommendations",
     "myProfile": "My profile",
     "myJobs": "My jobs",
     "myCompanies": "My companies",
@@ -31,6 +32,7 @@
   },
   "common": {
     "search": "Search",
+    "clear": "Clear",
     "loading": "Loading…",
     "save": "Save",
     "cancel": "Cancel",
@@ -86,6 +88,10 @@
     "subtitle": "Find the role that fits you.",
     "filters": "Filters",
     "clearFilters": "Clear filters",
+    "activeFilters": "Active",
+    "activeFiltersCount": "{{count}} active",
+    "removeFilter": "Remove filter",
+    "searchPlaceholder": "Search by job title, company, or keyword…",
     "region": "Region",
     "industry": "Industry",
     "jobType": "Job type",
@@ -93,6 +99,11 @@
     "salaryMin": "Min salary",
     "salaryMax": "Max salary",
     "all": "All",
+    "allRegions": "All regions",
+    "allIndustries": "All industries",
+    "allJobTypes": "All job types",
+    "allJobSites": "All work sites",
+    "allLanguages": "All languages",
     "remote": "Remote",
     "onsite": "On-site",
     "hybrid": "Hybrid",
@@ -372,5 +383,55 @@
     "registerFailed": "Sign-up failed",
     "notFound": "Page not found",
     "notFoundCta": "Back to home"
+  },
+  "ai": {
+    "recommendationsTitle": "Recommended for you",
+    "recommendationsSubtitle": "AI-powered matches based on your profile and activity",
+    "poweredBy": "Powered by AI",
+    "loading": "Finding jobs that match your profile…",
+    "empty": "No recommendations yet. Complete your profile (skills, languages) to unlock personalized matches.",
+    "error": "Recommendations are temporarily unavailable. Please try again later.",
+    "whyMatch": "Why this job is a great match",
+    "whyMatchShort": "Why this match",
+    "showMore": "Show more",
+    "showLess": "Show less",
+    "keyFactors": "Key matching factors:",
+    "moreFactors": "+{{count}} more",
+    "viewJob": "View Job",
+    "save": "Save",
+    "viewAll": "View all recommended jobs",
+    "postedAgo": "Posted {{time}}",
+    "learnMore": "Learn more about AI matching",
+    "tier": {
+      "topMatch": "Top Match",
+      "greatMatch": "Great Match",
+      "goodMatch": "Good Match",
+      "fairMatch": "Fair Match"
+    },
+    "sidebar": {
+      "title": "Great matches!",
+      "subtitle": "These jobs are handpicked by AI to match your profile and preferences.",
+      "factors": {
+        "top": { "title": "Top match", "desc": "Highly relevant to your profile" },
+        "skills": { "title": "Skills match", "desc": "Your skills are a strong fit" },
+        "experience": { "title": "Experience match", "desc": "Your experience aligns well" },
+        "location": { "title": "Location match", "desc": "Preferred location or remote" },
+        "education": { "title": "Education match", "desc": "Your education fits" }
+      }
+    }
+  },
+  "recommendedPage": {
+    "title": "Recommended for you",
+    "subtitle": "Your personalized AI-ranked job matches — only jobs picked for your profile.",
+    "sortBy": "Sort:",
+    "filter": "Filter:",
+    "tierAll": "All matches",
+    "sort": {
+      "match": "Best match",
+      "newest": "Newest",
+      "salary": "Salary (high → low)"
+    },
+    "count": "Showing {{count}} of {{total}}",
+    "noMatchForFilter": "No recommendations in this category. Try a different filter."
   }
 }

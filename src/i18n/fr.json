@@ -9,6 +9,7 @@
     "companies": "Entreprises",
     "about": "À propos",
     "dashboard": "Tableau de bord",
+    "recommendations": "Recommandations",
     "myProfile": "Mon profil",
     "myJobs": "Mes offres",
     "myCompanies": "Mes entreprises",
@@ -31,6 +32,7 @@
   },
   "common": {
     "search": "Rechercher",
+    "clear": "Effacer",
     "loading": "Chargement…",
     "save": "Enregistrer",
     "cancel": "Annuler",
@@ -86,6 +88,10 @@
     "subtitle": "Trouvez le poste qui vous correspond.",
     "filters": "Filtres",
     "clearFilters": "Effacer les filtres",
+    "activeFilters": "Actifs",
+    "activeFiltersCount": "{{count}} actif(s)",
+    "removeFilter": "Retirer le filtre",
+    "searchPlaceholder": "Rechercher par titre, entreprise ou mot-clé…",
     "region": "Région",
     "industry": "Secteur",
     "jobType": "Type de contrat",
@@ -93,6 +99,11 @@
     "salaryMin": "Salaire min.",
     "salaryMax": "Salaire max.",
     "all": "Tous",
+    "allRegions": "Toutes les régions",
+    "allIndustries": "Tous les secteurs",
+    "allJobTypes": "Tous les types",
+    "allJobSites": "Tous les lieux",
+    "allLanguages": "Toutes les langues",
     "remote": "À distance",
     "onsite": "Sur site",
     "hybrid": "Hybride",
@@ -372,5 +383,55 @@
     "registerFailed": "L'inscription a échoué",
     "notFound": "Page introuvable",
     "notFoundCta": "Retour à l'accueil"
+  },
+  "ai": {
+    "recommendationsTitle": "Recommandé pour vous",
+    "recommendationsSubtitle": "Correspondances IA basées sur votre profil et votre activité",
+    "poweredBy": "Propulsé par l'IA",
+    "loading": "Recherche d'offres correspondant à votre profil…",
+    "empty": "Pas encore de recommandations. Complétez votre profil (compétences, langues) pour débloquer des correspondances personnalisées.",
+    "error": "Les recommandations sont temporairement indisponibles. Veuillez réessayer plus tard.",
+    "whyMatch": "Pourquoi cette offre vous correspond",
+    "whyMatchShort": "Pourquoi cette correspondance",
+    "showMore": "Voir plus",
+    "showLess": "Voir moins",
+    "keyFactors": "Facteurs clés de correspondance :",
+    "moreFactors": "+{{count}} de plus",
+    "viewJob": "Voir l'offre",
+    "save": "Enregistrer",
+    "viewAll": "Voir toutes les offres recommandées",
+    "postedAgo": "Publié {{time}}",
+    "learnMore": "En savoir plus sur la correspondance IA",
+    "tier": {
+      "topMatch": "Correspondance idéale",
+      "greatMatch": "Excellente correspondance",
+      "goodMatch": "Bonne correspondance",
+      "fairMatch": "Correspondance acceptable"
+    },
+    "sidebar": {
+      "title": "Belles correspondances !",
+      "subtitle": "Ces offres sont sélectionnées par l'IA pour correspondre à votre profil et à vos préférences.",
+      "factors": {
+        "top": { "title": "Correspondance idéale", "desc": "Très pertinente pour votre profil" },
+        "skills": { "title": "Compétences", "desc": "Vos compétences correspondent bien" },
+        "experience": { "title": "Expérience", "desc": "Votre expérience s'aligne" },
+        "location": { "title": "Localisation", "desc": "Lieu préféré ou télétravail" },
+        "education": { "title": "Formation", "desc": "Votre formation correspond" }
+      }
+    }
+  },
+  "recommendedPage": {
+    "title": "Recommandé pour vous",
+    "subtitle": "Vos correspondances d'emploi classées par IA — uniquement les offres sélectionnées pour votre profil.",
+    "sortBy": "Trier :",
+    "filter": "Filtrer :",
+    "tierAll": "Toutes",
+    "sort": {
+      "match": "Meilleure correspondance",
+      "newest": "Plus récentes",
+      "salary": "Salaire (élevé → bas)"
+    },
+    "count": "{{count}} sur {{total}}",
+    "noMatchForFilter": "Aucune recommandation dans cette catégorie. Essayez un autre filtre."
   }
 }

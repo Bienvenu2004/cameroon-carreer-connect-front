@@ -23,6 +23,7 @@ import { MyApplications } from "@/pages/seeker/MyApplications";
 import { SavedJobsPage } from "@/pages/seeker/SavedJobsPage";
 import { SavedSearchesPage } from "@/pages/seeker/SavedSearchesPage";
 import { SeekerProfilePage } from "@/pages/seeker/SeekerProfilePage";
+import { RecommendedJobsPage } from "@/pages/seeker/RecommendedJobsPage";
 
 import { RecruiterLayout } from "@/pages/recruiter/RecruiterLayout";
 import { RecruiterDashboard } from "@/pages/recruiter/RecruiterDashboard";
@@ -68,6 +69,7 @@ export function AppRouter() {
         }
       >
         <Route index element={<SeekerDashboard />} />
+        <Route path="recommendations" element={<RecommendedJobsPage />} />
         <Route path="profile" element={<SeekerProfilePage />} />
         <Route path="applications" element={<MyApplications />} />
         <Route path="saved-jobs" element={<SavedJobsPage />} />
