@@ -3,7 +3,7 @@ import { useTranslation } from "react-i18next";
 import { Link, NavLink, useNavigate } from "react-router-dom";
 import { LogOut, Menu, User as UserIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   DropdownMenu, DropdownMenuContent, DropdownMenuItem,
   DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger,
@@ -31,6 +31,16 @@ export function Header() {
     user?.jobSeekerProfile?.firstName ||
     user?.recruiterProfile?.firstName ||
     user?.email?.split("@")[0];
+
+  // The auth /me response embeds the active role's profile (jobSeekerProfile
+  // for JOB_SEEKER, recruiterProfile for RECRUITER). FileDto.url is the
+  // publicly-resolvable URL — already prefixed with the storage base. We
+  // just hand it to <AvatarImage> and let it fail back to <AvatarFallback>
+  // (initials) if the image can't load.
+  const photoUrl =
+    user?.jobSeekerProfile?.profilePhoto?.url ||
+    user?.recruiterProfile?.profilePhoto?.url ||
+    undefined;
 
   /**
    * Proper logout sequence:
@@ -86,6 +96,7 @@ export function Header() {
               <DropdownMenuTrigger asChild>
                 <Button variant="ghost" className="gap-2 pl-2 pr-3">
                   <Avatar className="h-8 w-8">
+                    {photoUrl && <AvatarImage src={photoUrl} alt={displayName} />}
                     <AvatarFallback>{initials(displayName)}</AvatarFallback>
                   </Avatar>
                   <span className="hidden text-sm font-medium sm:inline">{displayName}</span>

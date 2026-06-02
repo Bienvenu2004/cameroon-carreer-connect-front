@@ -1,4 +1,8 @@
 {
+  "greetings": {
+    "welcome": "Bienvenue sur JobConnect Cameroun !",
+    "hello": "Bonjour"
+  },
   "brand": {
     "name": "JobConnect Cameroun",
     "tagline": "Votre prochain emploi commence ici."
@@ -128,6 +132,46 @@
       "BILINGUAL": "Bilingue"
     }
   },
+  "companies": {
+    "searchPlaceholder": "Rechercher par nom d'entreprise…"
+  },
+  "aiSearch": {
+    "modeClassic": "Classique",
+    "modeAi": "Recherche IA",
+    "label": "Posez votre question en langage naturel",
+    "hint": "Décrivez ce que vous cherchez en français ou en anglais. L'IA traduit votre demande en filtres d'offres.",
+    "placeholder": "ex. Emplois de développeur Java junior à distance au Cameroun",
+    "submit": "Rechercher avec l'IA",
+    "loading": "Recherche…",
+    "tryExamples": "Essayez",
+    "examples": {
+      "remoteJunior": "Emplois de développeur Java junior à distance au Cameroun",
+      "marketingIntern": "Stages en marketing pour étudiants sans expérience",
+      "springBootBackend": "Offres correspondant à mon expérience Spring Boot backend",
+      "accountingDouala": "Postes en comptabilité à Douala avec connaissance OHADA"
+    },
+    "interpretationLabel": "Voici comment nous avons interprété votre requête",
+    "fallbackTitle": "Résultats par mots-clés",
+    "fallbackBody": "Nous n'avons pas pu extraire de filtres structurés. Une recherche par mots-clés a été effectuée. Reformulez ou utilisez les filtres classiques.",
+    "resultsCount": "{{count}} offre(s) trouvée(s)",
+    "error": "La recherche IA est temporairement indisponible. Veuillez réessayer.",
+    "submitShortcut": "(⌘/Ctrl + Entrée pour valider)",
+    "tryAgain": "Nouvelle recherche",
+    "clear": "Effacer et recommencer",
+    "refineInClassic": "Affiner avec les filtres classiques",
+    "switchToClassic": "Passer à la recherche classique",
+    "empty": {
+      "parsedTitle": "Aucune offre ne correspond à ces filtres",
+      "parsedBody": "Nous avons compris votre requête mais aucune offre ne correspond. Retirez un filtre ci-dessus ou ajustez-les manuellement.",
+      "fallbackTitle": "Aucun résultat pour vos mots-clés",
+      "fallbackBody": "Nous n'avons pas pu extraire de filtres et aucun mot-clé ne correspond. Essayez la recherche classique pour élargir les critères."
+    },
+    "chip": {
+      "city": "Ville",
+      "level": "Niveau",
+      "skill": "Compétence"
+    }
+  },
   "auth": {
     "loginTitle": "Bon retour parmi nous",
     "loginSubtitle": "Connectez-vous pour continuer.",
@@ -218,6 +262,7 @@
     "workPreferences": "Préférences professionnelles",
     "workAuth": "Autorisation de travail",
     "employmentType": "Type d'emploi",
+    "notSpecified": "Non spécifié",
     "street": "Rue",
     "uploadPhoto": "Photo de profil",
     "notSet": "Non renseigné",
@@ -360,6 +405,12 @@
     "TEXTILES_FASHION": "Textile & Mode",
     "OTHER": "Autre"
   },
+  "workAuth": {
+    "CITIZEN": "Citoyen camerounais",
+    "PERMANENT_RESIDENT": "Résident permanent",
+    "WORK_PERMIT": "Titulaire d'un permis de travail",
+    "NEEDS_SPONSORSHIP": "Nécessite un parrainage"
+  },
   "jobTypes": {
     "FULL_TIME": "Temps plein",
     "PART_TIME": "Temps partiel",
@@ -373,6 +424,16 @@
     "REMOTE": "À distance",
     "ONSITE": "Sur site",
     "HYBRID": "Hybride"
+  },
+  "experienceLevels": {
+    "INTERNSHIP": "Stage",
+    "ENTRY_LEVEL": "Débutant",
+    "JUNIOR": "Junior",
+    "MID_LEVEL": "Intermédiaire",
+    "SENIOR": "Senior",
+    "LEAD": "Lead",
+    "MANAGER": "Manager",
+    "DIRECTOR": "Directeur"
   },
   "errors": {
     "required": "Ce champ est obligatoire",

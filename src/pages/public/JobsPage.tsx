@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useSearchParams } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
-import { Filter, Search, X } from "lucide-react";
+import { Filter, Search, Sparkles, X } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -11,6 +11,7 @@ import {
 } from "@/components/ui/select";
 import { JobCard } from "@/components/common/JobCard";
 import { Pagination } from "@/components/common/Pagination";
+import { AiSearchPanel } from "@/components/jobs/AiSearchPanel";
 import { JobsApi } from "@/api";
 import {
   ALL_INDUSTRIES, ALL_JOB_LANGUAGES, ALL_JOB_SITES, ALL_JOB_TYPES, ALL_REGIONS,
@@ -44,6 +45,17 @@ const ALL = "ALL" as const;
 export function JobsPage() {
   const { t } = useTranslation();
   const [params, setParams] = useSearchParams();
+
+  // Search mode. URL-persisted so deep-links + back-button work.
+  // Default is "classic" — AI search is opt-in to keep the keyword/filter
+  // muscle memory intact for power users.
+  const mode: "classic" | "ai" = params.get("mode") === "ai" ? "ai" : "classic";
+  const setMode = (next: "classic" | "ai") => {
+    const p = new URLSearchParams(params);
+    if (next === "ai") p.set("mode", "ai");
+    else p.delete("mode");
+    setParams(p, { replace: true });
+  };
 
   const [keyword, setKeyword] = useState(params.get("q") ?? "");
   const [region, setRegion] = useState<Region | typeof ALL>((params.get("region") as Region) || ALL);
@@ -143,45 +155,27 @@ export function JobsPage() {
 
   return (
     <div className="container py-10">
-      <header>
-        <h1 className="font-display text-3xl font-bold tracking-tight">{t("jobs.title")}</h1>
-        <p className="mt-1 text-muted-foreground">{t("jobs.subtitle")}</p>
+      <header className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+        <div>
+          <h1 className="font-display text-3xl font-bold tracking-tight">{t("jobs.title")}</h1>
+          <p className="mt-1 text-muted-foreground">{t("jobs.subtitle")}</p>
+        </div>
+        <ModeToggle mode={mode} setMode={setMode} />
       </header>
 
+      {mode === "ai" && (
+        <div className="mt-6">
+          <AiSearchPanel initialQuery={keyword} onQueryChange={setKeyword} />
+        </div>
+      )}
+
+      {mode === "classic" && <>
       <form
         onSubmit={submitSearch}
         className="mt-6 rounded-2xl border border-border/60 bg-card p-5 elev-1"
       >
-        {/* Hero search row */}
-        <div className="flex flex-col gap-2 sm:flex-row">
-          <div className="relative flex-1">
-            <Search className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-            <Input
-              value={keyword}
-              onChange={(e) => setKeyword(e.target.value)}
-              placeholder={t("jobs.searchPlaceholder")}
-              className="h-11 pl-10 text-base"
-              aria-label={t("jobs.searchPlaceholder")}
-            />
-            {keyword && (
-              <button
-                type="button"
-                onClick={() => { setKeyword(""); writeUrl({ keyword: "" }); }}
-                aria-label={t("common.clear") || "Clear"}
-                className="absolute right-2 top-1/2 inline-flex h-7 w-7 -translate-y-1/2 items-center justify-center rounded-md text-muted-foreground transition hover:bg-muted hover:text-foreground"
-              >
-                <X className="h-3.5 w-3.5" />
-              </button>
-            )}
-          </div>
-          <Button type="submit" size="lg" className="h-11 gap-2 sm:px-6">
-            <Search className="h-4 w-4" />
-            {t("common.search")}
-          </Button>
-        </div>
-
-        {/* Filter row header */}
-        <div className="mt-5 flex items-center gap-2">
+        {/* Filters first — they set the scope. Search refines within. */}
+        <div className="flex items-center gap-2">
           <Filter className="h-4 w-4 text-muted-foreground" />
           <span className="text-sm font-semibold">{t("jobs.filters")}</span>
           {activeCount > 0 && (
@@ -279,6 +273,37 @@ export function JobsPage() {
             ))}
           </div>
         )}
+
+        {/* Hero search row — kept BELOW the filters so the user first
+            picks the scope, then types the search term inside it.    */}
+        <div className="mt-5 border-t border-border/40 pt-5">
+          <div className="flex flex-col gap-2 sm:flex-row">
+            <div className="relative flex-1">
+              <Search className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+              <Input
+                value={keyword}
+                onChange={(e) => setKeyword(e.target.value)}
+                placeholder={t("jobs.searchPlaceholder")}
+                className="h-11 pl-10 text-base"
+                aria-label={t("jobs.searchPlaceholder")}
+              />
+              {keyword && (
+                <button
+                  type="button"
+                  onClick={() => { setKeyword(""); writeUrl({ keyword: "" }); }}
+                  aria-label={t("common.clear") || "Clear"}
+                  className="absolute right-2 top-1/2 inline-flex h-7 w-7 -translate-y-1/2 items-center justify-center rounded-md text-muted-foreground transition hover:bg-muted hover:text-foreground"
+                >
+                  <X className="h-3.5 w-3.5" />
+                </button>
+              )}
+            </div>
+            <Button type="submit" size="lg" className="h-11 gap-2 sm:px-6">
+              <Search className="h-4 w-4" />
+              {t("common.search")}
+            </Button>
+          </div>
+        </div>
       </form>
 
       <div className="mt-6 text-sm text-muted-foreground">
@@ -306,6 +331,49 @@ export function JobsPage() {
           onChange={setPage}
         />
       )}
+      </>}
+    </div>
+  );
+}
+
+/* Mode toggle for classic vs. AI semantic search. */
+function ModeToggle({
+  mode, setMode,
+}: {
+  mode: "classic" | "ai";
+  setMode: (m: "classic" | "ai") => void;
+}) {
+  const { t } = useTranslation();
+  return (
+    <div className="inline-flex shrink-0 items-center rounded-full border border-border bg-card p-0.5 text-xs font-medium">
+      <button
+        type="button"
+        onClick={() => setMode("classic")}
+        aria-pressed={mode === "classic"}
+        className={
+          "inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 transition " +
+          (mode === "classic"
+            ? "bg-primary text-primary-foreground shadow-sm"
+            : "text-muted-foreground hover:text-foreground")
+        }
+      >
+        <Filter className="h-3.5 w-3.5" />
+        {t("aiSearch.modeClassic")}
+      </button>
+      <button
+        type="button"
+        onClick={() => setMode("ai")}
+        aria-pressed={mode === "ai"}
+        className={
+          "inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 transition " +
+          (mode === "ai"
+            ? "bg-primary text-primary-foreground shadow-sm"
+            : "text-muted-foreground hover:text-foreground")
+        }
+      >
+        <Sparkles className="h-3.5 w-3.5" />
+        {t("aiSearch.modeAi")}
+      </button>
     </div>
   );
 }

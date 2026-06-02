@@ -1,11 +1,7 @@
 import { useState, useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { Link } from "react-router-dom";
-import {
-  Sparkles, Briefcase, MapPin, CheckCircle2,
-  ChevronLeft, ChevronRight, GraduationCap, Target,
-} from "lucide-react";
+import { Sparkles, ChevronLeft, ChevronRight } from "lucide-react";
 
 import { AiApi, SavedJobsApi, SeekerApi } from "@/api";
 import {
@@ -16,8 +12,8 @@ import {
 /* ------------------------------------------------------------------ *
  *  AI Recommendations widget for the seeker dashboard.
  *
- *  Wraps the shared <RecommendationCard /> in a paginated grid + a
- *  static "matching factors" sidebar. Cards-per-page scales with the
+ *  Wraps the shared <RecommendationCard /> in a paginated grid.
+ *  Cards-per-page scales with the
  *  viewport: 1 (sm), 2 (md), 3 (xl). Every card on every page is a
  *  recommendation we already received — pagination is purely for
  *  visual density, no extra fetches.
@@ -94,121 +90,58 @@ export function RecommendationsSection() {
 
         {!isLoading && !isError && recs.length > 0 && (
           <div className="rounded-2xl border border-border/60 bg-gradient-to-br from-primary/[0.04] via-card to-card p-4 sm:p-5">
-            <div className="grid gap-5 lg:grid-cols-[220px_1fr]">
-              <MatchingFactorsSidebar />
-
-              <div>
-                <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
-                  {visible.map((r) => {
-                    const { tags, extra } = computeMatchingFactors(
-                      skillNames, r.job, MAX_FACTOR_TAGS,
-                    );
-                    return (
-                      <RecommendationCard
-                        key={r.id}
-                        rec={r}
-                        factors={tags}
-                        extraFactors={extra}
-                        onSave={(id) => saveM.mutate(id)}
-                        isSaving={saveM.isPending}
-                      />
-                    );
-                  })}
-                </div>
-
-                {pageCount > 1 && (
-                  <div className="mt-5 flex items-center justify-center gap-3">
-                    <PagerButton
-                      direction="prev"
-                      disabled={safePage === 0}
-                      onClick={() => setPage((p) => Math.max(0, p - 1))}
-                    />
-                    <div className="flex items-center gap-1.5">
-                      {Array.from({ length: pageCount }).map((_, i) => (
-                        <button
-                          key={i}
-                          type="button"
-                          aria-label={`Page ${i + 1}`}
-                          onClick={() => setPage(i)}
-                          className={
-                            "h-2 rounded-full transition-all " +
-                            (i === safePage
-                              ? "w-6 bg-primary"
-                              : "w-2 bg-border hover:bg-muted-foreground/40")
-                          }
-                        />
-                      ))}
-                    </div>
-                    <PagerButton
-                      direction="next"
-                      disabled={safePage >= pageCount - 1}
-                      onClick={() => setPage((p) => Math.min(pageCount - 1, p + 1))}
-                    />
-                  </div>
-                )}
-              </div>
+            <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
+              {visible.map((r) => {
+                const { tags, extra } = computeMatchingFactors(
+                  skillNames, r.job, MAX_FACTOR_TAGS,
+                );
+                return (
+                  <RecommendationCard
+                    key={r.id}
+                    rec={r}
+                    factors={tags}
+                    extraFactors={extra}
+                    onSave={(id) => saveM.mutate(id)}
+                    isSaving={saveM.isPending}
+                  />
+                );
+              })}
             </div>
+
+            {pageCount > 1 && (
+              <div className="mt-5 flex items-center justify-center gap-3">
+                <PagerButton
+                  direction="prev"
+                  disabled={safePage === 0}
+                  onClick={() => setPage((p) => Math.max(0, p - 1))}
+                />
+                <div className="flex items-center gap-1.5">
+                  {Array.from({ length: pageCount }).map((_, i) => (
+                    <button
+                      key={i}
+                      type="button"
+                      aria-label={`Page ${i + 1}`}
+                      onClick={() => setPage(i)}
+                      className={
+                        "h-2 rounded-full transition-all " +
+                        (i === safePage
+                          ? "w-6 bg-primary"
+                          : "w-2 bg-border hover:bg-muted-foreground/40")
+                      }
+                    />
+                  ))}
+                </div>
+                <PagerButton
+                  direction="next"
+                  disabled={safePage >= pageCount - 1}
+                  onClick={() => setPage((p) => Math.min(pageCount - 1, p + 1))}
+                />
+              </div>
+            )}
           </div>
         )}
       </div>
     </section>
-  );
-}
-
-/* -------------------- inner sidebar -------------------- */
-
-function MatchingFactorsSidebar() {
-  const { t } = useTranslation();
-  const factors = [
-    { icon: Target, key: "top" as const },
-    { icon: Sparkles, key: "skills" as const },
-    { icon: Briefcase, key: "experience" as const },
-    { icon: MapPin, key: "location" as const },
-    { icon: GraduationCap, key: "education" as const },
-  ];
-
-  return (
-    <aside className="rounded-xl border border-border/60 bg-card p-5">
-      <div className="flex items-start gap-2.5">
-        <div className="mt-0.5 inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-primary/15 text-primary">
-          <CheckCircle2 className="h-4 w-4" />
-        </div>
-        <div className="min-w-0">
-          <h3 className="font-display text-base font-semibold leading-tight">
-            {t("ai.sidebar.title")}
-          </h3>
-          <p className="mt-1 text-xs leading-relaxed text-muted-foreground">
-            {t("ai.sidebar.subtitle")}
-          </p>
-        </div>
-      </div>
-
-      <ul className="mt-5 space-y-3.5">
-        {factors.map(({ icon: Icon, key }) => (
-          <li key={key} className="flex items-start gap-2.5">
-            <div className="mt-0.5 inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary">
-              <Icon className="h-3.5 w-3.5" />
-            </div>
-            <div className="min-w-0">
-              <div className="text-sm font-medium leading-tight">
-                {t(`ai.sidebar.factors.${key}.title`)}
-              </div>
-              <div className="mt-0.5 text-xs text-muted-foreground">
-                {t(`ai.sidebar.factors.${key}.desc`)}
-              </div>
-            </div>
-          </li>
-        ))}
-      </ul>
-
-      <Link
-        to="/seeker/recommendations"
-        className="mt-5 flex w-full items-center justify-between rounded-lg bg-primary/10 px-3 py-2.5 text-xs font-medium text-primary transition hover:bg-primary/15"
-      >
-        <span>{t("ai.learnMore")}</span>
-        <ChevronRight className="h-3.5 w-3.5" />
-      </Link>
-    </aside>
   );
 }
 

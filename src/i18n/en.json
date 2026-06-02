@@ -1,4 +1,8 @@
 {
+  "greetings": {
+    "welcome": "Welcome to JobConnect Cameroun!",
+    "hello": "Hello"
+  },
   "brand": {
     "name": "JobConnect Cameroun",
     "tagline": "Your next job starts here."
@@ -128,6 +132,46 @@
       "BILINGUAL": "Bilingual"
     }
   },
+  "companies": {
+    "searchPlaceholder": "Search by company name…"
+  },
+  "aiSearch": {
+    "modeClassic": "Classic",
+    "modeAi": "AI search",
+    "label": "Ask in your own words",
+    "hint": "Describe what you're looking for in plain English or French. The AI will translate your query into job filters.",
+    "placeholder": "e.g. Remote junior Java developer jobs in Cameroon",
+    "submit": "Search with AI",
+    "loading": "Searching…",
+    "tryExamples": "Try",
+    "examples": {
+      "remoteJunior": "Remote junior Java developer jobs in Cameroon",
+      "marketingIntern": "Marketing internships for students with no experience",
+      "springBootBackend": "Jobs matching my Spring Boot backend experience",
+      "accountingDouala": "Accounting roles near Douala with OHADA knowledge"
+    },
+    "interpretationLabel": "We understood your query as",
+    "fallbackTitle": "Showing keyword results",
+    "fallbackBody": "We couldn't extract structured filters from your query, so we ran a plain keyword search instead. Try rephrasing or use the classic filters.",
+    "resultsCount": "{{count}} job(s) found",
+    "error": "AI search is temporarily unavailable. Please try again.",
+    "submitShortcut": "(⌘/Ctrl + Enter to submit)",
+    "tryAgain": "Try another query",
+    "clear": "Clear and try another query",
+    "refineInClassic": "Refine in classic filters",
+    "switchToClassic": "Switch to classic search",
+    "empty": {
+      "parsedTitle": "No jobs match these filters",
+      "parsedBody": "We understood your query but found no matching listings. Try removing a chip above or refining the filters manually.",
+      "fallbackTitle": "Nothing matched your keywords",
+      "fallbackBody": "We couldn't parse structured filters AND no keyword matches were found. Try classic search to broaden your criteria."
+    },
+    "chip": {
+      "city": "City",
+      "level": "Level",
+      "skill": "Skill"
+    }
+  },
   "auth": {
     "loginTitle": "Welcome back",
     "loginSubtitle": "Sign in to continue.",
@@ -218,6 +262,7 @@
     "workPreferences": "Work preferences",
     "workAuth": "Work authorization",
     "employmentType": "Employment type",
+    "notSpecified": "Not specified",
     "street": "Street",
     "uploadPhoto": "Profile photo",
     "notSet": "Not set",
@@ -360,6 +405,12 @@
     "TEXTILES_FASHION": "Textiles & Fashion",
     "OTHER": "Other"
   },
+  "workAuth": {
+    "CITIZEN": "Cameroonian citizen",
+    "PERMANENT_RESIDENT": "Permanent resident",
+    "WORK_PERMIT": "Work permit holder",
+    "NEEDS_SPONSORSHIP": "Requires sponsorship"
+  },
   "jobTypes": {
     "FULL_TIME": "Full-time",
     "PART_TIME": "Part-time",
@@ -373,6 +424,16 @@
     "REMOTE": "Remote",
     "ONSITE": "On-site",
     "HYBRID": "Hybrid"
+  },
+  "experienceLevels": {
+    "INTERNSHIP": "Internship",
+    "ENTRY_LEVEL": "Entry-level",
+    "JUNIOR": "Junior",
+    "MID_LEVEL": "Mid-level",
+    "SENIOR": "Senior",
+    "LEAD": "Lead",
+    "MANAGER": "Manager",
+    "DIRECTOR": "Director"
   },
   "errors": {
     "required": "This field is required",

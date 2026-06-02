@@ -28,6 +28,31 @@ import {
   type Region,
 } from "@/types/api";
 
+/* Controlled vocabularies for the work-preference dropdowns.
+ *
+ * The backend stores both fields as free-form `String`, but offering a
+ * fixed option list in the UI keeps the data clean for the AI matcher
+ * and downstream analytics. Adding/changing a value here is the only
+ * step needed — the read view picks it up via the same i18n keys.
+ *
+ * EmploymentType options reuse the existing `jobTypes.*` translations
+ * (a strict subset — REMOTE belongs on the job-site axis, not here).
+ */
+const EMPLOYMENT_TYPE_OPTIONS = [
+  "FULL_TIME", "PART_TIME", "CONTRACT", "TEMPORARY", "INTERN", "FREELANCE",
+] as const;
+const WORK_AUTH_OPTIONS = [
+  "CITIZEN", "PERMANENT_RESIDENT", "WORK_PERMIT", "NEEDS_SPONSORSHIP",
+] as const;
+
+/**
+ * Sentinel value used in the dropdowns to represent "no preference"
+ * because Radix Select doesn't allow an empty string for SelectItem
+ * values. Translated to "" on submit so the backend receives a cleared
+ * field rather than the literal "NONE".
+ */
+const NONE_VALUE = "__NONE__";
+
 /* ============================================================================
  *  Job-Seeker Profile page
  *
@@ -173,11 +198,26 @@ function ProfileView({ profile }: { profile: JobSeekerProfileDto }) {
         <Field
           icon={Briefcase}
           label={t("profile.workAuth")}
-          value={profile.workAuthorization}
+          // Translate known enum values; gracefully fall back to the raw
+          // string for legacy free-form entries written before this field
+          // became a dropdown.
+          value={
+            profile.workAuthorization
+              ? t(`workAuth.${profile.workAuthorization}`, {
+                  defaultValue: profile.workAuthorization,
+                })
+              : undefined
+          }
         />
         <Field
           label={t("profile.employmentType")}
-          value={profile.employmentType}
+          value={
+            profile.employmentType
+              ? t(`jobTypes.${profile.employmentType}`, {
+                  defaultValue: profile.employmentType,
+                })
+              : undefined
+          }
         />
       </Section>
 
@@ -580,18 +620,45 @@ function ProfileEditForm({
         <div className="mt-3 grid gap-4 sm:grid-cols-2">
           <div className="space-y-2">
             <Label>{t("profile.workAuth")}</Label>
-            <Input
-              value={workAuthorization}
-              onChange={(e) => setWorkAuthorization(e.target.value)}
-            />
+            {/* Backend stores this as a free String, but offering a
+                controlled vocabulary in the UI keeps data clean for the
+                AI matcher and downstream analytics. NONE_VALUE maps to
+                "" on submit so the user can clear the preference. */}
+            <Select
+              value={workAuthorization || NONE_VALUE}
+              onValueChange={(v) =>
+                setWorkAuthorization(v === NONE_VALUE ? "" : v)
+              }
+            >
+              <SelectTrigger aria-label={t("profile.workAuth")}>
+                <SelectValue placeholder={t("profile.notSpecified")} />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value={NONE_VALUE}>{t("profile.notSpecified")}</SelectItem>
+                {WORK_AUTH_OPTIONS.map((v) => (
+                  <SelectItem key={v} value={v}>{t(`workAuth.${v}`)}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
           <div className="space-y-2">
             <Label>{t("profile.employmentType")}</Label>
-            <Input
-              value={employmentType}
-              onChange={(e) => setEmploymentType(e.target.value)}
-              placeholder="FULL_TIME / PART_TIME / ..."
-            />
+            <Select
+              value={employmentType || NONE_VALUE}
+              onValueChange={(v) =>
+                setEmploymentType(v === NONE_VALUE ? "" : v)
+              }
+            >
+              <SelectTrigger aria-label={t("profile.employmentType")}>
+                <SelectValue placeholder={t("profile.notSpecified")} />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value={NONE_VALUE}>{t("profile.notSpecified")}</SelectItem>
+                {EMPLOYMENT_TYPE_OPTIONS.map((v) => (
+                  <SelectItem key={v} value={v}>{t(`jobTypes.${v}`)}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
         </div>
       </Card>

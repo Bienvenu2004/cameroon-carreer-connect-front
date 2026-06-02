@@ -393,6 +393,41 @@ export interface RecommendationDto {
   generatedAt?: string;
 }
 
+/* ---------------- AI Semantic Search ----------------
+ * Wire shape mirrors backend DTOs:
+ *   - InterpretationDto: every enum field arrives as its NAME string
+ *     (e.g. "LITTORAL", "JUNIOR"). Frontend translates them via existing
+ *     i18n keys (regions.*, jobTypes.*, etc.).
+ *   - AiSearchResponseDto.jobs reuses JobDto so the existing JobCard
+ *     component drops in unchanged.
+ *   - When usedFallback=true the interpretation's structured fields are
+ *     all null — UI should render the "showing keyword results" banner.
+ */
+export interface AiInterpretationDto {
+  keywords: string[];
+  skills: string[];
+  region: string | null;
+  city: string | null;
+  jobType: string | null;
+  jobSite: string | null;
+  language: string | null;
+  industry: string | null;
+  level: string | null;
+  salaryMin: number | null;
+  salaryMax: number | null;
+}
+
+export interface AiSearchResponseDto {
+  query: string;
+  interpretation: AiInterpretationDto;
+  jobs: JobDto[];
+  /** Model's parse confidence, 0..1. */
+  confidence: number;
+  /** True when we fell back to plain keyword search. */
+  usedFallback: boolean;
+  totalResults: number;
+}
+
 /* ---------------- Filters ---------------- */
 
 export interface JobsFilter {

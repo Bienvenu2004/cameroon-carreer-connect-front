@@ -3,6 +3,7 @@ import type {
   AdminPlatformStatsDto, AdminUserDto, AuthResponseDto, AuthResponseRaw,
   CompanyDto, CreationResponse,
   DashboardDto, JobApplicationDto, JobDto, JobSeekerSaveDto, JobsFilter,
+  AiSearchResponseDto,
   JobSeekerProfileDto, NotificationDto, PageResponse, RecommendationDto,
   RecruiterProfileDto, RegionalStatsDto, SavedSearchDto,
   UserDto, UserRole, ApplicationStatus, CompanyStatus, VerificationType,
@@ -279,6 +280,15 @@ export const SeekerApi = {
 export const AiApi = {
   recommendations: () =>
     unwrap<RecommendationDto[]>(api.get("/api/hjp/ai/recommendations")),
+
+  /**
+   * Natural-language job search (§5.2 of the product spec). Public —
+   * works for anonymous users. The backend always returns a result
+   * (never throws), so an empty interpretation + the keyword-fallback
+   * result set is the normal "low-confidence" branch — not an error.
+   */
+  search: (query: string, size?: number) =>
+    unwrap<AiSearchResponseDto>(api.post("/api/hjp/ai/search", { query, size })),
 };
 
 /* ---------------- RECRUITER PROFILE ----------------
