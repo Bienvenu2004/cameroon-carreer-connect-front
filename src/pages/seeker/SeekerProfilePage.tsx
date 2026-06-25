@@ -2,8 +2,8 @@ import { useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
-  Briefcase, Download, Facebook, FileText, Github, Globe, Languages,
-  Linkedin, Link as LinkIcon, Mail, MapPin, Pencil, Phone, Twitter,
+  Briefcase, Calendar, Download, Facebook, FileText, Github, Globe, Languages,
+  Linkedin, Link as LinkIcon, Mail, MapPin, Pencil, Phone, Plus, Trash2, Twitter,
   Upload, User as UserIcon, X,
 } from "lucide-react";
 
@@ -26,6 +26,7 @@ import {
   ALL_REGIONS,
   type JobSeekerProfileDto,
   type Region,
+  type WorkExperienceDto,
 } from "@/types/api";
 
 /* Controlled vocabularies for the work-preference dropdowns.
@@ -239,6 +240,30 @@ function ProfileView({ profile }: { profile: JobSeekerProfileDto }) {
         )}
       </Card>
 
+      {/* Work experience --------------------------------------------------- */}
+      <Card>
+        <div className="flex items-center justify-between gap-2">
+          <SectionHeader title={t("profile.workExperience")} />
+          {typeof profile.totalYearsOfExperience === "number" && profile.totalYearsOfExperience > 0 && (
+            <Badge variant="secondary" className="gap-1">
+              <Briefcase className="h-3 w-3" />
+              {t("profile.yearsOfExperience", { count: profile.totalYearsOfExperience })}
+            </Badge>
+          )}
+        </div>
+        {profile.experiences && profile.experiences.length > 0 ? (
+          <ol className="mt-4 space-y-4">
+            {profile.experiences.map((xp, i) => (
+              <ExperienceReadRow key={xp.id ?? i} xp={xp} />
+            ))}
+          </ol>
+        ) : (
+          <div className="mt-3 text-sm text-muted-foreground">
+            {t("profile.experiencesEmpty")}
+          </div>
+        )}
+      </Card>
+
       {/* Spoken languages -------------------------------------------------- */}
       <Card>
         <SectionHeader title={t("profile.spokenLanguages")} />
@@ -414,6 +439,15 @@ function ProfileEditForm({
     return SPOKEN_LANGUAGES.filter((l) => l.toLowerCase().includes(q));
   }, [languageQuery]);
 
+  // Work experience rows. Client-side draft list mutated through the
+  // ExperiencesEditor; sent on submit as indexed multipart keys
+  // (experiences[0].title, experiences[0].startDate, ...). The backend
+  // service treats this list as authoritative — anything absent gets
+  // deleted via orphanRemoval on the OneToMany.
+  const [experiences, setExperiences] = useState<WorkExperienceDraft[]>(
+    () => (profile.experiences ?? []).map(fromDto)
+  );
+
   // Portfolio / social links — plain URL inputs, all optional.
   const [githubUrl, setGithubUrl]       = useState(profile.githubUrl ?? "");
   const [linkedinUrl, setLinkedinUrl]   = useState(profile.linkedinUrl ?? "");
@@ -463,6 +497,26 @@ function ProfileEditForm({
       // Skills replace the whole list — service does setSkills(newList).
       skills.forEach((name, i) => fd.append(`skills[${i}].name`, name));
 
+      // Work experiences — same indexed-multipart pattern. Client-side
+      // validation here is a quick early-exit; the backend re-validates
+      // every row server-side regardless.
+      const xpError = validateExperiencesClient(experiences, t);
+      if (xpError) throw new Error(xpError);
+      experiences.forEach((xp, i) => {
+        fd.append(`experiences[${i}].title`, xp.title.trim());
+        fd.append(`experiences[${i}].companyName`, xp.companyName.trim());
+        if (xp.city.trim()) fd.append(`experiences[${i}].city`, xp.city.trim());
+        if (xp.country.trim()) fd.append(`experiences[${i}].country`, xp.country.trim());
+        fd.append(`experiences[${i}].startDate`, xp.startDate);
+        if (!xp.isCurrent && xp.endDate) {
+          fd.append(`experiences[${i}].endDate`, xp.endDate);
+        }
+        fd.append(`experiences[${i}].isCurrent`, String(xp.isCurrent));
+        if (xp.description.trim()) {
+          fd.append(`experiences[${i}].description`, xp.description.trim());
+        }
+      });
+
       return SeekerApi.update(fd);
     },
     onSuccess: () => {
@@ -470,6 +524,12 @@ function ProfileEditForm({
       // Force a refetch so the new file URLs / persisted values render in
       // the view that comes after we leave edit mode.
       void qc.invalidateQueries({ queryKey: ["seeker-profile"] });
+      // Profile mutations (especially new experience rows / skills / region)
+      // change what the AI matcher sees. Evict the cached recommendations
+      // so the dashboard re-fetches with the fresh signal next visit —
+      // otherwise the user waits up to 5 minutes for the staleTime to
+      // expire and wonders why their new role didn't move the needle.
+      void qc.invalidateQueries({ queryKey: ["ai-recommendations"] });
       onSaved();
     },
     onError: (e) =>
@@ -679,6 +739,12 @@ function ProfileEditForm({
             placeholder={t("profile.skillsPlaceholder")}
           />
         </div>
+      </Card>
+
+      {/* Work experience -------------------------------------------------- */}
+      <Card>
+        <SectionHeader title={t("profile.workExperience")} />
+        <ExperiencesEditor values={experiences} onChange={setExperiences} />
       </Card>
 
       {/* Spoken languages ------------------------------------------------- */}
@@ -952,4 +1018,268 @@ function LinkRow({
       </div>
     </a>
   );
+}
+
+/* ===================================================================== *
+ *  Work-experience editor + read row
+ * ===================================================================== */
+
+/**
+ * Local draft shape — strings for everything so the controlled inputs
+ * don't have to deal with null vs "" vs undefined edge cases. The
+ * submit-time mapping into FormData handles the conversion back to
+ * the backend's typed payload.
+ */
+type WorkExperienceDraft = {
+  id?: string;
+  title: string;
+  companyName: string;
+  city: string;
+  country: string;
+  startDate: string;   // yyyy-MM-dd or ""
+  endDate: string;     // yyyy-MM-dd or ""
+  isCurrent: boolean;
+  description: string;
+};
+
+function fromDto(d: WorkExperienceDto): WorkExperienceDraft {
+  return {
+    id: d.id,
+    title: d.title ?? "",
+    companyName: d.companyName ?? "",
+    city: d.city ?? "",
+    country: d.country ?? "",
+    startDate: d.startDate ?? "",
+    endDate: d.endDate ?? "",
+    isCurrent: !!d.isCurrent,
+    description: d.description ?? "",
+  };
+}
+
+function emptyDraft(): WorkExperienceDraft {
+  return {
+    title: "", companyName: "", city: "", country: "",
+    startDate: "", endDate: "", isCurrent: false, description: "",
+  };
+}
+
+/**
+ * Client-side validation mirroring the backend rules. Cheap early-exit
+ * before we POST a 50-field FormData that the server would reject anyway.
+ * Returns a translated error string, or null when every row is valid.
+ */
+function validateExperiencesClient(
+  list: WorkExperienceDraft[],
+  t: (k: string) => string,
+): string | null {
+  const today = new Date().toISOString().slice(0, 10); // yyyy-MM-dd
+  for (const [i, xp] of list.entries()) {
+    const where = `#${i + 1}`;
+    if (!xp.title.trim()) return `${t("profile.xp.errTitle")} (${where})`;
+    if (!xp.companyName.trim()) return `${t("profile.xp.errCompany")} (${where})`;
+    if (!xp.startDate) return `${t("profile.xp.errStart")} (${where})`;
+    if (xp.startDate > today) return `${t("profile.xp.errStartFuture")} (${where})`;
+    if (!xp.isCurrent) {
+      if (!xp.endDate) return `${t("profile.xp.errEnd")} (${where})`;
+      if (xp.endDate < xp.startDate) return `${t("profile.xp.errEndBefore")} (${where})`;
+    }
+  }
+  return null;
+}
+
+/**
+ * Read-view row. Two-line layout: title @ company, then dates +
+ * location; description rendered as small paragraph beneath when set.
+ */
+function ExperienceReadRow({ xp }: { xp: WorkExperienceDto }) {
+  const { t, i18n } = useTranslation();
+  const locale = i18n.language?.startsWith("en") ? "en-GB" : "fr-FR";
+  const range = formatRange(xp.startDate, xp.endDate, xp.isCurrent, locale, t);
+  const loc = [xp.city, xp.country].filter(Boolean).join(", ");
+
+  return (
+    <li className="flex gap-3">
+      <div className="mt-1 inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-md bg-primary/10 text-primary">
+        <Briefcase className="h-4 w-4" />
+      </div>
+      <div className="min-w-0 flex-1">
+        <div className="font-display text-base font-semibold leading-tight">
+          {xp.title}
+        </div>
+        <div className="text-sm text-foreground/80">
+          {xp.companyName}
+          {loc && <span className="text-muted-foreground"> · {loc}</span>}
+        </div>
+        <div className="mt-0.5 flex items-center gap-1 text-xs text-muted-foreground">
+          <Calendar className="h-3 w-3" />
+          {range}
+        </div>
+        {xp.description && (
+          <p className="mt-2 whitespace-pre-wrap text-sm text-foreground/85">
+            {xp.description}
+          </p>
+        )}
+      </div>
+    </li>
+  );
+}
+
+/**
+ * Inline-editable list of experience rows. No modal — keeps the form
+ * focused, lets the user fix mistakes between rows without losing scroll
+ * position. Add button at the bottom; trash icon per row.
+ */
+function ExperiencesEditor({
+  values, onChange,
+}: {
+  values: WorkExperienceDraft[];
+  onChange: (next: WorkExperienceDraft[]) => void;
+}) {
+  const { t } = useTranslation();
+
+  const update = (i: number, patch: Partial<WorkExperienceDraft>) => {
+    const next = values.slice();
+    next[i] = { ...next[i], ...patch };
+    // isCurrent ↔ endDate invariant — clear endDate when isCurrent flips on
+    if (patch.isCurrent === true) next[i].endDate = "";
+    onChange(next);
+  };
+
+  const remove = (i: number) => onChange(values.filter((_, j) => j !== i));
+  const add = () => onChange([...values, emptyDraft()]);
+
+  return (
+    <div className="mt-3 space-y-3">
+      {values.length === 0 && (
+        <div className="rounded-lg border border-dashed border-border bg-muted/30 p-4 text-sm text-muted-foreground">
+          {t("profile.xp.empty")}
+        </div>
+      )}
+
+      {values.map((xp, i) => (
+        <div
+          key={xp.id ?? `new-${i}`}
+          className="rounded-lg border border-border/60 bg-background p-4"
+        >
+          <div className="flex items-center justify-between gap-2">
+            <span className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
+              {t("profile.xp.rowLabel", { n: i + 1 })}
+            </span>
+            <button
+              type="button"
+              onClick={() => remove(i)}
+              aria-label={t("profile.xp.remove")}
+              className="inline-flex h-7 w-7 items-center justify-center rounded-md text-muted-foreground transition hover:bg-destructive/10 hover:text-destructive"
+            >
+              <Trash2 className="h-4 w-4" />
+            </button>
+          </div>
+
+          <div className="mt-3 grid gap-3 sm:grid-cols-2">
+            <div className="space-y-1.5 sm:col-span-2">
+              <Label>{t("profile.xp.title")}</Label>
+              <Input
+                value={xp.title}
+                onChange={(e) => update(i, { title: e.target.value })}
+                placeholder={t("profile.xp.titlePlaceholder")}
+              />
+            </div>
+            <div className="space-y-1.5">
+              <Label>{t("profile.xp.company")}</Label>
+              <Input
+                value={xp.companyName}
+                onChange={(e) => update(i, { companyName: e.target.value })}
+                placeholder={t("profile.xp.companyPlaceholder")}
+              />
+            </div>
+            <div className="grid grid-cols-2 gap-2">
+              <div className="space-y-1.5">
+                <Label>{t("profile.xp.city")}</Label>
+                <Input
+                  value={xp.city}
+                  onChange={(e) => update(i, { city: e.target.value })}
+                />
+              </div>
+              <div className="space-y-1.5">
+                <Label>{t("profile.xp.country")}</Label>
+                <Input
+                  value={xp.country}
+                  onChange={(e) => update(i, { country: e.target.value })}
+                />
+              </div>
+            </div>
+            <div className="space-y-1.5">
+              <Label>{t("profile.xp.startDate")}</Label>
+              <Input
+                type="date"
+                value={xp.startDate}
+                max={new Date().toISOString().slice(0, 10)}
+                onChange={(e) => update(i, { startDate: e.target.value })}
+              />
+            </div>
+            <div className="space-y-1.5">
+              <Label>{t("profile.xp.endDate")}</Label>
+              <Input
+                type="date"
+                value={xp.endDate}
+                min={xp.startDate || undefined}
+                max={new Date().toISOString().slice(0, 10)}
+                disabled={xp.isCurrent}
+                onChange={(e) => update(i, { endDate: e.target.value })}
+              />
+            </div>
+            <label className="sm:col-span-2 inline-flex items-center gap-2 text-sm">
+              <input
+                type="checkbox"
+                checked={xp.isCurrent}
+                onChange={(e) => update(i, { isCurrent: e.target.checked })}
+                className="h-4 w-4 rounded border-input text-primary focus:ring-primary"
+              />
+              {t("profile.xp.isCurrent")}
+            </label>
+            <div className="space-y-1.5 sm:col-span-2">
+              <Label>{t("profile.xp.description")}</Label>
+              <textarea
+                value={xp.description}
+                onChange={(e) => update(i, { description: e.target.value })}
+                rows={3}
+                placeholder={t("profile.xp.descriptionPlaceholder")}
+                className="w-full resize-y rounded-md border border-input bg-background px-3 py-2 text-sm shadow-sm placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-primary"
+              />
+            </div>
+          </div>
+        </div>
+      ))}
+
+      <Button type="button" variant="outline" size="sm" onClick={add} className="gap-1.5">
+        <Plus className="h-4 w-4" />
+        {t("profile.xp.add")}
+      </Button>
+    </div>
+  );
+}
+
+/**
+ * Render a date range as "Jan 2022 — Jun 2024" or "Jan 2022 — Present"
+ * in the user's locale. Falls back to the raw ISO string if Intl can't
+ * parse it (defensive — shouldn't happen with backend LocalDate output).
+ */
+function formatRange(
+  start: string | undefined,
+  end: string | null | undefined,
+  isCurrent: boolean,
+  locale: string,
+  t: (k: string) => string,
+): string {
+  const fmt = (iso?: string | null) => {
+    if (!iso) return "";
+    const d = new Date(iso);
+    if (isNaN(d.getTime())) return iso;
+    return new Intl.DateTimeFormat(locale, { year: "numeric", month: "short" }).format(d);
+  };
+  const s = fmt(start);
+  const e = isCurrent ? t("profile.xp.present") : fmt(end);
+  if (!s && !e) return "";
+  if (!e) return s;
+  return `${s} — ${e}`;
 }

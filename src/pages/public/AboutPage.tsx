@@ -4,7 +4,7 @@ import { BadgeCheck, Building2, Globe2, Users } from "lucide-react";
 export function AboutPage() {
   const { t } = useTranslation();
   return (
-    <div className="container max-w-4xl py-16">
+    <div className="container py-16">
       <h1 className="font-display text-4xl font-bold tracking-tight">{t("brand.name")}</h1>
       <p className="mt-2 text-lg text-muted-foreground">{t("brand.tagline")}</p>
       <p className="mt-6 text-foreground/85 leading-relaxed">{t("home.heroSubtitle")}</p>

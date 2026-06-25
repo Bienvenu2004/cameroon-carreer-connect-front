@@ -17,6 +17,19 @@ export interface ApiEnvelope<T> {
 
 const baseURL = import.meta.env.VITE_API_BASE_URL ?? "";
 
+// Dev-mode diagnostic: prints once on startup so you can verify which
+// API mode is active. If baseURL is non-empty in dev, you're going
+// cross-origin and HttpOnly cookies will be dropped by the browser on
+// SameSite=Lax (the JVM cookie default). Fix: blank out
+// VITE_API_BASE_URL and restart the dev server so requests ride the
+// Vite proxy and the cookie is set same-origin.
+if (import.meta.env.DEV) {
+  // eslint-disable-next-line no-console
+  console.info(
+    `[auth] axios baseURL=${baseURL ? `"${baseURL}" (CROSS-ORIGIN — cookies may drop)` : "\"\" (proxy mode — cookies same-origin)"}`,
+  );
+}
+
 export const api = axios.create({
   baseURL,
   /**

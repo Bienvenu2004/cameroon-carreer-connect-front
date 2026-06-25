@@ -3,7 +3,7 @@ import { useTranslation } from "react-i18next";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Link } from "react-router-dom";
 import {
-  Briefcase, Download, Facebook, FileText, Github, Globe, Languages,
+  Briefcase, Calendar, Download, Facebook, FileText, Github, Globe, Languages,
   Linkedin, Link as LinkIcon, Mail, MapPin, Phone, Twitter, UserCircle2,
 } from "lucide-react";
 
@@ -22,7 +22,7 @@ import { useToast } from "@/components/ui/toast-provider";
 import { apiErrorMessage } from "@/lib/api";
 import { initials, relativeTime } from "@/lib/utils";
 import type {
-  ApplicationStatus, JobApplicationDto, JobSeekerProfileDto,
+  ApplicationStatus, JobApplicationDto, JobSeekerProfileDto, WorkExperienceDto,
 } from "@/types/api";
 
 const STATUSES: ApplicationStatus[] = ["APPLIED", "REVIEWED", "INTERVIEW", "HIRED", "REJECTED"];
@@ -275,6 +275,35 @@ function CandidateProfileDialog({
               )}
             </div>
 
+            {/* Work experience -------------------------------------------- *
+             * The backend ships these on every /job-seeker-profile/{id}
+             * response (same DTO the seeker's own page uses) — recruiter
+             * just needed the read-side render. Mirrors the seeker self-
+             * view layout so candidates and recruiters see the same shape. */}
+            <div>
+              <div className="flex items-center justify-between gap-2">
+                <SectionHeader title={t("profile.workExperience")} />
+                {typeof profile.totalYearsOfExperience === "number"
+                  && profile.totalYearsOfExperience > 0 && (
+                  <Badge variant="secondary" className="gap-1">
+                    <Briefcase className="h-3 w-3" />
+                    {t("profile.yearsOfExperience", { count: profile.totalYearsOfExperience })}
+                  </Badge>
+                )}
+              </div>
+              {profile.experiences && profile.experiences.length > 0 ? (
+                <ol className="mt-3 space-y-4">
+                  {profile.experiences.map((xp, i) => (
+                    <RecruiterExperienceRow key={xp.id ?? i} xp={xp} />
+                  ))}
+                </ol>
+              ) : (
+                <div className="mt-2 text-sm text-muted-foreground italic">
+                  {t("profile.notSet")}
+                </div>
+              )}
+            </div>
+
             {/* Portfolio / social ------------------------------------------ */}
             <div>
               <SectionHeader title={t("profile.portfolioLinks")} />
@@ -444,4 +473,62 @@ function LinkRow({
       </div>
     </a>
   );
+}
+
+/**
+ * One experience row in the recruiter's view of a candidate. Compact —
+ * the dialog has a max-h and we want as many roles visible at once as
+ * possible. Layout mirrors the seeker's own profile view so the same
+ * data reads the same way for whoever's looking.
+ */
+function RecruiterExperienceRow({ xp }: { xp: WorkExperienceDto }) {
+  const { t, i18n } = useTranslation();
+  const locale = i18n.language?.startsWith("en") ? "en-GB" : "fr-FR";
+  const loc = [xp.city, xp.country].filter(Boolean).join(", ");
+  const range = formatXpRange(xp.startDate, xp.endDate, xp.isCurrent, locale, t);
+
+  return (
+    <li className="flex gap-3">
+      <div className="mt-1 inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-md bg-primary/10 text-primary">
+        <Briefcase className="h-3.5 w-3.5" />
+      </div>
+      <div className="min-w-0 flex-1">
+        <div className="font-medium leading-tight">{xp.title}</div>
+        <div className="text-sm text-foreground/80">
+          {xp.companyName}
+          {loc && <span className="text-muted-foreground"> · {loc}</span>}
+        </div>
+        <div className="mt-0.5 flex items-center gap-1 text-xs text-muted-foreground">
+          <Calendar className="h-3 w-3" />
+          {range}
+        </div>
+        {xp.description && (
+          <p className="mt-1.5 whitespace-pre-wrap text-sm text-foreground/85">
+            {xp.description}
+          </p>
+        )}
+      </div>
+    </li>
+  );
+}
+
+/** Locale-aware "Jan 2022 — Jun 2024" / "Jan 2022 — Present" formatter. */
+function formatXpRange(
+  start: string | undefined,
+  end: string | null | undefined,
+  isCurrent: boolean,
+  locale: string,
+  t: (k: string) => string,
+): string {
+  const fmt = (iso?: string | null) => {
+    if (!iso) return "";
+    const d = new Date(iso);
+    if (isNaN(d.getTime())) return iso;
+    return new Intl.DateTimeFormat(locale, { year: "numeric", month: "short" }).format(d);
+  };
+  const s = fmt(start);
+  const e = isCurrent ? t("profile.xp.present") : fmt(end);
+  if (!s && !e) return "";
+  if (!e) return s;
+  return `${s} — ${e}`;
 }

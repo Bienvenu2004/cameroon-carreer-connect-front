@@ -163,6 +163,33 @@ export interface JobSeekerProfileDto {
   resume?: FileDto | null;
   profilePhoto?: FileDto | null;
   skills?: SkillDto[];
+
+  /** Past + current roles, newest-start-first. */
+  experiences?: WorkExperienceDto[];
+
+  /**
+   * Server-computed sum of all experience date ranges, expressed in
+   * whole years. Null when the seeker has no experience rows — UI hides
+   * the badge entirely in that case (no "0 years" noise).
+   */
+  totalYearsOfExperience?: number | null;
+}
+
+/**
+ * One work-experience row on the seeker profile. Mirrors backend
+ * WorkExperienceDto — dates arrive as ISO yyyy-MM-dd strings thanks to
+ * Jackson's JavaTimeModule serializing LocalDate that way.
+ */
+export interface WorkExperienceDto {
+  id?: string;
+  title: string;
+  companyName: string;
+  city?: string | null;
+  country?: string | null;
+  startDate: string;          // "2022-01-15"
+  endDate?: string | null;    // null when isCurrent
+  isCurrent: boolean;
+  description?: string | null;
 }
 
 export interface RecruiterProfileDto {

@@ -1,7 +1,7 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { Link, NavLink, useNavigate } from "react-router-dom";
-import { LogOut, Menu, User as UserIcon } from "lucide-react";
+import { Link, NavLink, useLocation, useNavigate } from "react-router-dom";
+import { LogOut, Menu, User as UserIcon, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
@@ -9,6 +9,7 @@ import {
   DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { LanguageToggle } from "@/components/common/LanguageToggle";
+import { ThemeToggle } from "@/components/common/ThemeToggle";
 import { Logo } from "@/components/common/Logo";
 import { NotificationBell } from "@/components/common/NotificationBell";
 import { useAuthStore } from "@/stores/auth";
@@ -20,7 +21,28 @@ export function Header() {
   const user = useAuthStore((s) => s.user);
   const logout = useAuthStore((s) => s.logout);
   const nav = useNavigate();
+  const location = useLocation();
   const [loggingOut, setLoggingOut] = useState(false);
+  const [mobileOpen, setMobileOpen] = useState(false);
+
+  // Auto-close the mobile menu whenever the route changes. Otherwise a
+  // user tapping a nav link sees the page swap underneath the overlay
+  // and has to close the menu manually before they can interact.
+  useEffect(() => { setMobileOpen(false); }, [location.pathname]);
+
+  // Close on Escape + lock body scroll while the sheet is open so the
+  // page beneath doesn't drift when the user scrolls inside the menu.
+  useEffect(() => {
+    if (!mobileOpen) return;
+    const onKey = (e: KeyboardEvent) => { if (e.key === "Escape") setMobileOpen(false); };
+    document.addEventListener("keydown", onKey);
+    const prevOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.removeEventListener("keydown", onKey);
+      document.body.style.overflow = prevOverflow;
+    };
+  }, [mobileOpen]);
 
   const dashboardPath =
     user?.role === "SYSTEM_ADMIN" ? "/admin"
@@ -87,6 +109,7 @@ export function Header() {
           </nav>
         </div>
         <div className="flex items-center gap-2">
+          <ThemeToggle />
           <LanguageToggle />
           {/* Bell renders nothing when there's no auth user, so it's safe
               to mount unconditionally here. */}
@@ -124,11 +147,86 @@ export function Header() {
               </Button>
             </div>
           )}
-          <Button variant="ghost" size="icon" className="lg:hidden">
-            <Menu className="h-5 w-5" />
+          <Button
+            variant="ghost"
+            size="icon"
+            className="lg:hidden"
+            onClick={() => setMobileOpen((o) => !o)}
+            aria-label={mobileOpen ? t("nav.close") : t("nav.openMenu")}
+            aria-expanded={mobileOpen}
+            aria-controls="mobile-nav-sheet"
+          >
+            {mobileOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
           </Button>
         </div>
       </div>
+
+      {/* Mobile nav sheet — backdrop + slide-down panel. Rendered as a
+          sibling to the header bar so the sticky-top anchor on the header
+          works correctly underneath the overlay. Hidden on lg+ where the
+          inline nav already shows every link. */}
+      {mobileOpen && (
+        <div className="lg:hidden">
+          <button
+            type="button"
+            aria-label={t("nav.close")}
+            onClick={() => setMobileOpen(false)}
+            className="fixed inset-0 top-16 z-30 bg-black/40 backdrop-blur-sm"
+          />
+          <nav
+            id="mobile-nav-sheet"
+            className="fixed inset-x-0 top-16 z-40 max-h-[calc(100vh-4rem)] overflow-y-auto border-b border-border/60 bg-background shadow-lg"
+          >
+            <div className="container flex flex-col gap-1 py-4">
+              <MobileLink to="/jobs" label={t("nav.jobs")} />
+              <MobileLink to="/companies" label={t("nav.companies")} />
+              <MobileLink to="/about" label={t("nav.about")} />
+
+              {user ? (
+                <>
+                  <div className="my-2 border-t border-border/50" />
+                  <MobileLink to={dashboardPath} label={t("nav.dashboard")} />
+                  <button
+                    type="button"
+                    onClick={handleLogout}
+                    disabled={loggingOut}
+                    className="flex items-center gap-2 rounded-md px-3 py-3 text-left text-sm font-medium text-foreground/80 transition hover:bg-muted disabled:opacity-50"
+                  >
+                    <LogOut className="h-4 w-4" />
+                    {t("nav.logout")}
+                  </button>
+                </>
+              ) : (
+                <div className="mt-2 grid gap-2 border-t border-border/50 pt-3 sm:hidden">
+                  <Button variant="outline" asChild className="w-full">
+                    <Link to="/login">{t("nav.login")}</Link>
+                  </Button>
+                  <Button asChild className="w-full">
+                    <Link to="/register">{t("nav.register")}</Link>
+                  </Button>
+                </div>
+              )}
+            </div>
+          </nav>
+        </div>
+      )}
     </header>
+  );
+}
+
+/** Single nav link inside the mobile sheet — chunky tap target. */
+function MobileLink({ to, label }: { to: string; label: string }) {
+  return (
+    <NavLink
+      to={to}
+      className={({ isActive }) =>
+        "rounded-md px-3 py-3 text-sm font-medium transition " +
+        (isActive
+          ? "bg-primary/10 text-primary"
+          : "text-foreground/80 hover:bg-muted hover:text-foreground")
+      }
+    >
+      {label}
+    </NavLink>
   );
 }

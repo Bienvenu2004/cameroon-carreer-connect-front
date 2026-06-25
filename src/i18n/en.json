@@ -25,7 +25,9 @@
     "platformStats": "Platform stats",
     "logout": "Sign out",
     "login": "Sign in",
-    "register": "Sign up"
+    "register": "Sign up",
+    "openMenu": "Open menu",
+    "close": "Close"
   },
   "notifications": {
     "title": "Notifications",
@@ -263,6 +265,33 @@
     "workAuth": "Work authorization",
     "employmentType": "Employment type",
     "notSpecified": "Not specified",
+    "workExperience": "Work experience",
+    "experiencesEmpty": "No work experience added yet.",
+    "yearsOfExperience": "{{count}} year(s) of experience",
+    "xp": {
+      "add": "Add experience",
+      "remove": "Remove",
+      "empty": "No roles added yet. Click \"Add experience\" to share your career so far.",
+      "rowLabel": "Role #{{n}}",
+      "title": "Job title",
+      "titlePlaceholder": "e.g. Backend Engineer",
+      "company": "Company",
+      "companyPlaceholder": "e.g. Orange Cameroun",
+      "city": "City",
+      "country": "Country",
+      "startDate": "Start date",
+      "endDate": "End date",
+      "isCurrent": "I currently work here",
+      "description": "What did you do?",
+      "descriptionPlaceholder": "Key responsibilities, achievements, technologies…",
+      "present": "Present",
+      "errTitle": "Job title is required",
+      "errCompany": "Company name is required",
+      "errStart": "Start date is required",
+      "errStartFuture": "Start date cannot be in the future",
+      "errEnd": "End date is required (or mark as current)",
+      "errEndBefore": "End date must be on or after the start date"
+    },
     "street": "Street",
     "uploadPhoto": "Profile photo",
     "notSet": "Not set",
@@ -494,5 +523,11 @@
     },
     "count": "Showing {{count}} of {{total}}",
     "noMatchForFilter": "No recommendations in this category. Try a different filter."
+  },
+  "theme": {
+    "toggle": "Toggle theme",
+    "light": "Light",
+    "dark": "Dark",
+    "system": "System"
   }
 }

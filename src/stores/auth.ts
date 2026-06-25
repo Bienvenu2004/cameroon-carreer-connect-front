@@ -16,13 +16,78 @@ export type UserRole = "JOB_SEEKER" | "RECRUITER" | "SYSTEM_ADMIN";
  */
 export type AuthStatus = "unknown" | "authenticated" | "unauthenticated";
 
+/**
+ * Minimal user shape persisted in the {@code jcc_user} cookie. ALL nested
+ * objects here must stay small — the cookie is capped at ~4 KB by the
+ * browser, and exceeding that limit causes the assignment to silently
+ * no-op (no error thrown). If we ever need a richer field at the top
+ * level, fetch it via /me after bootstrap rather than stuffing it here.
+ *
+ * The full user with skills, experiences, address, etc. lives in memory
+ * once {@code bootstrap()} runs and refreshes from /me. The cookie is
+ * only used to (a) tell bootstrap "yes, validate the session" instead
+ * of fast-pathing to unauthenticated, and (b) render the header avatar
+ * during the brief window between page load and /me responding.
+ */
 export interface AuthUser {
   id: string;
   email: string;
   role: UserRole;
   active: boolean;
-  jobSeekerProfile?: { firstName?: string; lastName?: string } | null;
-  recruiterProfile?: { firstName?: string; lastName?: string; company?: string } | null;
+  jobSeekerProfile?: {
+    firstName?: string;
+    lastName?: string;
+    /** Only the URL — never the full FileDto. */
+    profilePhoto?: { url?: string } | null;
+  } | null;
+  recruiterProfile?: {
+    firstName?: string;
+    lastName?: string;
+    company?: string;
+    profilePhoto?: { url?: string } | null;
+  } | null;
+}
+
+/**
+ * Project the full {@code UserDto} returned by /me down to the minimal
+ * shape the cookie can hold. Anything not listed here is discarded —
+ * the cookie's job is to keep the session alive across refresh, not to
+ * be a complete user cache.
+ *
+ * Accepts {@code unknown} because both /me (full UserDto) and
+ * loginSession (already-typed AuthUser) feed this. Safe-defaults every
+ * field so a malformed input still produces a valid (if sparse) record.
+ */
+function pickAuthUser(raw: unknown): AuthUser {
+  const u = (raw ?? {}) as Record<string, unknown>;
+  const seeker = (u.jobSeekerProfile ?? null) as Record<string, unknown> | null;
+  const recruiter = (u.recruiterProfile ?? null) as Record<string, unknown> | null;
+  const photoUrl = (p: Record<string, unknown> | null): { url?: string } | null => {
+    if (!p) return null;
+    const photo = p.profilePhoto as { url?: string } | null | undefined;
+    return photo?.url ? { url: photo.url } : null;
+  };
+  return {
+    id: String(u.id ?? ""),
+    email: String(u.email ?? ""),
+    role: (u.role as UserRole) ?? "JOB_SEEKER",
+    active: Boolean(u.active),
+    jobSeekerProfile: seeker
+      ? {
+          firstName: seeker.firstName as string | undefined,
+          lastName: seeker.lastName as string | undefined,
+          profilePhoto: photoUrl(seeker),
+        }
+      : null,
+    recruiterProfile: recruiter
+      ? {
+          firstName: recruiter.firstName as string | undefined,
+          lastName: recruiter.lastName as string | undefined,
+          company: recruiter.company as string | undefined,
+          profilePhoto: photoUrl(recruiter),
+        }
+      : null,
+  };
 }
 
 interface AuthState {
@@ -113,13 +178,20 @@ export const useAuthStore = create<AuthState>((set, get) => ({
   user: cachedUser,
 
   setUser(user) {
-    set({ user, status: user ? "authenticated" : "unauthenticated" });
-    persistUser(user);
+    // Project to the minimal shape before storing — UserDto from /me
+    // includes the entire profile (skills, experiences, social URLs,
+    // file objects) and the JSON serialization easily exceeds the
+    // browser's 4 KB cookie cap. When that happens, document.cookie
+    // silently no-ops and the next refresh boots us to /login.
+    const slim = user ? pickAuthUser(user) : null;
+    set({ user: slim, status: slim ? "authenticated" : "unauthenticated" });
+    persistUser(slim);
   },
 
   loginSession({ user }) {
-    set({ user, status: "authenticated" });
-    persistUser(user);
+    const slim = pickAuthUser(user);
+    set({ user: slim, status: "authenticated" });
+    persistUser(slim);
   },
 
   logout() {
@@ -145,10 +217,18 @@ export const useAuthStore = create<AuthState>((set, get) => ({
         const { UserApi } = await import("@/api");
         const me = await UserApi.me();
         get().setUser(me as AuthUser);
-      } catch {
+        if (import.meta.env.DEV) {
+          // eslint-disable-next-line no-console
+          console.info("[auth] bootstrap /me OK → authenticated");
+        }
+      } catch (err) {
         // /me failed (after the response interceptor already attempted a
         // refresh and that also failed). Force the unauthenticated state
         // even if the interceptor already did it — idempotent.
+        if (import.meta.env.DEV) {
+          // eslint-disable-next-line no-console
+          console.warn("[auth] bootstrap /me FAILED → logging out", err);
+        }
         get().logout();
       } finally {
         bootstrapPromise = null;

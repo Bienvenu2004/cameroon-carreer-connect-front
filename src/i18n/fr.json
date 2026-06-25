@@ -25,7 +25,9 @@
     "platformStats": "Statistiques",
     "logout": "Se déconnecter",
     "login": "Se connecter",
-    "register": "S'inscrire"
+    "register": "S'inscrire",
+    "openMenu": "Ouvrir le menu",
+    "close": "Fermer"
   },
   "notifications": {
     "title": "Notifications",
@@ -263,6 +265,33 @@
     "workAuth": "Autorisation de travail",
     "employmentType": "Type d'emploi",
     "notSpecified": "Non spécifié",
+    "workExperience": "Expérience professionnelle",
+    "experiencesEmpty": "Aucune expérience ajoutée pour l'instant.",
+    "yearsOfExperience": "{{count}} an(s) d'expérience",
+    "xp": {
+      "add": "Ajouter une expérience",
+      "remove": "Retirer",
+      "empty": "Aucune expérience ajoutée. Cliquez sur « Ajouter une expérience » pour partager votre parcours.",
+      "rowLabel": "Poste n°{{n}}",
+      "title": "Intitulé du poste",
+      "titlePlaceholder": "ex. Ingénieur Backend",
+      "company": "Entreprise",
+      "companyPlaceholder": "ex. Orange Cameroun",
+      "city": "Ville",
+      "country": "Pays",
+      "startDate": "Date de début",
+      "endDate": "Date de fin",
+      "isCurrent": "Je travaille actuellement ici",
+      "description": "Que faisiez-vous ?",
+      "descriptionPlaceholder": "Responsabilités, réalisations, technologies…",
+      "present": "À ce jour",
+      "errTitle": "L'intitulé du poste est obligatoire",
+      "errCompany": "Le nom de l'entreprise est obligatoire",
+      "errStart": "La date de début est obligatoire",
+      "errStartFuture": "La date de début ne peut pas être dans le futur",
+      "errEnd": "La date de fin est obligatoire (ou cochez « actuellement »)",
+      "errEndBefore": "La date de fin doit être postérieure ou égale au début"
+    },
     "street": "Rue",
     "uploadPhoto": "Photo de profil",
     "notSet": "Non renseigné",
@@ -494,5 +523,11 @@
     },
     "count": "{{count}} sur {{total}}",
     "noMatchForFilter": "Aucune recommandation dans cette catégorie. Essayez un autre filtre."
+  },
+  "theme": {
+    "toggle": "Changer le thème",
+    "light": "Clair",
+    "dark": "Sombre",
+    "system": "Système"
   }
 }

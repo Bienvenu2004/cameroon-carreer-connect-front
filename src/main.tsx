@@ -8,7 +8,10 @@ import App from "./App";
 import { queryClient } from "@/lib/queryClient";
 import { i18n } from "@/i18n/config";
 import { ToastProvider } from "@/components/ui/toast-provider";
+import { initTheme } from "@/stores/theme";
 import "./index.css";
+
+initTheme();
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
