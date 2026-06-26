@@ -23,7 +23,7 @@ export function MyCompanyPage() {
   // Backend's /companies/me returns the company owned by the current
   // authenticated recruiter (createdBy = currentUser), or null if none.
   const mine = useQuery({ queryKey: ["my-recruiter-company"], queryFn: () => CompaniesApi.mine() });
-  const company = mine.data;
+  const company = mine.data?.[0];
 
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");

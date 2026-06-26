@@ -328,7 +328,7 @@ type Chip = { id: string; label: string; value: string };
 function buildChips(
   result: AiSearchResponseDto,
   hidden: Set<string>,
-  t: (k: string, opts?: object) => string,
+  t: (k: string, opts?: Record<string, unknown>) => string,
 ): Chip[] {
   const i = result.interpretation;
   const out: Chip[] = [];
