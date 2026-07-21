@@ -10,6 +10,8 @@ import { useToast } from "@/components/ui/toast-provider";
 import { AuthApi, UserApi } from "@/api";
 import { useAuthStore } from "@/stores/auth";
 import { apiErrorMessage } from "@/lib/api";
+import { GoogleAuthButton } from "@/components/common/GoogleAuthButton";
+import { isGoogleAuthEnabled } from "@/lib/googleAuth";
 import { AuthShell } from "./AuthShell";
 
 export function LoginPage() {
@@ -63,6 +65,17 @@ export function LoginPage() {
         </div>
         <Button type="submit" className="w-full" size="lg" loading={m.isPending}>{t("auth.signIn")}</Button>
       </form>
+
+      {isGoogleAuthEnabled() && (
+        <>
+          <div className="my-6 flex items-center gap-3">
+            <span className="h-px flex-1 bg-border" />
+            <span className="text-xs uppercase tracking-wide text-muted-foreground">{t("auth.orContinueWith")}</span>
+            <span className="h-px flex-1 bg-border" />
+          </div>
+          <GoogleAuthButton redirect={redirect} text="signin_with" />
+        </>
+      )}
 
       <p className="mt-6 text-center text-sm text-muted-foreground">
         {t("auth.noAccount")} <Link to="/register" className="font-medium text-primary hover:underline">{t("auth.signUp")}</Link>

@@ -3,7 +3,7 @@ import { useTranslation } from "react-i18next";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Link } from "react-router-dom";
 import {
-  Briefcase, Calendar, Download, Facebook, FileText, Github, Globe, Languages,
+  Briefcase, Calendar, Download, Eye, Facebook, FileText, Github, Globe, Languages,
   Linkedin, Link as LinkIcon, Mail, MapPin, Phone, Twitter, UserCircle2,
 } from "lucide-react";
 
@@ -22,7 +22,7 @@ import { useToast } from "@/components/ui/toast-provider";
 import { apiErrorMessage } from "@/lib/api";
 import { initials, relativeTime } from "@/lib/utils";
 import type {
-  ApplicationStatus, JobApplicationDto, JobSeekerProfileDto, WorkExperienceDto,
+  ApplicationStatus, FileDto, JobApplicationDto, JobSeekerProfileDto, WorkExperienceDto,
 } from "@/types/api";
 
 const STATUSES: ApplicationStatus[] = ["APPLIED", "REVIEWED", "INTERVIEW", "HIRED", "REJECTED"];
@@ -134,6 +134,83 @@ export function ApplicationsReceived() {
         app={openApp}
         onClose={() => setOpenApp(null)}
       />
+    </div>
+  );
+}
+
+/* =============================================================================
+ *  Resume panel
+ *
+ *  Lets the recruiter either stream the candidate's resume inline (an embedded
+ *  PDF viewer, toggled on demand so the dialog stays compact) or download it.
+ *
+ *  Resumes live on Cloudinary as `raw` resources: the bare secure URL is served
+ *  inline (viewable in-browser), and appending `fl_attachment=true` forces the
+ *  browser to download instead — mirroring the backend's downloadFile() logic.
+ * ===========================================================================*/
+function ResumePanel({ resume }: { resume: FileDto | null }) {
+  const { t } = useTranslation();
+  const [preview, setPreview] = useState(false);
+
+  const url = resume?.url;
+
+  if (!url) {
+    return (
+      <div className="rounded-xl border border-border/60 bg-muted/30 p-4">
+        <div className="mb-2 text-xs font-medium uppercase tracking-wider text-muted-foreground">
+          {t("profile.currentResume")}
+        </div>
+        <div className="text-sm text-muted-foreground italic">{t("profile.noResume")}</div>
+      </div>
+    );
+  }
+
+  const isPdf = (resume?.type ?? "").includes("pdf") || url.toLowerCase().includes(".pdf");
+  const downloadHref = url.includes("?") ? `${url}&fl_attachment=true` : `${url}?fl_attachment=true`;
+
+  return (
+    <div className="rounded-xl border border-border/60 bg-muted/30 p-4">
+      <div className="mb-2 text-xs font-medium uppercase tracking-wider text-muted-foreground">
+        {t("profile.currentResume")}
+      </div>
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <div className="flex items-center gap-2 min-w-0">
+          <FileText className="h-4 w-4 shrink-0 text-primary" />
+          <span className="truncate text-sm">{resume?.name ?? "resume"}</span>
+        </div>
+        <div className="flex items-center gap-2">
+          {/* PDFs stream inline in an embedded viewer; other formats (e.g. docx)
+              can't be embedded, so open them in a new tab instead. */}
+          {isPdf ? (
+            <Button size="sm" variant="outline" onClick={() => setPreview((v) => !v)}>
+              <Eye className="h-4 w-4" /> {preview ? t("profile.hideResume") : t("profile.viewResume")}
+            </Button>
+          ) : (
+            <Button asChild size="sm" variant="outline">
+              <a href={url} target="_blank" rel="noreferrer noopener">
+                <Eye className="h-4 w-4" /> {t("profile.viewResume")}
+              </a>
+            </Button>
+          )}
+          <Button asChild size="sm" variant="outline">
+            <a
+              href={downloadHref}
+              target="_blank"
+              rel="noreferrer noopener"
+              download={resume?.name ?? undefined}
+            >
+              <Download className="h-4 w-4" /> {t("profile.downloadResume")}
+            </a>
+          </Button>
+        </div>
+      </div>
+      {preview && isPdf && (
+        <iframe
+          src={url}
+          title={resume?.name ?? "resume"}
+          className="mt-3 h-[70vh] w-full rounded-lg border border-border/60 bg-background"
+        />
+      )}
     </div>
   );
 }
@@ -324,33 +401,7 @@ function CandidateProfileDialog({
             </div>
 
             {/* Resume ------------------------------------------------------ */}
-            <div className="rounded-xl border border-border/60 bg-muted/30 p-4">
-              <div className="mb-2 text-xs font-medium uppercase tracking-wider text-muted-foreground">
-                {t("profile.currentResume")}
-              </div>
-              {profile.resume?.url ? (
-                <div className="flex items-center justify-between gap-3">
-                  <div className="flex items-center gap-2 min-w-0">
-                    <FileText className="h-4 w-4 shrink-0 text-primary" />
-                    <span className="truncate text-sm">{profile.resume.name ?? "resume"}</span>
-                  </div>
-                  <Button asChild size="sm" variant="outline">
-                    <a
-                      href={profile.resume.url}
-                      target="_blank"
-                      rel="noreferrer noopener"
-                      download={profile.resume.name ?? undefined}
-                    >
-                      <Download className="h-4 w-4" /> {t("profile.downloadResume")}
-                    </a>
-                  </Button>
-                </div>
-              ) : (
-                <div className="text-sm text-muted-foreground italic">
-                  {t("profile.noResume")}
-                </div>
-              )}
-            </div>
+            <ResumePanel resume={profile.resume ?? null} />
           </div>
         )}
 

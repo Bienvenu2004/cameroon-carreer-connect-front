@@ -72,6 +72,7 @@ api.interceptors.request.use((config: InternalAxiosRequestConfig) => {
  */
 const NO_REFRESH_PATHS = [
   "/api/hjp/auth/login",
+  "/api/hjp/auth/google",
   "/api/hjp/auth/register",
   "/api/hjp/auth/request-email-verification",
   "/api/hjp/auth/verify-email",

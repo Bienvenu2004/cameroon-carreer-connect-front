@@ -59,6 +59,18 @@ export const AuthApi = {
     return normalizeAuth(raw);
   },
 
+  /**
+   * Sign in (or, on first use, sign up) with a Google ID token. `credential`
+   * is the token returned by Google Identity Services. `role` is only honored
+   * when creating a brand-new account (from the register screen); for an
+   * existing account the stored role wins. Returns the same normalized auth
+   * response as {@link login} — the session cookies are already set by then.
+   */
+  google: async (body: { credential: string; role?: UserRole }) => {
+    const raw = await unwrap<AuthResponseRaw>(api.post("/api/hjp/auth/google", body));
+    return normalizeAuth(raw);
+  },
+
   logout: () => unwrap<void>(api.post("/api/hjp/auth/logout")),
 
   /** Trigger a password reset OTP to the user's email. */

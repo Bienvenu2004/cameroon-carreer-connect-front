@@ -12,6 +12,8 @@ import { AuthApi } from "@/api";
 import { apiErrorMessage } from "@/lib/api";
 import type { UserRole } from "@/types/api";
 import { cn } from "@/lib/utils";
+import { GoogleAuthButton } from "@/components/common/GoogleAuthButton";
+import { isGoogleAuthEnabled } from "@/lib/googleAuth";
 import { AuthShell } from "./AuthShell";
 
 /**
@@ -85,6 +87,18 @@ export function RegisterPage() {
         </div>
         <Button type="submit" className="w-full" size="lg" loading={m.isPending}>{t("auth.signUp")}</Button>
       </form>
+
+      {isGoogleAuthEnabled() && (
+        <>
+          <div className="my-6 flex items-center gap-3">
+            <span className="h-px flex-1 bg-border" />
+            <span className="text-xs uppercase tracking-wide text-muted-foreground">{t("auth.orContinueWith")}</span>
+            <span className="h-px flex-1 bg-border" />
+          </div>
+          {/* The role selected above is applied when Google creates the account. */}
+          <GoogleAuthButton role={role} text="signup_with" />
+        </>
+      )}
 
       <p className="mt-6 text-center text-sm text-muted-foreground">
         {t("auth.haveAccount")} <Link to="/login" className="font-medium text-primary hover:underline">{t("auth.signIn")}</Link>

@@ -201,7 +201,11 @@
     "forgotPasswordTitle": "Reset your password",
     "forgotPasswordSub": "Enter your email to get a reset link.",
     "resetPasswordTitle": "Choose a new password",
-    "newPassword": "New password"
+    "newPassword": "New password",
+    "orContinueWith": "or",
+    "continueWithGoogle": "Continue with Google",
+    "googleUnavailable": "Google Sign-In is not configured.",
+    "googleFailed": "Google Sign-In failed. Please try again."
   },
   "applications": {
     "title": "My applications",
@@ -254,6 +258,8 @@
     "uploadResume": "Upload my resume",
     "currentResume": "Current resume",
     "downloadResume": "Download resume",
+    "viewResume": "View resume",
+    "hideResume": "Hide resume",
     "skills": "Skills",
     "addSkill": "Add a skill",
     "editProfile": "Edit profile",

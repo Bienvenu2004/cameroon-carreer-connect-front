@@ -201,7 +201,11 @@
     "forgotPasswordTitle": "Réinitialiser votre mot de passe",
     "forgotPasswordSub": "Saisissez votre e-mail pour recevoir un lien de réinitialisation.",
     "resetPasswordTitle": "Choisissez un nouveau mot de passe",
-    "newPassword": "Nouveau mot de passe"
+    "newPassword": "Nouveau mot de passe",
+    "orContinueWith": "ou",
+    "continueWithGoogle": "Continuer avec Google",
+    "googleUnavailable": "La connexion Google n'est pas configurée.",
+    "googleFailed": "Échec de la connexion Google. Veuillez réessayer."
   },
   "applications": {
     "title": "Mes candidatures",
@@ -254,6 +258,8 @@
     "uploadResume": "Téléverser mon CV",
     "currentResume": "CV actuel",
     "downloadResume": "Télécharger le CV",
+    "viewResume": "Voir le CV",
+    "hideResume": "Masquer le CV",
     "skills": "Compétences",
     "addSkill": "Ajouter une compétence",
     "editProfile": "Modifier le profil",
