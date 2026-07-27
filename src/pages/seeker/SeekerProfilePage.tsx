@@ -2,9 +2,9 @@ import { useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
-  Briefcase, Calendar, Download, Facebook, FileText, Github, Globe, Languages,
-  Linkedin, Link as LinkIcon, Mail, MapPin, Pencil, Phone, Plus, Trash2, Twitter,
-  Upload, User as UserIcon, X,
+  Briefcase, Calendar, Download, Eye, Facebook, FileText, Github, Globe, Languages,
+  Linkedin, Link as LinkIcon, Mail, MapPin, Pencil, Phone, Plus, Sparkles, Trash2, Twitter,
+  Upload, User as UserIcon, Video, X,
 } from "lucide-react";
 
 import { SeekerApi, SkillsApi } from "@/api";
@@ -20,7 +20,8 @@ import {
 } from "@/components/ui/select";
 import { useToast } from "@/components/ui/toast-provider";
 import { useAuthStore } from "@/stores/auth";
-import { apiErrorMessage } from "@/lib/api";
+import { apiErrorMessage, storageUrl } from "@/lib/api";
+import { downloadResumeFromProfile } from "@/lib/resume";
 import { initials } from "@/lib/utils";
 import {
   ALL_REGIONS,
@@ -127,12 +128,34 @@ export function SeekerProfilePage() {
  *  View mode
  * ==========================================================================*/
 function ProfileView({ profile }: { profile: JobSeekerProfileDto }) {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const user = useAuthStore((s) => s.user);
 
   const fullName = [profile.firstName, profile.lastName]
     .filter(Boolean)
     .join(" ");
+
+  // Build a downloadable résumé straight from the structured profile data —
+  // no upload required. Labels are translated here so the generated PDF
+  // matches the user's current language.
+  const generateResume = () => {
+    const locale = i18n.language?.startsWith("en") ? "en-GB" : "fr-FR";
+    downloadResumeFromProfile(profile, {
+      email: user?.email,
+      locale,
+      labels: {
+        resume: t("profile.resumeDocTitle"),
+        experience: t("profile.workExperience"),
+        skills: t("profile.skills"),
+        languages: t("profile.spokenLanguages"),
+        links: t("profile.portfolioLinks"),
+        present: t("profile.xp.present"),
+        footer: t("profile.resumeGeneratedOn", {
+          date: new Date().toLocaleDateString(locale),
+        }),
+      },
+    });
+  };
 
   return (
     <div className="space-y-4">
@@ -306,9 +329,20 @@ function ProfileView({ profile }: { profile: JobSeekerProfileDto }) {
 
       {/* Documents --------------------------------------------------------- */}
       <Card>
-        <SectionHeader title={t("profile.documents")} />
+        <div className="flex flex-wrap items-center justify-between gap-2">
+          <SectionHeader title={t("profile.documents")} />
+          {/* Auto-generate a résumé from the structured profile — works even
+              when the seeker never uploaded a CV. Opens the browser's
+              print / "Save as PDF" dialog. */}
+          <Button size="sm" variant="outline" onClick={generateResume}>
+            <Sparkles className="h-4 w-4" /> {t("profile.generateResume")}
+          </Button>
+        </div>
+        <p className="mt-2 text-xs text-muted-foreground">
+          {t("profile.generateResumeHint")}
+        </p>
         <div className="mt-3">
-          {profile.resume?.url ? (
+          {profile.resume?.id ? (
             <div className="flex items-center justify-between gap-3 rounded-xl border border-border/40 bg-muted/30 p-3">
               <div className="flex min-w-0 items-center gap-2">
                 <FileText className="h-4 w-4 shrink-0 text-primary" />
@@ -316,20 +350,58 @@ function ProfileView({ profile }: { profile: JobSeekerProfileDto }) {
                   {profile.resume.name ?? "resume"}
                 </span>
               </div>
-              <Button asChild size="sm" variant="outline">
-                <a
-                  href={profile.resume.url}
-                  target="_blank"
-                  rel="noreferrer noopener"
-                  download={profile.resume.name ?? undefined}
-                >
-                  <Download className="h-4 w-4" /> {t("profile.downloadResume")}
-                </a>
-              </Button>
+              <div className="flex items-center gap-2">
+                {/* Stream through the backend so PDFs preview/download with the
+                    correct type and filename (raw Cloudinary URLs lack the
+                    .pdf extension and download as unknown files). */}
+                <Button asChild size="sm" variant="outline">
+                  <a
+                    href={storageUrl(profile.resume.id)}
+                    target="_blank"
+                    rel="noreferrer noopener"
+                  >
+                    <Eye className="h-4 w-4" /> {t("profile.viewResume")}
+                  </a>
+                </Button>
+                <Button asChild size="sm" variant="outline">
+                  <a
+                    href={storageUrl(profile.resume.id, { download: true })}
+                    target="_blank"
+                    rel="noreferrer noopener"
+                  >
+                    <Download className="h-4 w-4" /> {t("profile.downloadResume")}
+                  </a>
+                </Button>
+              </div>
             </div>
           ) : (
             <div className="text-sm text-muted-foreground">
               {t("profile.noResume")}
+            </div>
+          )}
+        </div>
+      </Card>
+
+      {/* Video introduction ------------------------------------------------ */}
+      <Card>
+        <SectionHeader title={t("profile.videoResume")} />
+        <div className="mt-3">
+          {profile.videoResume?.url ? (
+            // Streams directly from the Cloudinary video URL (HTTP range /
+            // CDN) — playback only. controlsList=nodownload hides the
+            // browser's download button; there is no download link.
+            <video
+              src={profile.videoResume.url}
+              controls
+              controlsList="nodownload"
+              preload="metadata"
+              className="w-full max-h-[420px] rounded-xl border border-border/50 bg-black"
+            >
+              {t("profile.videoUnsupported")}
+            </video>
+          ) : (
+            <div className="text-sm text-muted-foreground">
+              {t("profile.noVideoResume")}
             </div>
           )}
         </div>
@@ -374,6 +446,7 @@ function ProfileEditForm({
   );
 
   const [resumeFile, setResumeFile] = useState<File | null>(null);
+  const [videoFile, setVideoFile] = useState<File | null>(null);
   const [photoFile, setPhotoFile] = useState<File | null>(null);
   const photoPreviewUrl = useMemo(
     () => (photoFile ? URL.createObjectURL(photoFile) : null),
@@ -492,6 +565,7 @@ function ProfileEditForm({
       // MultipartFiles are guarded server-side, but skipping the field
       // avoids needlessly wrapping an empty Part.
       if (resumeFile) fd.append("resume", resumeFile);
+      if (videoFile) fd.append("videoResume", videoFile);
       if (photoFile) fd.append("profilePhoto", photoFile);
 
       // Skills replace the whole list — service does setSkills(newList).
@@ -848,6 +922,45 @@ function ProfileEditForm({
               variant="ghost"
               size="sm"
               onClick={() => setResumeFile(null)}
+            >
+              <X className="h-3.5 w-3.5" /> {t("common.cancel")}
+            </Button>
+          )}
+        </div>
+      </Card>
+
+      {/* Video introduction ----------------------------------------------- */}
+      <Card>
+        <SectionHeader title={t("profile.videoResume")} />
+        <p className="mt-2 text-xs text-muted-foreground">
+          {t("profile.videoResumeHint")}
+        </p>
+        <div className="mt-3 space-y-3">
+          <label className="inline-flex cursor-pointer items-center gap-2 rounded-md border border-dashed border-border px-4 py-3 text-sm hover:bg-accent">
+            <Video className="h-4 w-4 text-primary" />
+            <span>{videoFile?.name ?? t("profile.uploadVideoResume")}</span>
+            <input
+              type="file"
+              // FileServiceImpl.ALLOWED_FILES permits mp4/webm/quicktime/avi/wmv/mpeg.
+              accept="video/mp4,video/webm,video/quicktime,video/x-msvideo,video/x-ms-wmv,video/mpeg"
+              className="sr-only"
+              onChange={(e) => setVideoFile(e.target.files?.[0] ?? null)}
+            />
+          </label>
+          <p className="text-xs text-muted-foreground">
+            {t("profile.videoResumeFormats")}
+          </p>
+          {!videoFile && profile.videoResume?.name && (
+            <p className="text-xs text-muted-foreground">
+              {t("profile.currentVideoResume")}: {profile.videoResume.name}
+            </p>
+          )}
+          {videoFile && (
+            <Button
+              type="button"
+              variant="ghost"
+              size="sm"
+              onClick={() => setVideoFile(null)}
             >
               <X className="h-3.5 w-3.5" /> {t("common.cancel")}
             </Button>

@@ -43,6 +43,25 @@ export const api = axios.create({
   withCredentials: true,
 });
 
+/**
+ * Absolute URL to a stored file streamed through the backend's /storage
+ * endpoints. We proxy the bytes (rather than linking straight to Cloudinary)
+ * because PDFs are stored as Cloudinary "raw" resources whose URL has no
+ * `.pdf` extension — served that way the browser can't preview them and
+ * downloads an extension-less file. The backend re-sends the bytes with the
+ * correct Content-Type and filename.
+ *
+ *   - preview (default): inline disposition, viewable in an <iframe>
+ *   - download: attachment disposition with a proper filename
+ *
+ * Prefixed with the same base as the axios client so it resolves correctly
+ * both in dev (proxy target) and prod (same-origin).
+ */
+export function storageUrl(fileId: string, opts?: { download?: boolean }): string {
+  const path = opts?.download ? `/storage/download/${fileId}` : `/storage/${fileId}`;
+  return `${baseURL}${path}`;
+}
+
 /* ---------------- request interceptor: language + client-type ---------------- */
 api.interceptors.request.use((config: InternalAxiosRequestConfig) => {
   // Forward the chosen UI language so the backend's MessageSource can
@@ -72,6 +91,7 @@ api.interceptors.request.use((config: InternalAxiosRequestConfig) => {
  */
 const NO_REFRESH_PATHS = [
   "/api/hjp/auth/login",
+  "/api/hjp/auth/google",
   "/api/hjp/auth/register",
   "/api/hjp/auth/request-email-verification",
   "/api/hjp/auth/verify-email",
