@@ -6,7 +6,7 @@ import type {
   AiSearchResponseDto,
   JobSeekerProfileDto, NotificationDto, PageResponse, RecommendationDto,
   RecruiterProfileDto, RegionalStatsDto, SavedSearchDto,
-  UserDto, UserRole, ApplicationStatus, CompanyStatus, VerificationType,
+  UserDto, UserRole, ApplicationStatus, UpdateApplicationStatusPayload, CompanyStatus, VerificationType,
 } from "@/types/api";
 
 /** Normalize backend snake_case auth response to camelCase. */
@@ -133,14 +133,17 @@ export const ApplicationsApi = {
     unwrap<PageResponse<JobApplicationDto>>(api.get("/api/hjp/jobs/applications", { params })),
 
   /**
-   * Backend uses @RequestParam ApplicationStatus status — must be sent as a
-   * query parameter, not a JSON body. Returns Void.
+   * Backend takes UpdateApplicationStatusDto as a JSON body. For INTERVIEW,
+   * include the interview place/date-time/phone/note so the candidate can be
+   * emailed the invitation; other statuses just send `status`.
+   *
+   * Accepts either a bare status (ergonomic for APPLIED/REVIEWED/HIRED/REJECTED)
+   * or the full payload when scheduling an interview.
    */
-  updateStatus: (id: string, status: ApplicationStatus) =>
+  updateStatus: (id: string, payload: ApplicationStatus | UpdateApplicationStatusPayload) =>
     unwrap<void>(api.patch(
       `/api/hjp/jobs/applications/${id}/status`,
-      null,
-      { params: { status } },
+      typeof payload === "string" ? { status: payload } : payload,
     )),
 };
 

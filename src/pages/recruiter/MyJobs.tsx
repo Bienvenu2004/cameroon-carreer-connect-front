@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Link } from "react-router-dom";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { Edit, Plus, Search, Trash2, X } from "lucide-react";
+import { Edit, Plus, Search, Trash2, X, Zap } from "lucide-react";
 
 import { JobsApi } from "@/api";
 import { Button } from "@/components/ui/button";
@@ -63,7 +63,10 @@ export function MyJobs() {
           <h1 className="font-display text-2xl font-bold tracking-tight">{t("nav.myJobs")}</h1>
           <p className="mt-1 text-sm text-muted-foreground">{t("home.heroSubtitle")}</p>
         </div>
-        <Button asChild><Link to="/recruiter/jobs/new"><Plus className="h-4 w-4" /> {t("jobEditor.createTitle")}</Link></Button>
+        <div className="flex flex-wrap gap-2">
+          <Button asChild><Link to="/recruiter/jobs/quick"><Zap className="h-4 w-4" /> {t("quickPost.cta")}</Link></Button>
+          <Button asChild variant="outline"><Link to="/recruiter/jobs/new"><Plus className="h-4 w-4" /> {t("jobEditor.createTitle")}</Link></Button>
+        </div>
       </header>
 
       <div className="mb-4 flex flex-wrap gap-3">

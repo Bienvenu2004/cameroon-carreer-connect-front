@@ -27,10 +27,13 @@ import { RecommendedJobsPage } from "@/pages/seeker/RecommendedJobsPage";
 
 import { RecruiterLayout } from "@/pages/recruiter/RecruiterLayout";
 import { RecruiterDashboard } from "@/pages/recruiter/RecruiterDashboard";
+import { RecruiterProfilePage } from "@/pages/recruiter/RecruiterProfilePage";
 import { MyJobs } from "@/pages/recruiter/MyJobs";
 import { JobEditor } from "@/pages/recruiter/JobEditor";
+import { QuickJobPost } from "@/pages/recruiter/QuickJobPost";
 import { ApplicationsReceived } from "@/pages/recruiter/ApplicationsReceived";
 import { MyCompaniesPage } from "@/pages/recruiter/MyCompaniesPage";
+import { RecruiterCompanyDetailPage } from "@/pages/recruiter/CompanyDetailPage";
 import { CompanyEditor } from "@/pages/recruiter/CompanyEditor";
 
 import { AdminLayout } from "@/pages/admin/AdminLayout";
@@ -86,10 +89,13 @@ export function AppRouter() {
         }
       >
         <Route index element={<RecruiterDashboard />} />
+        <Route path="profile" element={<RecruiterProfilePage />} />
         <Route path="companies" element={<MyCompaniesPage />} />
         <Route path="companies/new" element={<CompanyEditor mode="create" />} />
+        <Route path="companies/:id" element={<RecruiterCompanyDetailPage />} />
         <Route path="companies/:id/edit" element={<CompanyEditor mode="edit" />} />
         <Route path="jobs" element={<MyJobs />} />
+        <Route path="jobs/quick" element={<QuickJobPost />} />
         <Route path="jobs/new" element={<JobEditor mode="create" />} />
         <Route path="jobs/:id/edit" element={<JobEditor mode="edit" />} />
         <Route path="applications" element={<ApplicationsReceived />} />

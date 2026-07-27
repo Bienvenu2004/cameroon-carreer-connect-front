@@ -4,6 +4,7 @@ import { Link, useLocation, useNavigate, useSearchParams } from "react-router-do
 import { useMutation } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { PasswordInput } from "@/components/ui/password-input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/components/ui/toast-provider";
 import { AuthApi } from "@/api";
@@ -88,12 +89,12 @@ export function ResetPasswordPage() {
         </div>
         <div className="space-y-2">
           <Label htmlFor="password">{t("auth.newPassword")}</Label>
-          <Input id="password" type="password" minLength={8} required value={password} onChange={(e) => setPassword(e.target.value)} />
+          <PasswordInput id="password" minLength={8} required value={password} onChange={(e) => setPassword(e.target.value)} />
           <p className="text-xs text-muted-foreground">{t("auth.passwordMin")}</p>
         </div>
         <div className="space-y-2">
           <Label htmlFor="confirm">{t("auth.confirmPassword")}</Label>
-          <Input id="confirm" type="password" minLength={8} required value={confirm} onChange={(e) => setConfirm(e.target.value)} />
+          <PasswordInput id="confirm" minLength={8} required value={confirm} onChange={(e) => setConfirm(e.target.value)} />
         </div>
         <Button type="submit" className="w-full" size="lg" loading={m.isPending}>{t("common.submit")}</Button>
         <Button type="button" variant="ghost" className="w-full" loading={resend.isPending} onClick={() => resend.mutate()}>

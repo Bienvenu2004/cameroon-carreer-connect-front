@@ -5,6 +5,7 @@ import { useMutation } from "@tanstack/react-query";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { PasswordInput } from "@/components/ui/password-input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/components/ui/toast-provider";
 import { AuthApi, UserApi } from "@/api";
@@ -61,7 +62,7 @@ export function LoginPage() {
             <Label htmlFor="password">{t("auth.password")}</Label>
             <Link to="/forgot-password" className="text-xs font-medium text-primary hover:underline">{t("auth.forgotPassword")}</Link>
           </div>
-          <Input id="password" type="password" autoComplete="current-password" required value={password} onChange={(e) => setPassword(e.target.value)} placeholder="••••••••" />
+          <PasswordInput id="password" autoComplete="current-password" required value={password} onChange={(e) => setPassword(e.target.value)} placeholder="••••••••" />
         </div>
         <Button type="submit" className="w-full" size="lg" loading={m.isPending}>{t("auth.signIn")}</Button>
       </form>

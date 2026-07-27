@@ -6,6 +6,7 @@ import { Briefcase, User } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { PasswordInput } from "@/components/ui/password-input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/components/ui/toast-provider";
 import { AuthApi } from "@/api";
@@ -78,12 +79,12 @@ export function RegisterPage() {
         </div>
         <div className="space-y-2">
           <Label htmlFor="password">{t("auth.password")}</Label>
-          <Input id="password" type="password" autoComplete="new-password" required minLength={8} value={password} onChange={(e) => setPassword(e.target.value)} />
+          <PasswordInput id="password" autoComplete="new-password" required minLength={8} value={password} onChange={(e) => setPassword(e.target.value)} />
           <p className="text-xs text-muted-foreground">{t("auth.passwordMin")}</p>
         </div>
         <div className="space-y-2">
           <Label htmlFor="confirm">{t("auth.confirmPassword")}</Label>
-          <Input id="confirm" type="password" autoComplete="new-password" required minLength={8} value={confirm} onChange={(e) => setConfirm(e.target.value)} />
+          <PasswordInput id="confirm" autoComplete="new-password" required minLength={8} value={confirm} onChange={(e) => setConfirm(e.target.value)} />
         </div>
         <Button type="submit" className="w-full" size="lg" loading={m.isPending}>{t("auth.signUp")}</Button>
       </form>

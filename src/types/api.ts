@@ -161,6 +161,12 @@ export interface JobSeekerProfileDto {
   facebookUrl?: string;
 
   resume?: FileDto | null;
+  /**
+   * Short-form video introduction. `url` is a Cloudinary `video` delivery URL
+   * that streams directly in a <video> element (HTTP range / CDN) — playback
+   * only, no download.
+   */
+  videoResume?: FileDto | null;
   profilePhoto?: FileDto | null;
   skills?: SkillDto[];
 
@@ -264,6 +270,25 @@ export interface JobApplicationDto {
   /** Candidate snapshot — concatenated firstName + lastName from the seeker profile. */
   profileId?: string;
   candidateName?: string;
+
+  /** Interview details — present once the recruiter schedules an interview. */
+  interviewPlace?: string;
+  /** ISO date-time string (LocalDateTime on the wire). */
+  interviewDateTime?: string;
+  interviewPhone?: string;
+  interviewNote?: string;
+}
+
+/**
+ * Request body for changing an application's status. The interview fields
+ * are only sent (and only meaningful) when `status` is `INTERVIEW`.
+ */
+export interface UpdateApplicationStatusPayload {
+  status: ApplicationStatus;
+  interviewPlace?: string;
+  interviewDateTime?: string;
+  interviewPhone?: string;
+  interviewNote?: string;
 }
 
 /**

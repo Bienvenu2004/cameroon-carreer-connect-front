@@ -1,7 +1,7 @@
 import { useTranslation } from "react-i18next";
 import { Link } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
-import { Building2, Edit, MapPin, Plus } from "lucide-react";
+import { Building2, Edit, Eye, MapPin, Plus } from "lucide-react";
 
 import { CompaniesApi } from "@/api";
 import { Button } from "@/components/ui/button";
@@ -67,7 +67,11 @@ export function MyCompaniesPage() {
                   <Building2 className="h-5 w-5" />
                 </div>
                 <div className="min-w-0">
-                  <h3 className="truncate font-display text-base font-semibold">{c.name}</h3>
+                  <h3 className="truncate font-display text-base font-semibold">
+                    <Link to={`/recruiter/companies/${c.id}`} className="hover:text-primary">
+                      {c.name}
+                    </Link>
+                  </h3>
                   {c.industry && (
                     <div className="text-xs text-muted-foreground">
                       {t(`industries.${c.industry}`)}
@@ -104,6 +108,11 @@ export function MyCompaniesPage() {
             )}
 
             <div className="mt-auto flex items-center justify-end gap-2 pt-2">
+              <Button asChild variant="outline" size="sm">
+                <Link to={`/recruiter/companies/${c.id}`}>
+                  <Eye className="h-3.5 w-3.5" /> {t("company.view")}
+                </Link>
+              </Button>
               <Button asChild variant="outline" size="sm">
                 <Link to={`/recruiter/companies/${c.id}/edit`}>
                   <Edit className="h-3.5 w-3.5" /> {t("company.edit")}

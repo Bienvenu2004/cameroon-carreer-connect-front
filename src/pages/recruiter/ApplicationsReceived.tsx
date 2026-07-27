@@ -1,10 +1,10 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Link } from "react-router-dom";
 import {
   Briefcase, Calendar, Download, Eye, Facebook, FileText, Github, Globe, Languages,
-  Linkedin, Link as LinkIcon, Mail, MapPin, Phone, Twitter, UserCircle2,
+  Linkedin, Link as LinkIcon, Mail, MapPin, Phone, Twitter, UserCircle2, Video,
 } from "lucide-react";
 
 import { ApplicationsApi, SeekerApi } from "@/api";
@@ -17,13 +17,23 @@ import {
   Dialog, DialogContent, DialogDescription, DialogFooter,
   DialogHeader, DialogTitle,
 } from "@/components/ui/dialog";
+import { Input, Textarea } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/components/ui/toast-provider";
-import { apiErrorMessage } from "@/lib/api";
+import { apiErrorMessage, storageUrl } from "@/lib/api";
 import { initials, relativeTime } from "@/lib/utils";
 import type {
-  ApplicationStatus, FileDto, JobApplicationDto, JobSeekerProfileDto, WorkExperienceDto,
+  ApplicationStatus, FileDto, JobApplicationDto, JobSeekerProfileDto,
+  UpdateApplicationStatusPayload, WorkExperienceDto,
 } from "@/types/api";
+
+/**
+ * Statuses that email the candidate and are hard to undo — a mistaken hire,
+ * interview invite, or rejection all send mail. We require an explicit
+ * confirmation step for these; APPLIED/REVIEWED apply immediately.
+ */
+const CONFIRM_STATUSES: ApplicationStatus[] = ["INTERVIEW", "HIRED", "REJECTED"];
 
 const STATUSES: ApplicationStatus[] = ["APPLIED", "REVIEWED", "INTERVIEW", "HIRED", "REJECTED"];
 
@@ -36,6 +46,12 @@ export function ApplicationsReceived() {
 
   /** Which application's profile dialog is currently open, if any. */
   const [openApp, setOpenApp] = useState<JobApplicationDto | null>(null);
+
+  /**
+   * A status change awaiting confirmation (INTERVIEW/HIRED/REJECTED). Holds
+   * the target application and the requested status; null when no dialog open.
+   */
+  const [pending, setPending] = useState<{ app: JobApplicationDto; status: ApplicationStatus } | null>(null);
 
   const filter = {
     page,
@@ -50,10 +66,11 @@ export function ApplicationsReceived() {
   });
 
   const update = useMutation({
-    mutationFn: ({ id, status }: { id: string; status: ApplicationStatus }) =>
-      ApplicationsApi.updateStatus(id, status),
+    mutationFn: ({ id, payload }: { id: string; payload: ApplicationStatus | UpdateApplicationStatusPayload }) =>
+      ApplicationsApi.updateStatus(id, payload),
     onSuccess: () => {
       void qc.invalidateQueries({ queryKey: ["recruiter-applications"] });
+      setPending(null);
       toast({ title: t("common.successSaved"), variant: "success" });
     },
     onError: (e) => toast({
@@ -62,6 +79,19 @@ export function ApplicationsReceived() {
       variant: "destructive",
     }),
   });
+
+  /**
+   * Requested from the per-row status <Select>. Emailing statuses go through a
+   * confirmation dialog; the rest apply immediately. No-op if unchanged.
+   */
+  function requestStatusChange(app: JobApplicationDto, status: ApplicationStatus) {
+    if (status === app.status) return;
+    if (CONFIRM_STATUSES.includes(status)) {
+      setPending({ app, status });
+    } else {
+      update.mutate({ id: app.id, payload: status });
+    }
+  }
 
   return (
     <div>
@@ -96,7 +126,7 @@ export function ApplicationsReceived() {
                 <td className="p-4">
                   <div className="flex items-center gap-2">
                     <ApplicationStatusBadge status={a.status} />
-                    <Select value={a.status} onValueChange={(v) => update.mutate({ id: a.id, status: v as ApplicationStatus })}>
+                    <Select value={a.status} onValueChange={(v) => requestStatusChange(a, v as ApplicationStatus)}>
                       <SelectTrigger className="h-8 w-36 text-xs"><SelectValue /></SelectTrigger>
                       <SelectContent>
                         {STATUSES.map((s) => <SelectItem key={s} value={s}>{t(`applications.statuses.${s}`)}</SelectItem>)}
@@ -134,27 +164,183 @@ export function ApplicationsReceived() {
         app={openApp}
         onClose={() => setOpenApp(null)}
       />
+
+      <StatusChangeDialog
+        pending={pending}
+        submitting={update.isPending}
+        onCancel={() => setPending(null)}
+        onConfirm={(payload) => pending && update.mutate({ id: pending.app.id, payload })}
+      />
     </div>
+  );
+}
+
+/* =============================================================================
+ *  Status change confirmation dialog
+ *
+ *  Guards the three "emailing" statuses so a recruiter can't hire, invite, or
+ *  reject a candidate by a stray click:
+ *    - HIRED / REJECTED: a plain confirm step (both send an email; HIRED also
+ *      closes the job to the public).
+ *    - INTERVIEW: a small form for the interview place, date/time, phone and an
+ *      optional note — all included in the invitation email to the candidate.
+ *
+ *  The native datetime-local value ("2026-07-28T10:00") is already a valid
+ *  LocalDateTime on the wire, so it's sent as-is.
+ * ===========================================================================*/
+function StatusChangeDialog({
+  pending,
+  submitting,
+  onCancel,
+  onConfirm,
+}: {
+  pending: { app: JobApplicationDto; status: ApplicationStatus } | null;
+  submitting: boolean;
+  onCancel: () => void;
+  onConfirm: (payload: UpdateApplicationStatusPayload) => void;
+}) {
+  const { t } = useTranslation();
+  const [place, setPlace] = useState("");
+  const [dateTime, setDateTime] = useState("");
+  const [phone, setPhone] = useState("");
+  const [note, setNote] = useState("");
+
+  const status = pending?.status;
+  const isInterview = status === "INTERVIEW";
+
+  // Reset the form whenever a new change is requested.
+  useEffect(() => {
+    if (pending) {
+      setPlace("");
+      setDateTime("");
+      setPhone("");
+      setNote("");
+    }
+  }, [pending]);
+
+  // Interview requires at least a place and a date/time before it can send.
+  const canSubmit = !isInterview || (place.trim().length > 0 && dateTime.length > 0);
+
+  function handleConfirm() {
+    if (!status) return;
+    if (isInterview) {
+      onConfirm({
+        status,
+        interviewPlace: place.trim(),
+        interviewDateTime: dateTime,
+        interviewPhone: phone.trim() || undefined,
+        interviewNote: note.trim() || undefined,
+      });
+    } else {
+      onConfirm({ status });
+    }
+  }
+
+  const candidate = pending?.app.candidateName || t("applications.theCandidate");
+  const jobTitle = pending?.app.jobTitle ?? "";
+
+  return (
+    <Dialog open={!!pending} onOpenChange={(o) => !o && onCancel()}>
+      <DialogContent className="max-w-md">
+        <DialogHeader>
+          <DialogTitle>
+            {isInterview
+              ? t("applications.confirm.interviewTitle")
+              : status === "HIRED"
+                ? t("applications.confirm.hiredTitle")
+                : t("applications.confirm.rejectedTitle")}
+          </DialogTitle>
+          <DialogDescription>
+            {isInterview
+              ? t("applications.confirm.interviewDesc", { name: candidate, job: jobTitle })
+              : status === "HIRED"
+                ? t("applications.confirm.hiredDesc", { name: candidate, job: jobTitle })
+                : t("applications.confirm.rejectedDesc", { name: candidate, job: jobTitle })}
+          </DialogDescription>
+        </DialogHeader>
+
+        {isInterview && (
+          <div className="space-y-4 py-2">
+            <div className="space-y-1.5">
+              <Label htmlFor="iv-place">{t("applications.interview.place")}</Label>
+              <Input
+                id="iv-place"
+                value={place}
+                onChange={(e) => setPlace(e.target.value)}
+                placeholder={t("applications.interview.placePlaceholder")}
+              />
+            </div>
+            <div className="space-y-1.5">
+              <Label htmlFor="iv-datetime">{t("applications.interview.dateTime")}</Label>
+              <Input
+                id="iv-datetime"
+                type="datetime-local"
+                value={dateTime}
+                onChange={(e) => setDateTime(e.target.value)}
+              />
+            </div>
+            <div className="space-y-1.5">
+              <Label htmlFor="iv-phone">{t("applications.interview.phone")}</Label>
+              <Input
+                id="iv-phone"
+                value={phone}
+                onChange={(e) => setPhone(e.target.value)}
+                placeholder={t("applications.interview.phonePlaceholder")}
+              />
+            </div>
+            <div className="space-y-1.5">
+              <Label htmlFor="iv-note">{t("applications.interview.note")}</Label>
+              <Textarea
+                id="iv-note"
+                value={note}
+                onChange={(e) => setNote(e.target.value)}
+                placeholder={t("applications.interview.notePlaceholder")}
+              />
+            </div>
+          </div>
+        )}
+
+        <DialogFooter>
+          <Button variant="ghost" onClick={onCancel} disabled={submitting}>
+            {t("common.cancel")}
+          </Button>
+          <Button
+            onClick={handleConfirm}
+            disabled={!canSubmit || submitting}
+            variant={status === "REJECTED" ? "destructive" : "default"}
+          >
+            {isInterview
+              ? t("applications.confirm.sendInvite")
+              : t("common.confirm")}
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
   );
 }
 
 /* =============================================================================
  *  Resume panel
  *
- *  Lets the recruiter either stream the candidate's resume inline (an embedded
- *  PDF viewer, toggled on demand so the dialog stays compact) or download it.
+ *  Lets the recruiter view (open inline in a new tab) or download the
+ *  candidate's resume. Both go through the backend /storage endpoints, which
+ *  stream the bytes with the correct Content-Type and filename.
  *
- *  Resumes live on Cloudinary as `raw` resources: the bare secure URL is served
- *  inline (viewable in-browser), and appending `fl_attachment=true` forces the
- *  browser to download instead — mirroring the backend's downloadFile() logic.
+ *  Why not link straight to Cloudinary: resumes are stored as `raw` resources
+ *  whose delivery URL has no `.pdf` extension, so Cloudinary serves them as
+ *  octet-stream — the browser then can't preview them and downloads an
+ *  extension-less "unknown" file. Streaming through /storage fixes both the
+ *  view (inline disposition) and the download (attachment + proper name).
+ *
+ *  We open the preview in a new tab rather than an inline <iframe> so it isn't
+ *  blocked by the backend's X-Frame-Options and works cross-origin in dev.
  * ===========================================================================*/
 function ResumePanel({ resume }: { resume: FileDto | null }) {
   const { t } = useTranslation();
-  const [preview, setPreview] = useState(false);
 
-  const url = resume?.url;
+  const fileId = resume?.id;
 
-  if (!url) {
+  if (!fileId) {
     return (
       <div className="rounded-xl border border-border/60 bg-muted/30 p-4">
         <div className="mb-2 text-xs font-medium uppercase tracking-wider text-muted-foreground">
@@ -165,8 +351,8 @@ function ResumePanel({ resume }: { resume: FileDto | null }) {
     );
   }
 
-  const isPdf = (resume?.type ?? "").includes("pdf") || url.toLowerCase().includes(".pdf");
-  const downloadHref = url.includes("?") ? `${url}&fl_attachment=true` : `${url}?fl_attachment=true`;
+  const viewHref = storageUrl(fileId);
+  const downloadHref = storageUrl(fileId, { download: true });
 
   return (
     <div className="rounded-xl border border-border/60 bg-muted/30 p-4">
@@ -179,37 +365,50 @@ function ResumePanel({ resume }: { resume: FileDto | null }) {
           <span className="truncate text-sm">{resume?.name ?? "resume"}</span>
         </div>
         <div className="flex items-center gap-2">
-          {/* PDFs stream inline in an embedded viewer; other formats (e.g. docx)
-              can't be embedded, so open them in a new tab instead. */}
-          {isPdf ? (
-            <Button size="sm" variant="outline" onClick={() => setPreview((v) => !v)}>
-              <Eye className="h-4 w-4" /> {preview ? t("profile.hideResume") : t("profile.viewResume")}
-            </Button>
-          ) : (
-            <Button asChild size="sm" variant="outline">
-              <a href={url} target="_blank" rel="noreferrer noopener">
-                <Eye className="h-4 w-4" /> {t("profile.viewResume")}
-              </a>
-            </Button>
-          )}
           <Button asChild size="sm" variant="outline">
-            <a
-              href={downloadHref}
-              target="_blank"
-              rel="noreferrer noopener"
-              download={resume?.name ?? undefined}
-            >
+            <a href={viewHref} target="_blank" rel="noreferrer noopener">
+              <Eye className="h-4 w-4" /> {t("profile.viewResume")}
+            </a>
+          </Button>
+          <Button asChild size="sm" variant="outline">
+            <a href={downloadHref} target="_blank" rel="noreferrer noopener">
               <Download className="h-4 w-4" /> {t("profile.downloadResume")}
             </a>
           </Button>
         </div>
       </div>
-      {preview && isPdf && (
-        <iframe
-          src={url}
-          title={resume?.name ?? "resume"}
-          className="mt-3 h-[70vh] w-full rounded-lg border border-border/60 bg-background"
-        />
+    </div>
+  );
+}
+
+/* =============================================================================
+ *  Video-résumé panel
+ *
+ *  Streams the candidate's short-form video introduction directly from its
+ *  Cloudinary `video` delivery URL (HTTP range / CDN) inside a <video> player.
+ *  Playback only — controlsList="nodownload" hides the download control and we
+ *  offer no download link, per product decision.
+ * ===========================================================================*/
+function VideoResumePanel({ video }: { video: FileDto | null }) {
+  const { t } = useTranslation();
+
+  return (
+    <div className="rounded-xl border border-border/60 bg-muted/30 p-4">
+      <div className="mb-2 flex items-center gap-1.5 text-xs font-medium uppercase tracking-wider text-muted-foreground">
+        <Video className="h-3.5 w-3.5" /> {t("profile.videoResume")}
+      </div>
+      {video?.url ? (
+        <video
+          src={video.url}
+          controls
+          controlsList="nodownload"
+          preload="metadata"
+          className="w-full max-h-[360px] rounded-lg border border-border/50 bg-black"
+        >
+          {t("profile.videoUnsupported")}
+        </video>
+      ) : (
+        <div className="text-sm text-muted-foreground italic">{t("profile.noVideoResume")}</div>
       )}
     </div>
   );
@@ -261,6 +460,32 @@ function CandidateProfileDialog({
 
         {isLoading && (
           <div className="py-8 text-center text-muted-foreground">{t("common.loading")}</div>
+        )}
+
+        {app && app.status === "INTERVIEW" && (app.interviewPlace || app.interviewDateTime) && (
+          <div className="rounded-xl border border-primary/30 bg-primary/5 p-4">
+            <div className="mb-2 flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-primary">
+              <Calendar className="h-3.5 w-3.5" /> {t("applications.interview.scheduled")}
+            </div>
+            <div className="grid gap-1.5 text-sm">
+              {app.interviewDateTime && (
+                <div><span className="text-muted-foreground">{t("applications.interview.dateTime")}: </span>
+                  <span className="font-medium">{formatInterviewDateTime(app.interviewDateTime)}</span></div>
+              )}
+              {app.interviewPlace && (
+                <div><span className="text-muted-foreground">{t("applications.interview.place")}: </span>
+                  <span className="font-medium">{app.interviewPlace}</span></div>
+              )}
+              {app.interviewPhone && (
+                <div><span className="text-muted-foreground">{t("applications.interview.phone")}: </span>
+                  <span className="font-medium">{app.interviewPhone}</span></div>
+              )}
+              {app.interviewNote && (
+                <div className="whitespace-pre-wrap"><span className="text-muted-foreground">{t("applications.interview.note")}: </span>
+                  <span className="font-medium">{app.interviewNote}</span></div>
+              )}
+            </div>
+          </div>
         )}
 
         {!isLoading && profile && (
@@ -402,6 +627,9 @@ function CandidateProfileDialog({
 
             {/* Resume ------------------------------------------------------ */}
             <ResumePanel resume={profile.resume ?? null} />
+
+            {/* Video introduction ----------------------------------------- */}
+            <VideoResumePanel video={profile.videoResume ?? null} />
           </div>
         )}
 
@@ -561,6 +789,17 @@ function RecruiterExperienceRow({ xp }: { xp: WorkExperienceDto }) {
       </div>
     </li>
   );
+}
+
+/** Format an ISO LocalDateTime ("2026-07-28T10:00") for display. Falls back
+ *  to the raw string if it isn't parseable. */
+function formatInterviewDateTime(iso: string): string {
+  const d = new Date(iso);
+  if (isNaN(d.getTime())) return iso;
+  return new Intl.DateTimeFormat(undefined, {
+    weekday: "short", year: "numeric", month: "short", day: "numeric",
+    hour: "2-digit", minute: "2-digit",
+  }).format(d);
 }
 
 /** Locale-aware "Jan 2022 — Jun 2024" / "Jan 2022 — Present" formatter. */

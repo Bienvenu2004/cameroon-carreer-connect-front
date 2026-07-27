@@ -3,6 +3,7 @@ import { useTranslation } from "react-i18next";
 import { Link, NavLink, useLocation, useNavigate } from "react-router-dom";
 import { LogOut, Menu, User as UserIcon, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   DropdownMenu, DropdownMenuContent, DropdownMenuItem,
@@ -53,6 +54,10 @@ export function Header() {
     user?.jobSeekerProfile?.firstName ||
     user?.recruiterProfile?.firstName ||
     user?.email?.split("@")[0];
+
+  // Human-readable label for the role the user is currently logged in as,
+  // shown in the top bar so it's always clear which kind of account is active.
+  const roleLabel = user ? t(`roles.${user.role}`) : "";
 
   // The auth /me response embeds the active role's profile (jobSeekerProfile
   // for JOB_SEEKER, recruiterProfile for RECRUITER). FileDto.url is the
@@ -122,11 +127,17 @@ export function Header() {
                     {photoUrl && <AvatarImage src={photoUrl} alt={displayName} />}
                     <AvatarFallback>{initials(displayName)}</AvatarFallback>
                   </Avatar>
-                  <span className="hidden text-sm font-medium sm:inline">{displayName}</span>
+                  <span className="hidden flex-col items-start leading-tight sm:flex">
+                    <span className="text-sm font-medium">{displayName}</span>
+                    <span className="text-[11px] font-normal text-muted-foreground">{roleLabel}</span>
+                  </span>
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-56">
-                <DropdownMenuLabel>{user.email}</DropdownMenuLabel>
+                <DropdownMenuLabel className="flex flex-col gap-1.5">
+                  <span className="truncate">{user.email}</span>
+                  <Badge variant="secondary" className="w-fit font-normal">{roleLabel}</Badge>
+                </DropdownMenuLabel>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem onClick={() => nav(dashboardPath)}>
                   <UserIcon className="mr-2 h-4 w-4" /> {t("nav.dashboard")}

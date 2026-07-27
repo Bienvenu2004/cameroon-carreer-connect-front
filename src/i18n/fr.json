@@ -37,6 +37,8 @@
     "unreadCountSr": "{{count}} notifications non lues"
   },
   "common": {
+    "showPassword": "Afficher le mot de passe",
+    "hidePassword": "Masquer le mot de passe",
     "search": "Rechercher",
     "clear": "Effacer",
     "loading": "Chargement…",
@@ -114,6 +116,7 @@
     "onsite": "Sur site",
     "hybrid": "Hybride",
     "postedAt": "Publié",
+    "views": "vues",
     "details": "Détails de l'offre",
     "description": "Description du poste",
     "benefits": "Avantages",
@@ -224,7 +227,40 @@
     "received": "Candidatures reçues",
     "receivedSubtitle": "Examinez et faites évoluer les candidatures sur vos offres.",
     "changeStatus": "Changer le statut",
-    "viewProfile": "Voir le profil"
+    "viewProfile": "Voir le profil",
+    "theCandidate": "le candidat",
+    "confirm": {
+      "interviewTitle": "Inviter à un entretien ?",
+      "interviewDesc": "Planifiez un entretien pour {{name}}. Il recevra une invitation par e-mail avec les détails ci-dessous.",
+      "hiredTitle": "Recruter ce candidat ?",
+      "hiredDesc": "Cela marquera {{name}} comme recruté, lui enverra la bonne nouvelle par e-mail et fermera l'offre au public. Vous pourrez annuler cette action plus tard.",
+      "rejectedTitle": "Rejeter cette candidature ?",
+      "rejectedDesc": "Cela rejettera la candidature de {{name}} et lui enverra un e-mail de refus.",
+      "sendInvite": "Envoyer l'invitation"
+    },
+    "interview": {
+      "place": "Lieu",
+      "placePlaceholder": "ex. Bureau de l'entreprise, Douala — 3e étage",
+      "dateTime": "Date et heure",
+      "phone": "Numéro à appeler",
+      "phonePlaceholder": "ex. +237 6XX XXX XXX",
+      "note": "Note (facultatif)",
+      "notePlaceholder": "Ce que le candidat doit apporter ou savoir",
+      "scheduled": "Entretien planifié"
+    }
+  },
+  "roles": {
+    "JOB_SEEKER": "Chercheur d'emploi",
+    "RECRUITER": "Recruteur",
+    "SYSTEM_ADMIN": "Administrateur"
+  },
+  "recruiterProfile": {
+    "title": "Mon profil",
+    "subtitle": "Gardez vos informations de recruteur à jour.",
+    "companySection": "Entreprise",
+    "company": "Nom de l'entreprise",
+    "companyPlaceholder": "ex. Acme Corp",
+    "state": "État / Région"
   },
   "savedJobs": {
     "title": "Offres sauvegardées",
@@ -313,7 +349,18 @@
     "websiteUrl": "Site personnel",
     "portfolioUrl": "Portfolio",
     "twitterUrl": "X / Twitter",
-    "facebookUrl": "Facebook"
+    "facebookUrl": "Facebook",
+    "generateResume": "Générer un CV",
+    "generateResumeHint": "Créez un CV propre et téléchargeable à partir de votre profil — sans téléversement. Ouvre la boîte de dialogue d'impression / Enregistrer en PDF de votre navigateur.",
+    "resumeDocTitle": "CV",
+    "resumeGeneratedOn": "Généré avec JobConnect le {{date}}",
+    "videoResume": "Vidéo de présentation",
+    "videoResumeHint": "Enregistrez un court clip de 30 à 60 secondes pour vous présenter. Il est diffusé sur votre profil et auprès des recruteurs — un excellent moyen de vous démarquer.",
+    "uploadVideoResume": "Téléverser une vidéo",
+    "currentVideoResume": "Vidéo actuelle",
+    "videoResumeFormats": "MP4, WebM ou MOV · restez bref · max 50 Mo",
+    "noVideoResume": "Aucune vidéo de présentation ajoutée pour le moment.",
+    "videoUnsupported": "Votre navigateur ne prend pas en charge la lecture vidéo."
   },
   "company": {
     "listTitle": "Mes entreprises",
@@ -321,6 +368,8 @@
     "noCompanies": "Vous n'avez pas encore créé d'entreprise.",
     "createNew": "Créer une entreprise",
     "edit": "Modifier",
+    "view": "Voir",
+    "postedJobs": "Offres publiées sous cette entreprise",
     "title": "Mon entreprise",
     "createTitle": "Créer mon entreprise",
     "name": "Nom de l'entreprise",
@@ -370,6 +419,26 @@
     "noApprovedCompanies": "Vous devez avoir une entreprise approuvée avant de publier des offres.",
     "manageCompanies": "Gérer mes entreprises",
     "companyPlaceholder": "Choisir une entreprise"
+  },
+  "quickPost": {
+    "cta": "Publication rapide",
+    "badge": "Publication rapide",
+    "title": "Publiez une offre en une minute",
+    "subtitle": "Un parcours simplifié pour les petites entreprises — l'essentiel seulement, des valeurs par défaut pour le reste.",
+    "intro": "Indiquez quoi, où et combien. Vous pourrez modifier l'offre plus tard pour ajouter les avantages, le lieu de travail et la langue requise.",
+    "jobTitle": "Pour quel poste recrutez-vous ?",
+    "jobTitlePlaceholder": "ex. Vendeur, Chauffeur, Comptable",
+    "details": "Décrivez le poste",
+    "detailsPlaceholder": "Que fera la personne au quotidien ? Des exigences ? Comment se démarquer ?",
+    "city": "Ville",
+    "cityPlaceholder": "ex. Douala",
+    "region": "Région",
+    "pay": "Salaire mensuel (XAF)",
+    "payPlaceholder": "Facultatif",
+    "company": "Publier au nom de",
+    "postingAs": "Publié au nom de {{company}}.",
+    "advancedLink": "Besoin de plus d'options ? Éditeur complet",
+    "publish": "Publier l'offre"
   },
   "admin": {
     "title": "Administration",

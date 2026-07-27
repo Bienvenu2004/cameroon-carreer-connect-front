@@ -37,6 +37,8 @@
     "unreadCountSr": "{{count}} unread notifications"
   },
   "common": {
+    "showPassword": "Show password",
+    "hidePassword": "Hide password",
     "search": "Search",
     "clear": "Clear",
     "loading": "Loading…",
@@ -114,6 +116,7 @@
     "onsite": "On-site",
     "hybrid": "Hybrid",
     "postedAt": "Posted",
+    "views": "views",
     "details": "Job details",
     "description": "Job description",
     "benefits": "Benefits",
@@ -224,7 +227,40 @@
     "received": "Applications received",
     "receivedSubtitle": "Review and progress applications on your jobs.",
     "changeStatus": "Change status",
-    "viewProfile": "View profile"
+    "viewProfile": "View profile",
+    "theCandidate": "the candidate",
+    "confirm": {
+      "interviewTitle": "Invite to interview?",
+      "interviewDesc": "Schedule an interview for {{name}}. They'll receive an email invitation with the details below.",
+      "hiredTitle": "Hire this candidate?",
+      "hiredDesc": "This will mark {{name}} as hired, email them the good news, and close the job to the public. You can undo this later.",
+      "rejectedTitle": "Reject this application?",
+      "rejectedDesc": "This will reject {{name}}'s application and send them a rejection email.",
+      "sendInvite": "Send invitation"
+    },
+    "interview": {
+      "place": "Place",
+      "placePlaceholder": "e.g. Company office, Douala — 3rd floor",
+      "dateTime": "Date & time",
+      "phone": "Phone to call",
+      "phonePlaceholder": "e.g. +237 6XX XXX XXX",
+      "note": "Note (optional)",
+      "notePlaceholder": "Anything the candidate should bring or know",
+      "scheduled": "Interview scheduled"
+    }
+  },
+  "roles": {
+    "JOB_SEEKER": "Job seeker",
+    "RECRUITER": "Recruiter",
+    "SYSTEM_ADMIN": "Administrator"
+  },
+  "recruiterProfile": {
+    "title": "My profile",
+    "subtitle": "Keep your recruiter details up to date.",
+    "companySection": "Company",
+    "company": "Company name",
+    "companyPlaceholder": "e.g. Acme Corp",
+    "state": "State / Region"
   },
   "savedJobs": {
     "title": "Saved jobs",
@@ -313,7 +349,18 @@
     "websiteUrl": "Personal website",
     "portfolioUrl": "Portfolio",
     "twitterUrl": "X / Twitter",
-    "facebookUrl": "Facebook"
+    "facebookUrl": "Facebook",
+    "generateResume": "Generate résumé",
+    "generateResumeHint": "Build a clean, downloadable résumé from your profile — no upload needed. Opens your browser's print / Save-as-PDF dialog.",
+    "resumeDocTitle": "Résumé",
+    "resumeGeneratedOn": "Generated with JobConnect on {{date}}",
+    "videoResume": "Video introduction",
+    "videoResumeHint": "Record a short 30–60 second clip introducing yourself. It streams on your profile and to recruiters — a great way to stand out.",
+    "uploadVideoResume": "Upload a video",
+    "currentVideoResume": "Current video",
+    "videoResumeFormats": "MP4, WebM or MOV · keep it short · max 50 MB",
+    "noVideoResume": "No video introduction added yet.",
+    "videoUnsupported": "Your browser does not support video playback."
   },
   "company": {
     "listTitle": "My companies",
@@ -321,6 +368,8 @@
     "noCompanies": "You haven't created any company yet.",
     "createNew": "Create company",
     "edit": "Edit",
+    "view": "View",
+    "postedJobs": "Jobs posted under this company",
     "title": "My company",
     "createTitle": "Create my company",
     "name": "Company name",
@@ -370,6 +419,26 @@
     "noApprovedCompanies": "You need an approved company before posting jobs.",
     "manageCompanies": "Manage my companies",
     "companyPlaceholder": "Select a company"
+  },
+  "quickPost": {
+    "cta": "Quick post",
+    "badge": "Quick post",
+    "title": "Post a job in a minute",
+    "subtitle": "A simplified flow for small businesses — just the essentials, sensible defaults for the rest.",
+    "intro": "Fill in what, where and how much. You can always edit the job later to add benefits, work site and language requirements.",
+    "jobTitle": "What are you hiring for?",
+    "jobTitlePlaceholder": "e.g. Shop assistant, Driver, Accountant",
+    "details": "Describe the job",
+    "detailsPlaceholder": "What will they do day to day? Any requirements? How can a candidate stand out?",
+    "city": "City / town",
+    "cityPlaceholder": "e.g. Douala",
+    "region": "Region",
+    "pay": "Monthly pay (XAF)",
+    "payPlaceholder": "Optional",
+    "company": "Posting as",
+    "postingAs": "Posting as {{company}}.",
+    "advancedLink": "Need more options? Full editor",
+    "publish": "Publish job"
   },
   "admin": {
     "title": "Administration",
