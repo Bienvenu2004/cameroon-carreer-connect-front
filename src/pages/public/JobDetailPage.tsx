@@ -5,6 +5,8 @@ import { ArrowLeft, BadgeCheck, Bookmark, Briefcase, Building2, Check, Heart, La
 
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { WhatsAppShareButton } from "@/components/common/WhatsAppShareButton";
+import { TrustSafetyCard } from "@/components/common/TrustSafetyCard";
 import { ApplicationsApi, JobsApi, SavedJobsApi } from "@/api";
 import { formatXAF, relativeTime } from "@/lib/utils";
 import { useAuthStore } from "@/stores/auth";
@@ -209,7 +211,18 @@ export function JobDetailPage() {
                 {t("jobs.seekerOnlyAction")}
               </div>
             )}
+
+            {/* Share is available to everyone, on any job state — WhatsApp
+                is the primary way jobs spread in Cameroon. */}
+            <WhatsAppShareButton
+              url={typeof window !== "undefined" ? window.location.href : ""}
+              title={job.title}
+              className="mt-2 w-full"
+            />
           </div>
+
+          {/* Anti-scam trust notice + report action. */}
+          <TrustSafetyCard jobId={id} />
 
           {company && (
             <Link to={`/companies/${company.id}`} className="mt-4 block rounded-2xl border border-border/60 bg-card p-6 elev-1 transition-all hover:elev-2">
