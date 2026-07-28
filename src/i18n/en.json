@@ -135,7 +135,9 @@
       "FRENCH": "French",
       "ENGLISH": "English",
       "BILINGUAL": "Bilingual"
-    }
+    },
+    "shareOnWhatsApp": "Share on WhatsApp",
+    "shareMessage": "Check out this job: {{title}}"
   },
   "companies": {
     "searchPlaceholder": "Search by company name…"
@@ -577,11 +579,26 @@
       "title": "Great matches!",
       "subtitle": "These jobs are handpicked by AI to match your profile and preferences.",
       "factors": {
-        "top": { "title": "Top match", "desc": "Highly relevant to your profile" },
-        "skills": { "title": "Skills match", "desc": "Your skills are a strong fit" },
-        "experience": { "title": "Experience match", "desc": "Your experience aligns well" },
-        "location": { "title": "Location match", "desc": "Preferred location or remote" },
-        "education": { "title": "Education match", "desc": "Your education fits" }
+        "top": {
+          "title": "Top match",
+          "desc": "Highly relevant to your profile"
+        },
+        "skills": {
+          "title": "Skills match",
+          "desc": "Your skills are a strong fit"
+        },
+        "experience": {
+          "title": "Experience match",
+          "desc": "Your experience aligns well"
+        },
+        "location": {
+          "title": "Location match",
+          "desc": "Preferred location or remote"
+        },
+        "education": {
+          "title": "Education match",
+          "desc": "Your education fits"
+        }
       }
     }
   },
@@ -604,5 +621,20 @@
     "light": "Light",
     "dark": "Dark",
     "system": "System"
+  },
+  "safety": {
+    "title": "Stay safe",
+    "neverPay": "JobConnect will never ask you to pay to get a job. Never send money to an employer or recruiter.",
+    "report": "Report this job",
+    "reportReasonPrompt": "Why are you reporting this?",
+    "reportThanks": "Thanks — our team will review this listing.",
+    "reported": "Thanks, you've reported this job. Our team will review it.",
+    "reasons": {
+      "scam": "Scam or asks for money",
+      "misleading": "Misleading or fake",
+      "offensive": "Offensive or inappropriate",
+      "filled": "Position already filled",
+      "other": "Something else"
+    }
   }
 }

@@ -135,7 +135,9 @@
       "FRENCH": "Français",
       "ENGLISH": "Anglais",
       "BILINGUAL": "Bilingue"
-    }
+    },
+    "shareOnWhatsApp": "Partager sur WhatsApp",
+    "shareMessage": "Découvrez cette offre d'emploi : {{title}}"
   },
   "companies": {
     "searchPlaceholder": "Rechercher par nom d'entreprise…"
@@ -577,11 +579,26 @@
       "title": "Belles correspondances !",
       "subtitle": "Ces offres sont sélectionnées par l'IA pour correspondre à votre profil et à vos préférences.",
       "factors": {
-        "top": { "title": "Correspondance idéale", "desc": "Très pertinente pour votre profil" },
-        "skills": { "title": "Compétences", "desc": "Vos compétences correspondent bien" },
-        "experience": { "title": "Expérience", "desc": "Votre expérience s'aligne" },
-        "location": { "title": "Localisation", "desc": "Lieu préféré ou télétravail" },
-        "education": { "title": "Formation", "desc": "Votre formation correspond" }
+        "top": {
+          "title": "Correspondance idéale",
+          "desc": "Très pertinente pour votre profil"
+        },
+        "skills": {
+          "title": "Compétences",
+          "desc": "Vos compétences correspondent bien"
+        },
+        "experience": {
+          "title": "Expérience",
+          "desc": "Votre expérience s'aligne"
+        },
+        "location": {
+          "title": "Localisation",
+          "desc": "Lieu préféré ou télétravail"
+        },
+        "education": {
+          "title": "Formation",
+          "desc": "Votre formation correspond"
+        }
       }
     }
   },
@@ -604,5 +621,20 @@
     "light": "Clair",
     "dark": "Sombre",
     "system": "Système"
+  },
+  "safety": {
+    "title": "Restez vigilant",
+    "neverPay": "JobConnect ne vous demandera jamais de payer pour obtenir un emploi. N'envoyez jamais d'argent à un employeur ou à un recruteur.",
+    "report": "Signaler cette offre",
+    "reportReasonPrompt": "Pourquoi signalez-vous cette offre ?",
+    "reportThanks": "Merci — notre équipe va examiner cette offre.",
+    "reported": "Merci, vous avez signalé cette offre. Notre équipe va l'examiner.",
+    "reasons": {
+      "scam": "Arnaque ou demande d'argent",
+      "misleading": "Trompeuse ou fausse",
+      "offensive": "Offensante ou inappropriée",
+      "filled": "Poste déjà pourvu",
+      "other": "Autre chose"
+    }
   }
 }
