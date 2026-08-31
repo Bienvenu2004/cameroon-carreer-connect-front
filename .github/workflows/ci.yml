@@ -1,0 +1,46 @@
+name: CI
+
+on:
+  push:
+    branches: ["main", "develop", "hardening-**"]
+  pull_request:
+    branches: ["main", "develop"]
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  verify:
+    name: Lint, typecheck, test, build
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Node 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Typecheck
+        run: npm run typecheck
+
+      - name: Test
+        run: npm test
+
+      - name: Build
+        run: npm run build
+
+      # Guards the code-splitting work: the entry chunk used to be 1.2 MB and it
+      # is easy to silently pull a heavy library back into it with one stray
+      # top-level import. Fails the build if the initial payload regresses.
+      - name: Check first-load payload
+        run: node scripts/check-bundle-size.mjs

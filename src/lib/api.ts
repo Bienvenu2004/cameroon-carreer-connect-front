@@ -4,6 +4,12 @@ import axios, {
 } from "axios";
 
 import { useAuthStore } from "@/stores/auth";
+import {
+  getCsrfHeaderName,
+  getCsrfToken,
+  invalidateCsrfToken,
+  setCsrfToken,
+} from "@/lib/csrf";
 
 /**
  * Backend wraps every response as { success, message, data }.
@@ -32,6 +38,15 @@ if (import.meta.env.DEV) {
 
 export const api = axios.create({
   baseURL,
+  /**
+   * Send the XSRF-TOKEN cookie back as X-XSRF-TOKEN. Axios only does this
+   * automatically for same-origin requests, and this client also runs against a
+   * cross-origin backend in some deployments, so it is enabled explicitly. It is
+   * a belt-and-braces measure: `ensureCsrfToken` below is what actually
+   * guarantees a token is present, since a cross-site frontend cannot read the
+   * backend's cookie from JavaScript at all.
+   */
+  withXSRFToken: true,
   /**
    * Tokens (access_token, refresh_token) live in HttpOnly cookies set by
    * the backend at login time. With withCredentials=true the browser
@@ -62,6 +77,61 @@ export function storageUrl(fileId: string, opts?: { download?: boolean }): strin
   return `${baseURL}${path}`;
 }
 
+/* =============================================================================
+ *  CSRF
+ *
+ *  The backend authenticates with an HttpOnly cookie, so the browser attaches
+ *  credentials to cross-site requests on its own. It therefore enforces the
+ *  double-submit cookie pattern: state-changing requests must echo a token back
+ *  in a header.
+ *
+ *  A freshly loaded browser has no token -- the SPA's HTML comes from Vite or
+ *  nginx, not from Spring, so the backend has had no chance to set the cookie
+ *  before the first login POST. We fetch one explicitly instead of relying on
+ *  the cookie being readable, which it is not when the frontend is served from a
+ *  different site than the API.
+ * =========================================================================== */
+
+const CSRF_ENDPOINT = "/api/hjp/auth/csrf";
+const MUTATING_METHODS = new Set(["post", "put", "patch", "delete"]);
+
+let csrfInflight: Promise<void> | null = null;
+
+/**
+ * Fetch a CSRF token if we don't hold one. Single-flight, so a burst of
+ * mutations on page load results in exactly one request.
+ */
+async function ensureCsrfToken(force = false): Promise<void> {
+  if (getCsrfToken() && !force) return;
+  if (csrfInflight) return csrfInflight;
+
+  csrfInflight = (async () => {
+    try {
+      const r = await api.get<ApiEnvelope<{ token: string; headerName: string }>>(
+        CSRF_ENDPOINT,
+      );
+      setCsrfToken(r.data.data.token, r.data.data.headerName);
+    } catch {
+      // Leave the token null. The request proceeds and, if the backend rejects
+      // it, the response interceptor refetches and retries once.
+      invalidateCsrfToken();
+    } finally {
+      queueMicrotask(() => {
+        csrfInflight = null;
+      });
+    }
+  })();
+
+  return csrfInflight;
+}
+
+function isCsrfRejection(error: AxiosError): boolean {
+  if (error.response?.status !== 403) return false;
+  const body = error.response.data as { message?: string; errorCode?: string } | undefined;
+  const text = `${body?.errorCode ?? ""} ${body?.message ?? ""}`.toUpperCase();
+  return text.includes("CSRF");
+}
+
 /* ---------------- request interceptor: language + client-type ---------------- */
 api.interceptors.request.use((config: InternalAxiosRequestConfig) => {
   // Forward the chosen UI language so the backend's MessageSource can
@@ -76,6 +146,19 @@ api.interceptors.request.use((config: InternalAxiosRequestConfig) => {
   // never receives a session cookie — every protected request would 401.
   config.headers["X-Client-Type"] = "web";
 
+  return config;
+});
+
+/* ---------------- request interceptor: CSRF token ---------------- */
+api.interceptors.request.use(async (config: InternalAxiosRequestConfig) => {
+  const method = (config.method ?? "get").toLowerCase();
+  if (!MUTATING_METHODS.has(method)) return config;
+
+  await ensureCsrfToken();
+  const token = getCsrfToken();
+  if (token) {
+    config.headers[getCsrfHeaderName()] = token;
+  }
   return config;
 });
 
@@ -161,8 +244,20 @@ api.interceptors.response.use(
   (r) => r,
   async (error: AxiosError) => {
     const original = error.config as
-      | (InternalAxiosRequestConfig & { _retry?: boolean })
+      | (InternalAxiosRequestConfig & { _retry?: boolean; _csrfRetry?: boolean })
       | undefined;
+
+    // A rejected CSRF token usually means it rotated (for example across a
+    // login) rather than that anything is wrong. Refetch and replay once.
+    if (original && isCsrfRejection(error) && !original._csrfRetry) {
+      original._csrfRetry = true;
+      await ensureCsrfToken(true);
+      const fresh = getCsrfToken();
+      if (fresh) {
+        original.headers[getCsrfHeaderName()] = fresh;
+        return api(original);
+      }
+    }
 
     if (error.response?.status !== 401 || !original) {
       return Promise.reject(error);
