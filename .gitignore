@@ -26,3 +26,9 @@ dist-ssr
 .env
 .env.*
 !.env.example
+
+# test coverage
+coverage
+
+# TypeScript incremental build state
+*.tsbuildinfo
