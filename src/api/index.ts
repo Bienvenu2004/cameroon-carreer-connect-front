@@ -9,7 +9,7 @@ import type {
   UserDto, UserRole, ApplicationStatus, UpdateApplicationStatusPayload, CompanyStatus, VerificationType,
   ApplicationEventDto, CandidateSearchParams, CandidateSummaryDto, CompanyResponsivenessDto,
   InvitationDto, JobReportDto, ReportReason, ReportStatus, IndustryCountDto,
-  FollowedCompanyDto,
+  FollowedCompanyDto, ActivityEventDto,
 } from "@/types/api";
 
 /** Normalize backend snake_case auth response to camelCase. */
@@ -286,6 +286,21 @@ export const CandidatesApi = {
 
   myPendingInvitationCount: () =>
     unwrap<number>(api.get("/api/hjp/candidates/invitations/me/pending-count")),
+};
+
+/**
+ * Employer activity, derived server-side from existing records.
+ *
+ * `platform` is public and doubles as a discovery surface; `following` needs a
+ * seeker and falls back to platform-wide when they follow nobody, so neither
+ * call can come back with nothing to show on a populated database.
+ */
+export const FeedApi = {
+  platform: (limit = 12) =>
+    unwrap<ActivityEventDto[]>(api.get("/api/hjp/feed", { params: { limit } })),
+
+  following: (limit = 12) =>
+    unwrap<ActivityEventDto[]>(api.get("/api/hjp/feed/following", { params: { limit } })),
 };
 
 /** Trust and safety moderation. Admin only. */

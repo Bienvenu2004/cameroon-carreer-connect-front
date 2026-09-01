@@ -730,3 +730,28 @@ export interface FollowedCompanyDto {
   followedAt: string;
   emailAlerts: boolean;
 }
+
+/**
+ * Kinds of employer activity in the feed. Every one is derived from data the
+ * platform already records, so none of it is authored and none needs moderating.
+ */
+export type ActivityType = "JOB_POSTED" | "COMPANY_VERIFIED" | "POSITION_FILLED";
+
+/**
+ * One thing an employer did.
+ *
+ * Carries no prose: the API sends facts and the client decides how to word them,
+ * because the platform is bilingual and a server-assembled sentence would arrive
+ * in whichever language the server happened to pick.
+ */
+export interface ActivityEventDto {
+  type: ActivityType;
+  companyId: string;
+  companyName: string;
+  companyLogo?: FileDto | null;
+  /** Null for company-level events such as verification. */
+  jobId?: string | null;
+  jobTitle?: string | null;
+  region?: Region | null;
+  occurredAt: string;
+}

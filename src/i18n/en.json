@@ -827,5 +827,13 @@
     "noOpenJobs": "No open jobs right now",
     "followers_one": "{{count}} follower",
     "followers_other": "{{count}} followers"
+  },
+  "feed": {
+    "title": "Recent activity",
+    "subtitle": "What employers on the platform have been doing.",
+    "postedAJob": "posted",
+    "wasVerified": "was verified as an employer",
+    "filled": "filled a position through JobsConnect",
+    "filledNamed": "filled the {{job}} role through JobsConnect"
   }
 }

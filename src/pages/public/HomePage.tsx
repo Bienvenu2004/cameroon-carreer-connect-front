@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { JobCard } from "@/components/common/JobCard";
+import { ActivityFeed } from "@/components/common/ActivityFeed";
 import { JobsApi } from "@/api";
 import { ALL_REGIONS, type Region } from "@/types/api";
 import { formatNumber } from "@/lib/utils";
@@ -142,6 +143,20 @@ export function HomePage() {
       </section>
 
       {/* BROWSE BY REGION */}
+      {/*
+        Recent platform activity, for the visitor with no account.
+        The question a first-time visitor silently asks is "is anyone actually
+        using this?", and a list of real things that happened this month answers
+        it better than any claim the copy could make.
+      */}
+      <section className="container mx-auto max-w-6xl py-12">
+        <h2 className="font-display text-2xl font-semibold">{t("feed.title")}</h2>
+        <p className="mt-1 text-sm text-muted-foreground">{t("feed.subtitle")}</p>
+        <div className="mt-5 rounded-2xl border border-border/60 bg-card p-5">
+          <ActivityFeed scope="platform" limit={6} />
+        </div>
+      </section>
+
       <section className="container mx-auto max-w-6xl py-12">
         <h2 className="font-display text-2xl font-semibold">{t("home.browseByRegion")}</h2>
         <div className="mt-6 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5">

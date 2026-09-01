@@ -827,5 +827,13 @@
     "noOpenJobs": "Aucune offre ouverte actuellement",
     "followers_one": "{{count}} abonné",
     "followers_other": "{{count}} abonnés"
+  },
+  "feed": {
+    "title": "Activité récente",
+    "subtitle": "Ce que font les employeurs sur la plateforme.",
+    "postedAJob": "a publié",
+    "wasVerified": "a été vérifié en tant qu'employeur",
+    "filled": "a pourvu un poste via JobsConnect",
+    "filledNamed": "a pourvu le poste {{job}} via JobsConnect"
   }
 }
