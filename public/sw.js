@@ -1,5 +1,5 @@
 /**
- * Service worker for JobConnect Cameroun.
+ * Service worker for JobsConnect CMR.
  *
  * The platform's stated purpose is to work on the metered 2G/3G connections most
  * Cameroonian users are on. Code splitting took the first load from about 350 kB
@@ -21,7 +21,7 @@
  *     offline still boots the app instead of showing the browser's error page.
  */
 
-const VERSION = "v1";
+const VERSION = "v2";
 const SHELL_CACHE = `jcc-shell-${VERSION}`;
 const ASSET_CACHE = `jcc-assets-${VERSION}`;
 const DATA_CACHE = `jcc-data-${VERSION}`;
@@ -29,7 +29,15 @@ const DATA_CACHE = `jcc-data-${VERSION}`;
 /** Kept small on purpose: this is a fallback, not an offline archive. */
 const MAX_DATA_ENTRIES = 30;
 
-const SHELL_URLS = ["/", "/index.html"];
+const SHELL_URLS = [
+  "/",
+  "/index.html",
+  // Brand assets change only when the logo does, so they belong with the shell
+  // rather than being refetched on every visit.
+  "/logo/logo-full.png",
+  "/logo/favicon-32.png",
+  "/site.webmanifest",
+];
 
 /** Read-only endpoints worth keeping a copy of. */
 const CACHEABLE_DATA = [
@@ -121,7 +129,17 @@ self.addEventListener("fetch", (event) => {
     return;
   }
 
+  // Hashed build output: the URL changes whenever the content does.
   if (url.pathname.startsWith("/assets/")) {
+    event.respondWith(cacheFirst(request, ASSET_CACHE));
+    return;
+  }
+
+  // Brand assets are not content-hashed, but they change about as often as the
+  // company does. Cache-first here is what makes precaching them worth anything;
+  // without it the fetch handler would ignore /logo/ and the browser would go to
+  // the network for the header logo on every single page load.
+  if (url.pathname.startsWith("/logo/")) {
     event.respondWith(cacheFirst(request, ASSET_CACHE));
     return;
   }
