@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Link, useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
-import { Search, MapPin, Briefcase, Users2, BadgeCheck, ArrowRight, Building2, Sparkles } from "lucide-react";
+import { Search, MapPin, Briefcase, Users2, BadgeCheck, ArrowRight, Building2 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -41,11 +41,29 @@ export function HomePage() {
         <div className="absolute inset-0 bg-hero-mesh opacity-90" aria-hidden />
         <div className="container relative py-20 lg:py-28">
           <div className="mx-auto max-w-3xl text-center">
-            <span className="inline-flex items-center gap-2 rounded-full border border-primary/20 bg-primary/5 px-4 py-1.5 text-xs font-medium uppercase tracking-wider text-primary-700">
-              <Sparkles className="h-3.5 w-3.5" />
-              {t("home.heroEyebrow")}
-            </span>
-            <h1 className="mt-6 font-display text-4xl font-bold leading-tight tracking-tight text-foreground sm:text-5xl lg:text-display-2">
+            {/*
+              The brand mark, where a "National platform" pill used to sit.
+
+              The glyph rather than the full lockup: the header renders the
+              lockup 80px above this, and repeating it identically would read as
+              a mistake rather than as branding. Swap the src to
+              /logo/logo-full.png if the wordmark is wanted here instead.
+
+              Decorative, so alt is empty — the header logo already announces the
+              brand to a screen reader, and the h1 immediately below carries the
+              meaning. Announcing the name a second time is noise.
+            */}
+            <img
+              src="/logo/logo-mark.png"
+              alt=""
+              aria-hidden="true"
+              width={255}
+              height={288}
+              loading="eager"
+              decoding="async"
+              className="mx-auto h-16 w-auto dark:brightness-0 dark:invert sm:h-20"
+            />
+            <h1 className="mt-5 font-display text-4xl font-bold leading-tight tracking-tight text-foreground sm:text-5xl lg:text-display-2">
               {t("home.heroTitle")}
             </h1>
             <p className="mt-5 text-lg leading-relaxed text-muted-foreground">
