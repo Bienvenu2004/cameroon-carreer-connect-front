@@ -2,7 +2,7 @@ import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { Briefcase, Languages, MapPin, BadgeCheck } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
-import { formatXAF, relativeTime, formatSalaryRange } from "@/lib/utils";
+import { relativeTime, formatSalaryRange } from "@/lib/utils";
 import type { JobDto } from "@/types/api";
 
 export function JobCard({ job }: { job: JobDto }) {

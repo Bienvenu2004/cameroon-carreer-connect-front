@@ -6,7 +6,7 @@ import {
   MapPin, Sparkles,
 } from "lucide-react";
 
-import { formatXAF, relativeTime, formatSalaryRange } from "@/lib/utils";
+import { relativeTime, formatSalaryRange } from "@/lib/utils";
 import type { JobDto, RecommendationDto } from "@/types/api";
 
 /**
