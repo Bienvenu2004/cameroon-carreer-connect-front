@@ -89,7 +89,7 @@ export function RecommendationsSection() {
         {!isLoading && !isError && isEmpty && <EmptyNotice message={t("ai.empty")} />}
 
         {!isLoading && !isError && recs.length > 0 && (
-          <div className="rounded-2xl border border-border/60 bg-gradient-to-br from-primary/[0.04] via-card to-card p-4 sm:p-5">
+          <div className="rounded-2xl border border-border/60 bg-card p-4 sm:p-5">
             <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
               {visible.map((r) => {
                 const { tags, extra } = computeMatchingFactors(

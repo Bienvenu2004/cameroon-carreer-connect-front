@@ -37,8 +37,16 @@ export function HomePage() {
   return (
     <div>
       {/* HERO */}
-      <section className="relative overflow-hidden">
-        <div className="absolute inset-0 bg-hero-mesh opacity-90" aria-hidden />
+      {/*
+        Flat ground, deliberately.
+
+        This used to carry a two-stop radial mesh at 90% opacity, which put the
+        search form -- the most important element on the page -- on a surface
+        that shifted underneath it. The form competed with its own background
+        instead of being the thing the eye lands on. A hairline rule does the
+        separation that the gradient was being asked to do.
+      */}
+      <section className="relative border-b border-border/60">
         <div className="container mx-auto max-w-6xl relative py-20 lg:py-28">
           <div className="mx-auto max-w-3xl text-center">
             {/*
@@ -206,13 +214,25 @@ function CTACard({
   tone: "primary" | "gold";
 }) {
   return (
-    <div className={`relative overflow-hidden rounded-2xl border p-8 elev-1 ${tone === "primary" ? "border-primary/20 bg-primary/5" : "border-gold/30 bg-gold/5"}`}>
-      <div className={`mb-4 grid h-12 w-12 place-items-center rounded-xl ${tone === "primary" ? "bg-primary text-primary-foreground" : "bg-gold text-gold-foreground"}`}>
+    /*
+      Both cards sit on the same neutral surface. Tinting the panels themselves
+      made two equally loud options, so a visitor had no signal about which one
+      was meant for them; the colour now lives only in the icon and in one
+      filled button.
+
+      Seeker is the filled action and recruiter is outlined -- not because the
+      recruiter matters less, but because a page has one primary action and the
+      public home page is read overwhelmingly by people looking for work.
+    */
+    <div className="relative rounded-2xl border border-border/60 bg-card p-8 elev-1">
+      <div className={`mb-4 grid h-12 w-12 place-items-center rounded-xl ${
+        tone === "primary" ? "bg-primary/10 text-primary" : "bg-gold/15 text-gold-strong"
+      }`}>
         <Icon className="h-5 w-5" />
       </div>
       <h3 className="font-display text-xl font-semibold">{title}</h3>
       <p className="mt-1 text-sm text-muted-foreground">{subtitle}</p>
-      <Button asChild className={`mt-5 ${tone === "gold" ? "" : ""}`} variant={tone === "gold" ? "gold" : "default"}>
+      <Button asChild className="mt-5" variant={tone === "gold" ? "outline" : "default"}>
         <Link to={to}>{cta}</Link>
       </Button>
     </div>

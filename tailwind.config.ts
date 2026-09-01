@@ -16,6 +16,7 @@ export default {
     },
     extend: {
       colors: {
+        "gold-strong": "hsl(var(--gold-strong))",
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
         ring: "hsl(var(--ring))",
@@ -102,8 +103,7 @@ export default {
         "fade-in": "fade-in 0.18s ease-out",
       },
       backgroundImage: {
-        "hero-mesh":
-          "radial-gradient(at 0% 0%, hsl(var(--primary-100)) 0%, transparent 50%), radial-gradient(at 100% 100%, hsl(var(--gold) / 0.15) 0%, transparent 50%)",
+
       },
     },
   },

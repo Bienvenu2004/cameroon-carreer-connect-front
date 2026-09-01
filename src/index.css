@@ -33,6 +33,9 @@
     /* gold accent */
     --gold: 46 60% 52%;             /* #D4AF37 */
     --gold-foreground: 30 70% 14%;
+    /* Readable gold for text/icons on light surfaces; the base tone
+       is a fill colour and does not carry enough contrast for glyphs. */
+    --gold-strong: 40 72% 30%;
 
     /* secondary, muted */
     --secondary: 210 25% 95%;
@@ -80,6 +83,7 @@
 
     --gold: 46 65% 60%;
     --gold-foreground: 30 70% 10%;
+    --gold-strong: 44 70% 66%;
 
     --secondary: 222 22% 18%;
     --secondary-foreground: 210 25% 98%;
