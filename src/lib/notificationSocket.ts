@@ -1,5 +1,4 @@
-import SockJS from "sockjs-client";
-import { Client, type IMessage } from "@stomp/stompjs";
+import type { Client, IMessage } from "@stomp/stompjs";
 
 import type { NotificationDto } from "@/types/api";
 
@@ -20,6 +19,13 @@ import type { NotificationDto } from "@/types/api";
  * The client is a module singleton with reference counting. Several components
  * may want the feed (the bell, a dashboard badge), and they should share one
  * socket rather than opening one each.
+ *
+ * SockJS and the STOMP client are imported dynamically. Statically, they landed
+ * in the entry chunk -- roughly 50 kB gzipped -- because the notification bell
+ * lives in the header, which every page renders. An anonymous visitor reading a
+ * job advert has no notifications and no session to authenticate a socket with,
+ * so they were paying for a feature they cannot use, on the exact connections
+ * this platform exists to accommodate.
  */
 
 /** Where the backend publishes per-user notifications. */
@@ -57,35 +63,54 @@ function notify(message: IMessage) {
   }
 }
 
-function ensureClient(): Client {
+/** In flight while the socket libraries are being fetched. */
+let clientPromise: Promise<Client | null> | null = null;
+
+async function ensureClient(): Promise<Client | null> {
   if (client) return client;
+  if (clientPromise) return clientPromise;
 
-  client = new Client({
-    // SockJS rather than a raw WebSocket because the backend registers the
-    // endpoint `.withSockJS()`, and because its XHR fallbacks are what keep
-    // this working on the restrictive mobile networks the platform targets.
-    webSocketFactory: () => new SockJS(`${baseUrl()}${ENDPOINT}`),
+  clientPromise = (async () => {
+    const [{ default: SockJS }, { Client: StompClient }] = await Promise.all([
+      import("sockjs-client"),
+      import("@stomp/stompjs"),
+    ]);
 
-    // Back off rather than hammering a server that is down, and stay quiet in
-    // production: STOMP's debug output is extremely chatty.
-    reconnectDelay: 5000,
-    heartbeatIncoming: 10000,
-    heartbeatOutgoing: 10000,
-    debug: import.meta.env.DEV ? (msg) => console.debug("[stomp]", msg) : () => {},
+    const created = new StompClient({
+      // SockJS rather than a raw WebSocket because the backend registers the
+      // endpoint `.withSockJS()`, and because its XHR fallbacks are what keep
+      // this working on the restrictive mobile networks the platform targets.
+      webSocketFactory: () => new SockJS(`${baseUrl()}${ENDPOINT}`),
 
-    onConnect: () => {
-      connected = true;
-      client?.subscribe(USER_QUEUE, notify);
-    },
-    onWebSocketClose: () => {
-      connected = false;
-    },
-    onStompError: () => {
-      connected = false;
-    },
+      // Back off rather than hammering a server that is down, and stay quiet in
+      // production: STOMP's debug output is extremely chatty.
+      reconnectDelay: 5000,
+      heartbeatIncoming: 10000,
+      heartbeatOutgoing: 10000,
+      debug: import.meta.env.DEV ? (msg) => console.debug("[stomp]", msg) : () => {},
+
+      onConnect: () => {
+        connected = true;
+        created.subscribe(USER_QUEUE, notify);
+      },
+      onWebSocketClose: () => {
+        connected = false;
+      },
+      onStompError: () => {
+        connected = false;
+      },
+    });
+
+    client = created;
+    return created;
+  })().catch(() => {
+    // A blocked or failed chunk load must not break the page. The bell keeps
+    // polling, which is exactly why the poll was retained as a fallback.
+    clientPromise = null;
+    return null;
   });
 
-  return client;
+  return clientPromise;
 }
 
 /**
@@ -97,16 +122,18 @@ function ensureClient(): Client {
 export function subscribeToNotifications(listener: Listener): () => void {
   listeners.push(listener);
 
-  const c = ensureClient();
-  if (!c.active) {
-    c.activate();
-  }
+  void ensureClient().then((c) => {
+    // Bail if everyone unsubscribed while the chunk was downloading.
+    if (!c || listeners.length === 0) return;
+    if (!c.active) c.activate();
+  });
 
   return () => {
     listeners = listeners.filter((l) => l !== listener);
     if (listeners.length === 0 && client) {
       void client.deactivate();
       client = null;
+      clientPromise = null;
       connected = false;
     }
   };

@@ -11,9 +11,14 @@ import { i18n } from "@/i18n/config";
 import { ToastProvider } from "@/components/ui/toast-provider";
 import { initTheme } from "@/stores/theme";
 import { GOOGLE_CLIENT_ID } from "@/lib/googleAuth";
+import { registerServiceWorker } from "@/lib/registerServiceWorker";
 import "./index.css";
 
 initTheme();
+
+// Repeat visits should cost almost nothing on a metered connection, and a
+// listing already loaded should survive the connection dropping mid-scroll.
+registerServiceWorker();
 
 const tree = (
   <React.StrictMode>

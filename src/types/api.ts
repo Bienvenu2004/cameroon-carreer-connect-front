@@ -362,6 +362,13 @@ export interface JobApplicationDto {
   profileId?: string;
   candidateName?: string;
 
+  /**
+   * Why the application reached its current status, in the recruiter's words.
+   * Optional, and most often set on a rejection — being told why is the
+   * difference between a rejection and being ghosted.
+   */
+  statusReason?: string | null;
+
   /** Interview details — present once the recruiter schedules an interview. */
   interviewPlace?: string;
   /** ISO date-time string (LocalDateTime on the wire). */
@@ -380,6 +387,12 @@ export interface UpdateApplicationStatusPayload {
   interviewDateTime?: string;
   interviewPhone?: string;
   interviewNote?: string;
+
+  /**
+   * Why the application reached this status, shown to the candidate and
+   * included in the email. Optional, and most useful on a rejection.
+   */
+  statusReason?: string;
 }
 
 /**

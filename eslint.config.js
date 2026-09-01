@@ -47,6 +47,25 @@ export default tseslint.config(
     },
   },
 
+  /**
+   * The service worker runs in a worker global scope, not a window: no document,
+   * no window, but self / caches / fetch / clients instead.
+   */
+  {
+    files: ["public/sw.js"],
+    languageOptions: {
+      globals: {
+        self: "readonly",
+        caches: "readonly",
+        clients: "readonly",
+        fetch: "readonly",
+        URL: "readonly",
+        Response: "readonly",
+        Request: "readonly",
+      },
+    },
+  },
+
   /** Build scripts and config files run in Node, not the browser. */
   {
     files: ["*.config.{js,ts}", "vite.config.ts", "tailwind.config.ts", "scripts/**/*.{js,mjs}"],

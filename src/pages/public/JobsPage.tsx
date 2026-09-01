@@ -6,6 +6,7 @@ import { Filter, Search, Sparkles, X } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from "@/components/ui/select";
@@ -14,8 +15,8 @@ import { Pagination } from "@/components/common/Pagination";
 import { AiSearchPanel } from "@/components/jobs/AiSearchPanel";
 import { JobsApi } from "@/api";
 import {
-  ALL_INDUSTRIES, ALL_JOB_LANGUAGES, ALL_JOB_SITES, ALL_JOB_TYPES, ALL_REGIONS,
-  type Industry, type JobLanguage, type JobSite, type JobType, type Region,
+  ALL_DIPLOMA_LEVELS, ALL_EXPERIENCE_LEVELS, ALL_INDUSTRIES, ALL_JOB_LANGUAGES, ALL_JOB_SITES, ALL_JOB_TYPES, ALL_REGIONS,
+  type DiplomaLevel, type ExperienceLevel, type Industry, type JobLanguage, type JobSite, type JobType, type Region,
 } from "@/types/api";
 
 /**
@@ -65,6 +66,15 @@ export function JobsPage() {
   const [language, setLanguage] = useState<JobLanguage | typeof ALL>(
     (params.get("lang") as JobLanguage) || ALL,
   );
+  const [level, setLevel] = useState<ExperienceLevel | typeof ALL>(
+    (params.get("level") as ExperienceLevel) || ALL,
+  );
+  const [diploma, setDiploma] = useState<DiplomaLevel | typeof ALL>(
+    (params.get("diploma") as DiplomaLevel) || ALL,
+  );
+  const [postedWithin, setPostedWithin] = useState<string>(params.get("since") ?? ALL);
+  const [salaryMin, setSalaryMin] = useState(params.get("smin") ?? "");
+  const [salaryMax, setSalaryMax] = useState(params.get("smax") ?? "");
   const [page, setPage] = useState(0);
 
   const filter = {
@@ -79,9 +89,17 @@ export function JobsPage() {
     jobType: jobType === ALL ? undefined : jobType,
     jobSite: site === ALL ? undefined : site,
     requiredLanguage: language === ALL ? undefined : language,
+    experienceLevel: level === ALL ? undefined : level,
+    // "I hold a Licence" surfaces everything asking for a Licence or less,
+    // including jobs that state no requirement at all.
+    minimumDiploma: diploma === ALL ? undefined : diploma,
+    createdDaysAgo: postedWithin === ALL ? undefined : Number(postedWithin),
+    salaryMin: salaryMin ? Number(salaryMin) : undefined,
+    salaryMax: salaryMax ? Number(salaryMax) : undefined,
   };
 
-  useEffect(() => { setPage(0); }, [keyword, region, industry, jobType, site, language]);
+  useEffect(() => { setPage(0); },
+    [keyword, region, industry, jobType, site, language, level, diploma, postedWithin, salaryMin, salaryMax]);
 
   const { data, isLoading } = useQuery({
     queryKey: ["jobs", filter],
@@ -254,6 +272,59 @@ export function JobsPage() {
               v: lng, l: t(`jobs.languages.${lng}`),
             }))}
           />
+          <LabeledSelect
+            label={t("jobs.experienceLevel")}
+            value={level}
+            onValueChange={(v) => setLevel(v as ExperienceLevel | typeof ALL)}
+            placeholder={t("jobs.anyLevel")}
+            allLabel={t("jobs.anyLevel")}
+            options={ALL_EXPERIENCE_LEVELS.map((l) => ({ v: l, l: t(`experienceLevels.${l}`) }))}
+          />
+          <LabeledSelect
+            label={t("jobs.minimumDiploma")}
+            value={diploma}
+            onValueChange={(v) => setDiploma(v as DiplomaLevel | typeof ALL)}
+            placeholder={t("jobs.anyDiploma")}
+            allLabel={t("jobs.anyDiploma")}
+            options={ALL_DIPLOMA_LEVELS.map((d) => ({ v: d, l: t(`diplomas.${d}`) }))}
+          />
+          <LabeledSelect
+            label={t("jobs.postedWithin")}
+            value={postedWithin}
+            onValueChange={setPostedWithin}
+            placeholder={t("jobs.anyTime")}
+            allLabel={t("jobs.anyTime")}
+            options={[
+              { v: "1", l: t("jobs.last24h") },
+              { v: "7", l: t("jobs.last7d") },
+              { v: "30", l: t("jobs.last30d") },
+            ]}
+          />
+
+          {/* Pay was filterable server-side long before it was askable here.
+              It is one of the two things job seekers reach for first. */}
+          <div className="space-y-1.5">
+            <Label className="text-xs">{t("jobs.salaryRange")}</Label>
+            <div className="flex items-center gap-2">
+              <Input
+                type="number"
+                min="0"
+                inputMode="numeric"
+                placeholder={t("jobs.salaryMin")}
+                value={salaryMin}
+                onChange={(e) => setSalaryMin(e.target.value)}
+              />
+              <span className="text-muted-foreground">–</span>
+              <Input
+                type="number"
+                min="0"
+                inputMode="numeric"
+                placeholder={t("jobs.salaryMax")}
+                value={salaryMax}
+                onChange={(e) => setSalaryMax(e.target.value)}
+              />
+            </div>
+          </div>
         </div>
 
         {/* Active filter chips */}

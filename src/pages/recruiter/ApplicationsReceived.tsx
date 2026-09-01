@@ -204,6 +204,7 @@ function StatusChangeDialog({
   const [dateTime, setDateTime] = useState("");
   const [phone, setPhone] = useState("");
   const [note, setNote] = useState("");
+  const [statusReason, setStatusReason] = useState("");
 
   const status = pending?.status;
   const isInterview = status === "INTERVIEW";
@@ -215,6 +216,7 @@ function StatusChangeDialog({
       setDateTime("");
       setPhone("");
       setNote("");
+      setStatusReason("");
     }
   }, [pending]);
 
@@ -230,9 +232,10 @@ function StatusChangeDialog({
         interviewDateTime: dateTime,
         interviewPhone: phone.trim() || undefined,
         interviewNote: note.trim() || undefined,
+        statusReason: statusReason.trim() || undefined,
       });
     } else {
-      onConfirm({ status });
+      onConfirm({ status, statusReason: statusReason.trim() || undefined });
     }
   }
 
@@ -258,6 +261,26 @@ function StatusChangeDialog({
                 : t("applications.confirm.rejectedDesc", { name: candidate, job: jobTitle })}
           </DialogDescription>
         </DialogHeader>
+
+        {/* A reason for the bad news too.
+            This dialog carried four fields of care for an interview invitation
+            and nothing at all for a rejection, so candidates learned they were
+            rejected and never why. Being ghosted is the most common complaint
+            job seekers have; one sentence costs a recruiter a click. */}
+        {status === "REJECTED" && (
+          <div className="space-y-1.5 py-2">
+            <Label htmlFor="status-reason">{t("applications.rejectionReason")}</Label>
+            <Textarea
+              id="status-reason"
+              rows={3}
+              value={statusReason}
+              onChange={(e) => setStatusReason(e.target.value)}
+            />
+            <p className="text-xs text-muted-foreground">
+              {t("applications.rejectionReasonHint")}
+            </p>
+          </div>
+        )}
 
         {isInterview && (
           <div className="space-y-4 py-2">
