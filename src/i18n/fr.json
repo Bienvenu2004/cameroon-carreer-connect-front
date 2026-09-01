@@ -31,7 +31,8 @@
     "candidates": "Trouver des candidats",
     "invitations": "Invitations",
     "reports": "Signalements",
-    "concours": "Concours"
+    "concours": "Concours",
+    "industries": "Secteurs"
   },
   "notifications": {
     "title": "Notifications",
@@ -588,7 +589,11 @@
     "RETAIL_TRADE": "Commerce & Distribution",
     "TELECOMMUNICATIONS": "Télécommunications",
     "TEXTILES_FASHION": "Textile & Mode",
-    "OTHER": "Autre"
+    "OTHER": "Autre",
+    "title": "Parcourir les entreprises par secteur",
+    "subtitle": "Choisissez un secteur et découvrez les employeurs vérifiés qui recrutent.",
+    "companyCount_one": "{{count}} entreprise",
+    "companyCount_other": "{{count}} entreprises"
   },
   "workAuth": {
     "CITIZEN": "Citoyen camerounais",

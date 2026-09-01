@@ -8,7 +8,7 @@ import type {
   RecruiterProfileDto, RegionalStatsDto, SavedSearchDto,
   UserDto, UserRole, ApplicationStatus, UpdateApplicationStatusPayload, CompanyStatus, VerificationType,
   ApplicationEventDto, CandidateSearchParams, CandidateSummaryDto, CompanyResponsivenessDto,
-  InvitationDto, JobReportDto, ReportReason, ReportStatus,
+  InvitationDto, JobReportDto, ReportReason, ReportStatus, IndustryCountDto,
 } from "@/types/api";
 
 /** Normalize backend snake_case auth response to camelCase. */
@@ -202,6 +202,14 @@ export const SavedSearchApi = {
 
 /* ---------------- COMPANIES ---------------- */
 export const CompaniesApi = {
+  /**
+   * Approved company counts per industry, computed server-side in one grouped
+   * query. Public, and includes the empty industries so the directory grid
+   * stays a fixed shape.
+   */
+  industryCounts: () =>
+    unwrap<IndustryCountDto[]>(api.get("/api/hjp/companies/industry-counts")),
+
   list: (params: Record<string, unknown> = {}) =>
     unwrap<PageResponse<CompanyDto>>(api.get("/api/hjp/companies/", { params })),
 

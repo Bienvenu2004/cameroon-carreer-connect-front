@@ -39,7 +39,7 @@ export function HomePage() {
       {/* HERO */}
       <section className="relative overflow-hidden">
         <div className="absolute inset-0 bg-hero-mesh opacity-90" aria-hidden />
-        <div className="container relative py-20 lg:py-28">
+        <div className="container mx-auto max-w-6xl relative py-20 lg:py-28">
           <div className="mx-auto max-w-3xl text-center">
             {/*
               The brand mark, where a "National platform" pill used to sit.
@@ -108,7 +108,7 @@ export function HomePage() {
       </section>
 
       {/* FEATURED JOBS */}
-      <section className="container py-16">
+      <section className="container mx-auto max-w-6xl py-16">
         <div className="flex items-end justify-between">
           <div>
             <h2 className="font-display text-2xl font-semibold">{t("home.featuredJobs")}</h2>
@@ -134,7 +134,7 @@ export function HomePage() {
       </section>
 
       {/* BROWSE BY REGION */}
-      <section className="container py-12">
+      <section className="container mx-auto max-w-6xl py-12">
         <h2 className="font-display text-2xl font-semibold">{t("home.browseByRegion")}</h2>
         <div className="mt-6 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5">
           {ALL_REGIONS.map((r) => (
@@ -159,7 +159,7 @@ export function HomePage() {
       </section>
 
       {/* CTA dual */}
-      <section className="container py-16">
+      <section className="container mx-auto max-w-6xl py-16">
         <div className="grid gap-6 md:grid-cols-2">
           <CTACard
             icon={Users2}

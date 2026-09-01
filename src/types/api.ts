@@ -710,3 +710,9 @@ export interface CompanyResponsivenessDto {
   averageDaysToRespond?: number | null;
   enoughData: boolean;
 }
+
+/** Approved companies in one industry, for the browse-by-industry directory. */
+export interface IndustryCountDto {
+  industry: Industry;
+  count: number;
+}

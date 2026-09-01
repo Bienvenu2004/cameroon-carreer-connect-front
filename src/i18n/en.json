@@ -31,7 +31,8 @@
     "candidates": "Find candidates",
     "invitations": "Invitations",
     "reports": "Reports",
-    "concours": "Concours"
+    "concours": "Concours",
+    "industries": "Industries"
   },
   "notifications": {
     "title": "Notifications",
@@ -588,7 +589,11 @@
     "RETAIL_TRADE": "Retail & Trade",
     "TELECOMMUNICATIONS": "Telecommunications",
     "TEXTILES_FASHION": "Textiles & Fashion",
-    "OTHER": "Other"
+    "OTHER": "Other",
+    "title": "Browse companies by industry",
+    "subtitle": "Pick a sector and see the verified employers hiring in it.",
+    "companyCount_one": "{{count}} company",
+    "companyCount_other": "{{count}} companies"
   },
   "workAuth": {
     "CITIZEN": "Cameroonian citizen",

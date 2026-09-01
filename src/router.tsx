@@ -30,6 +30,7 @@ const CompaniesPage = lazy(() => import("@/pages/public/CompaniesPage").then(m =
 const CompanyDetailPage = lazy(() => import("@/pages/public/CompanyDetailPage").then(m => ({ default: m.CompanyDetailPage })));
 const AboutPage = lazy(() => import("@/pages/public/AboutPage").then(m => ({ default: m.AboutPage })));
 const ConcoursPage = lazy(() => import("@/pages/public/ConcoursPage").then(m => ({ default: m.ConcoursPage })));
+const IndustriesPage = lazy(() => import("@/pages/public/IndustriesPage").then(m => ({ default: m.IndustriesPage })));
 const NotFoundPage = lazy(() => import("@/pages/public/NotFoundPage").then(m => ({ default: m.NotFoundPage })));
 
 /* ----------------------------------- auth ---------------------------------- */
@@ -79,6 +80,7 @@ export function AppRouter() {
           <Route path="jobs" element={<JobsPage />} />
           <Route path="jobs/:id" element={<JobDetailPage />} />
           <Route path="companies" element={<CompaniesPage />} />
+          <Route path="industries" element={<IndustriesPage />} />
           <Route path="companies/:id" element={<CompanyDetailPage />} />
           <Route path="about" element={<AboutPage />} />
           <Route path="concours" element={<ConcoursPage />} />
