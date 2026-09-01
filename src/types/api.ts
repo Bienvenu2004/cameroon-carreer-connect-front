@@ -716,3 +716,17 @@ export interface IndustryCountDto {
   industry: Industry;
   count: number;
 }
+
+/** An employer on the seeker's "following" list. */
+export interface FollowedCompanyDto {
+  companyId: string;
+  name: string;
+  industry?: Industry | null;
+  region?: Region | null;
+  city?: string | null;
+  logo?: FileDto | null;
+  /** Open jobs right now — the reason the seeker followed them. */
+  openJobs: number;
+  followedAt: string;
+  emailAlerts: boolean;
+}

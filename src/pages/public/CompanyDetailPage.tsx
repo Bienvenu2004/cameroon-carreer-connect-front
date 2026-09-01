@@ -4,6 +4,7 @@ import { useQuery } from "@tanstack/react-query";
 import { ArrowLeft, BadgeCheck, Building2, ExternalLink, MapPin, PlayCircle } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
+import { FollowCompanyButton } from "@/components/common/FollowCompanyButton";
 import { Badge } from "@/components/ui/badge";
 import { JobCard } from "@/components/common/JobCard";
 import { CompaniesApi, JobsApi } from "@/api";
@@ -12,6 +13,14 @@ export function CompanyDetailPage() {
   const { id = "" } = useParams();
   const { t } = useTranslation();
   const company = useQuery({ queryKey: ["company", id], queryFn: () => CompaniesApi.get(id), enabled: !!id });
+
+  // Public: a signal of reach, shown to everyone rather than only to seekers.
+  const followers = useQuery({
+    queryKey: ["follower-count", id],
+    queryFn: () => CompaniesApi.followerCount(id!),
+    enabled: !!id,
+  });
+
   const jobs = useQuery({
     queryKey: ["company-jobs", id],
     queryFn: () => JobsApi.list({ companyName: company.data?.name, isActive: true, size: 12 }),
@@ -60,13 +69,28 @@ export function CompanyDetailPage() {
               </div>
             </div>
           </div>
-          {c.website && (
-            <Button asChild variant="outline">
-              <a href={c.website} target="_blank" rel="noreferrer noopener">
-                <ExternalLink className="h-4 w-4" /> {t("company.website")}
-              </a>
-            </Button>
-          )}
+          {/*
+            Follow sits ahead of the website link and is the filled action here:
+            leaving the site is not the outcome this page wants, and "tell me
+            when they post" is the one thing a visitor can do that pays off
+            later. The follower count is shown next to it because a company
+            people are watching reads as a real, operating employer.
+          */}
+          <div className="flex shrink-0 flex-wrap items-center gap-2">
+            {followers.data != null && followers.data > 0 && (
+              <span className="text-sm text-muted-foreground">
+                {t("follow.followers", { count: followers.data })}
+              </span>
+            )}
+            <FollowCompanyButton companyId={c.id} size="default" />
+            {c.website && (
+              <Button asChild variant="outline">
+                <a href={c.website} target="_blank" rel="noreferrer noopener">
+                  <ExternalLink className="h-4 w-4" /> {t("company.website")}
+                </a>
+              </Button>
+            )}
+          </div>
         </div>
         {c.description && <p className="mt-6 max-w-3xl text-foreground/85 leading-relaxed">{c.description}</p>}
         {c.promoVideoUrl && (

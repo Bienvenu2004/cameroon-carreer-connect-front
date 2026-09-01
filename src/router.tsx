@@ -49,6 +49,7 @@ const SavedSearchesPage = lazy(() => import("@/pages/seeker/SavedSearchesPage").
 const SeekerProfilePage = lazy(() => import("@/pages/seeker/SeekerProfilePage").then(m => ({ default: m.SeekerProfilePage })));
 const RecommendedJobsPage = lazy(() => import("@/pages/seeker/RecommendedJobsPage").then(m => ({ default: m.RecommendedJobsPage })));
 const InvitationsPage = lazy(() => import("@/pages/seeker/InvitationsPage").then(m => ({ default: m.InvitationsPage })));
+const FollowedCompaniesPage = lazy(() => import("@/pages/seeker/FollowedCompaniesPage").then(m => ({ default: m.FollowedCompaniesPage })));
 
 /* -------------------------------- recruiter -------------------------------- */
 const RecruiterLayout = lazy(() => import("@/pages/recruiter/RecruiterLayout").then(m => ({ default: m.RecruiterLayout })));
@@ -110,6 +111,7 @@ export function AppRouter() {
           <Route path="saved-jobs" element={<SavedJobsPage />} />
           <Route path="saved-searches" element={<SavedSearchesPage />} />
           <Route path="invitations" element={<InvitationsPage />} />
+          <Route path="following" element={<FollowedCompaniesPage />} />
         </Route>
 
         {/* RECRUITER */}

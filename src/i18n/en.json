@@ -32,7 +32,8 @@
     "invitations": "Invitations",
     "reports": "Reports",
     "concours": "Concours",
-    "industries": "Industries"
+    "industries": "Industries",
+    "following": "Following"
   },
   "notifications": {
     "title": "Notifications",
@@ -810,5 +811,21 @@
     "speed": "Usually within {{days}} days",
     "notEnough": "Not enough applications yet to say.",
     "explain": "Measured from how quickly applications here move past \"Applied\"."
+  },
+  "follow": {
+    "follow": "Get job alerts",
+    "following": "Getting alerts",
+    "nowFollowing": "You'll be notified",
+    "nowFollowingHint": "We'll tell you as soon as this employer posts a job.",
+    "unfollowed": "Alerts turned off",
+    "title": "Employers you follow",
+    "subtitle": "You'll hear as soon as any of them posts a job.",
+    "none": "You're not following any employers yet.",
+    "noneHint": "Follow an employer and we'll tell you the moment they post — no need to keep checking.",
+    "openJobs_one": "{{count}} job open now",
+    "openJobs_other": "{{count}} jobs open now",
+    "noOpenJobs": "No open jobs right now",
+    "followers_one": "{{count}} follower",
+    "followers_other": "{{count}} followers"
   }
 }

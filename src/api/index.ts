@@ -9,6 +9,7 @@ import type {
   UserDto, UserRole, ApplicationStatus, UpdateApplicationStatusPayload, CompanyStatus, VerificationType,
   ApplicationEventDto, CandidateSearchParams, CandidateSummaryDto, CompanyResponsivenessDto,
   InvitationDto, JobReportDto, ReportReason, ReportStatus, IndustryCountDto,
+  FollowedCompanyDto,
 } from "@/types/api";
 
 /** Normalize backend snake_case auth response to camelCase. */
@@ -209,6 +210,28 @@ export const CompaniesApi = {
    */
   industryCounts: () =>
     unwrap<IndustryCountDto[]>(api.get("/api/hjp/companies/industry-counts")),
+
+  /* ---- following ----
+   * "Tell me when this employer is hiring" — the standing request a job seeker
+   * most wants to make.
+   */
+
+  /** Toggles. Resolves to true when the seeker now follows the company. */
+  toggleFollow: (companyId: string) =>
+    unwrap<boolean>(api.post(`/api/hjp/companies/${companyId}/follow`)),
+
+  followed: (page = 0, size = 12) =>
+    unwrap<PageResponse<FollowedCompanyDto>>(
+      api.get("/api/hjp/companies/followed/me", { params: { page, size } })),
+
+  /**
+   * Ids only, so a grid of company cards renders its follow buttons from one
+   * request rather than one per card.
+   */
+  followedIds: () => unwrap<string[]>(api.get("/api/hjp/companies/followed/me/ids")),
+
+  followerCount: (companyId: string) =>
+    unwrap<number>(api.get(`/api/hjp/companies/${companyId}/followers/count`)),
 
   list: (params: Record<string, unknown> = {}) =>
     unwrap<PageResponse<CompanyDto>>(api.get("/api/hjp/companies/", { params })),

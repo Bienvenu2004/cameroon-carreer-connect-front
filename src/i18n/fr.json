@@ -32,7 +32,8 @@
     "invitations": "Invitations",
     "reports": "Signalements",
     "concours": "Concours",
-    "industries": "Secteurs"
+    "industries": "Secteurs",
+    "following": "Suivis"
   },
   "notifications": {
     "title": "Notifications",
@@ -810,5 +811,21 @@
     "speed": "Généralement sous {{days}} jours",
     "notEnough": "Pas encore assez de candidatures pour se prononcer.",
     "explain": "Mesuré à partir de la vitesse à laquelle les candidatures dépassent l'état « Envoyée »."
+  },
+  "follow": {
+    "follow": "Recevoir les alertes",
+    "following": "Alertes activées",
+    "nowFollowing": "Vous serez notifié",
+    "nowFollowingHint": "Nous vous préviendrons dès que cet employeur publiera une offre.",
+    "unfollowed": "Alertes désactivées",
+    "title": "Employeurs que vous suivez",
+    "subtitle": "Vous serez prévenu dès que l'un d'eux publie une offre.",
+    "none": "Vous ne suivez encore aucun employeur.",
+    "noneHint": "Suivez un employeur et nous vous préviendrons dès qu'il publie — inutile de revenir vérifier.",
+    "openJobs_one": "{{count}} offre ouverte",
+    "openJobs_other": "{{count}} offres ouvertes",
+    "noOpenJobs": "Aucune offre ouverte actuellement",
+    "followers_one": "{{count}} abonné",
+    "followers_other": "{{count}} abonnés"
   }
 }
