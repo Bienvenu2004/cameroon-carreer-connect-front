@@ -7,6 +7,8 @@ import type {
   JobSeekerProfileDto, NotificationDto, PageResponse, RecommendationDto,
   RecruiterProfileDto, RegionalStatsDto, SavedSearchDto,
   UserDto, UserRole, ApplicationStatus, UpdateApplicationStatusPayload, CompanyStatus, VerificationType,
+  ApplicationEventDto, CandidateSearchParams, CandidateSummaryDto, CompanyResponsivenessDto,
+  InvitationDto, JobReportDto, ReportReason, ReportStatus,
 } from "@/types/api";
 
 /** Normalize backend snake_case auth response to camelCase. */
@@ -115,6 +117,22 @@ export const JobsApi = {
   close: (id: string) => unwrap<void>(api.patch(`/api/hjp/jobs/${id}/close`)),
 
   remove: (id: string) => unwrap<void>(api.delete(`/api/hjp/jobs/${id}`)),
+
+  /** Other roles like this one. Public. */
+  similar: (id: string, limit = 4) =>
+    unwrap<JobDto[]>(api.get(`/api/hjp/jobs/${id}/similar`, { params: { limit } })),
+
+  /** Other open listings from the same employer. Public. */
+  otherAtCompany: (id: string, limit = 4) =>
+    unwrap<JobDto[]>(api.get(`/api/hjp/jobs/${id}/company-jobs`, { params: { limit } })),
+
+  /**
+   * Flag a suspect listing. Open to anonymous visitors -- the people most likely
+   * to spot a "pay a deposit to secure the position" advert are exactly those
+   * browsing before they trust the site enough to register.
+   */
+  report: (id: string, body: { reason: ReportReason; details?: string }) =>
+    unwrap<void>(api.post(`/api/hjp/jobs/${id}/report`, body)),
 };
 
 /* ---------------- APPLICATIONS ----------------
@@ -131,6 +149,17 @@ export const ApplicationsApi = {
 
   list: (params: Record<string, unknown> = {}) =>
     unwrap<PageResponse<JobApplicationDto>>(api.get("/api/hjp/jobs/applications", { params })),
+
+  /**
+   * Step out of a pipeline. The one transition a seeker controls; the reason is
+   * optional, because someone leaving owes nobody an explanation.
+   */
+  withdraw: (id: string, reason?: string) =>
+    unwrap<void>(api.patch(`/api/hjp/jobs/applications/${id}/withdraw`, { reason })),
+
+  /** Full status history. Visible to the candidate, the recruiter, and admins. */
+  timeline: (id: string) =>
+    unwrap<ApplicationEventDto[]>(api.get(`/api/hjp/jobs/applications/${id}/timeline`)),
 
   /**
    * Backend takes UpdateApplicationStatusDto as a JSON body. For INTERVIEW,
@@ -195,6 +224,50 @@ export const CompaniesApi = {
 };
 
 /* ---------------- ADMIN ---------------- */
+/**
+ * How an employer actually treats applicants, computed from application history.
+ * A verification badge says the company is real; this says whether applying is
+ * worth a candidate's evening and their data bundle.
+ */
+export const ResponsivenessApi = {
+  forCompany: (companyId: string) =>
+    unwrap<CompanyResponsivenessDto>(
+      api.get(`/api/hjp/companies/${companyId}/responsiveness`)),
+};
+
+/** Recruiter-facing candidate search, and the invitations that follow from it. */
+export const CandidatesApi = {
+  search: (params: CandidateSearchParams = {}) =>
+    unwrap<PageResponse<CandidateSummaryDto>>(
+      api.get("/api/hjp/candidates", {
+        params,
+        // Skills are repeated (?skills=Java&skills=SQL) rather than joined, so
+        // Spring binds them straight onto List<String>.
+        paramsSerializer: { indexes: null },
+      })),
+
+  invite: (body: { profileId: string; jobId: string; message?: string }) =>
+    unwrap<boolean>(api.post("/api/hjp/candidates/invite", body)),
+
+  myInvitations: (page = 0, size = 10) =>
+    unwrap<PageResponse<InvitationDto>>(
+      api.get("/api/hjp/candidates/invitations/me", { params: { page, size } })),
+
+  myPendingInvitationCount: () =>
+    unwrap<number>(api.get("/api/hjp/candidates/invitations/me/pending-count")),
+};
+
+/** Trust and safety moderation. Admin only. */
+export const ReportsApi = {
+  list: (params: { status?: ReportStatus; page?: number; size?: number } = {}) =>
+    unwrap<PageResponse<JobReportDto>>(api.get("/api/hjp/admin/reports", { params })),
+
+  resolve: (id: string, body: { upheld: boolean; note?: string }) =>
+    unwrap<void>(api.patch(`/api/hjp/admin/reports/${id}/resolve`, body)),
+
+  pendingCount: () => unwrap<number>(api.get("/api/hjp/admin/reports/pending-count")),
+};
+
 export const AdminApi = {
   listUsers: (params: Record<string, unknown> = {}) =>
     unwrap<PageResponse<AdminUserDto>>(api.get("/api/hjp/admin/users", { params })),

@@ -29,6 +29,7 @@ const JobDetailPage = lazy(() => import("@/pages/public/JobDetailPage").then(m =
 const CompaniesPage = lazy(() => import("@/pages/public/CompaniesPage").then(m => ({ default: m.CompaniesPage })));
 const CompanyDetailPage = lazy(() => import("@/pages/public/CompanyDetailPage").then(m => ({ default: m.CompanyDetailPage })));
 const AboutPage = lazy(() => import("@/pages/public/AboutPage").then(m => ({ default: m.AboutPage })));
+const ConcoursPage = lazy(() => import("@/pages/public/ConcoursPage").then(m => ({ default: m.ConcoursPage })));
 const NotFoundPage = lazy(() => import("@/pages/public/NotFoundPage").then(m => ({ default: m.NotFoundPage })));
 
 /* ----------------------------------- auth ---------------------------------- */
@@ -46,6 +47,7 @@ const SavedJobsPage = lazy(() => import("@/pages/seeker/SavedJobsPage").then(m =
 const SavedSearchesPage = lazy(() => import("@/pages/seeker/SavedSearchesPage").then(m => ({ default: m.SavedSearchesPage })));
 const SeekerProfilePage = lazy(() => import("@/pages/seeker/SeekerProfilePage").then(m => ({ default: m.SeekerProfilePage })));
 const RecommendedJobsPage = lazy(() => import("@/pages/seeker/RecommendedJobsPage").then(m => ({ default: m.RecommendedJobsPage })));
+const InvitationsPage = lazy(() => import("@/pages/seeker/InvitationsPage").then(m => ({ default: m.InvitationsPage })));
 
 /* -------------------------------- recruiter -------------------------------- */
 const RecruiterLayout = lazy(() => import("@/pages/recruiter/RecruiterLayout").then(m => ({ default: m.RecruiterLayout })));
@@ -58,12 +60,14 @@ const ApplicationsReceived = lazy(() => import("@/pages/recruiter/ApplicationsRe
 const MyCompaniesPage = lazy(() => import("@/pages/recruiter/MyCompaniesPage").then(m => ({ default: m.MyCompaniesPage })));
 const RecruiterCompanyDetailPage = lazy(() => import("@/pages/recruiter/CompanyDetailPage").then(m => ({ default: m.RecruiterCompanyDetailPage })));
 const CompanyEditor = lazy(() => import("@/pages/recruiter/CompanyEditor").then(m => ({ default: m.CompanyEditor })));
+const CandidateSearchPage = lazy(() => import("@/pages/recruiter/CandidateSearchPage").then(m => ({ default: m.CandidateSearchPage })));
 
 /* ----------------------------------- admin --------------------------------- */
 const AdminLayout = lazy(() => import("@/pages/admin/AdminLayout").then(m => ({ default: m.AdminLayout })));
 const AdminStats = lazy(() => import("@/pages/admin/AdminStats").then(m => ({ default: m.AdminStats })));
 const AdminUsers = lazy(() => import("@/pages/admin/AdminUsers").then(m => ({ default: m.AdminUsers })));
 const AdminCompanies = lazy(() => import("@/pages/admin/AdminCompanies").then(m => ({ default: m.AdminCompanies })));
+const AdminReports = lazy(() => import("@/pages/admin/AdminReports").then(m => ({ default: m.AdminReports })));
 
 export function AppRouter() {
   return (
@@ -77,6 +81,7 @@ export function AppRouter() {
           <Route path="companies" element={<CompaniesPage />} />
           <Route path="companies/:id" element={<CompanyDetailPage />} />
           <Route path="about" element={<AboutPage />} />
+          <Route path="concours" element={<ConcoursPage />} />
           <Route path="*" element={<NotFoundPage />} />
         </Route>
 
@@ -102,6 +107,7 @@ export function AppRouter() {
           <Route path="applications" element={<MyApplications />} />
           <Route path="saved-jobs" element={<SavedJobsPage />} />
           <Route path="saved-searches" element={<SavedSearchesPage />} />
+          <Route path="invitations" element={<InvitationsPage />} />
         </Route>
 
         {/* RECRUITER */}
@@ -124,6 +130,7 @@ export function AppRouter() {
           <Route path="jobs/new" element={<JobEditor mode="create" />} />
           <Route path="jobs/:id/edit" element={<JobEditor mode="edit" />} />
           <Route path="applications" element={<ApplicationsReceived />} />
+          <Route path="candidates" element={<CandidateSearchPage />} />
         </Route>
 
         {/* ADMIN */}
@@ -138,6 +145,7 @@ export function AppRouter() {
           <Route index element={<AdminStats />} />
           <Route path="users" element={<AdminUsers />} />
           <Route path="companies" element={<AdminCompanies />} />
+          <Route path="reports" element={<AdminReports />} />
         </Route>
       </Routes>
     </Suspense>

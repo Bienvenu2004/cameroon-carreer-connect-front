@@ -6,7 +6,7 @@ import {
   MapPin, Sparkles,
 } from "lucide-react";
 
-import { formatXAF, relativeTime } from "@/lib/utils";
+import { formatXAF, relativeTime, formatSalaryRange } from "@/lib/utils";
 import type { JobDto, RecommendationDto } from "@/types/api";
 
 /**
@@ -64,6 +64,9 @@ export function RecommendationCard({
     setCanExpand(el.scrollHeight > el.clientHeight + 1);
   }, [reason, expanded]);
 
+  const salaryLabel = formatSalaryRange(job.salaryMin, job.salaryMax, locale);
+
+
   return (
     <article
       className="group relative flex flex-col rounded-xl border border-border/50 bg-card p-4 shadow-[0_1px_2px_0_rgb(0_0_0_/_0.03)] transition-all duration-200 hover:-translate-y-0.5 hover:border-primary/30 hover:shadow-[0_10px_24px_-12px_rgba(0,0,0,0.18)]"
@@ -99,10 +102,8 @@ export function RecommendationCard({
         <Meta icon={MapPin} label={`${city}${region ? `, ${region}` : ""}`} />
         {job.type && <Dot />}
         {job.type && <Meta icon={Briefcase} label={job.type} />}
-        {job.salary != null && <Dot />}
-        {job.salary != null && (
-          <Meta icon={Coins} label={formatXAF(Number(job.salary), locale)} />
-        )}
+        {salaryLabel && <Dot />}
+        {salaryLabel && <Meta icon={Coins} label={salaryLabel} />}
       </div>
 
       {/* AI reason — subtle tint, no border. Sparkle reinforces AI origin. */}

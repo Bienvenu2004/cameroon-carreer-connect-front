@@ -24,6 +24,36 @@ export function formatXAF(value: number | string | null | undefined, locale = "f
   }).format(n);
 }
 
+/**
+ * Render a job's advertised pay.
+ *
+ * Jobs carry a band rather than a single figure, and either bound may be absent:
+ * a minimum alone reads as "from X", a maximum alone as "up to X", and equal
+ * bounds collapse to one number rather than repeating themselves. Returns null
+ * when no pay is stated, so callers can omit the row entirely instead of
+ * printing a dash where a salary should be.
+ */
+export function formatSalaryRange(
+  min: number | string | null | undefined,
+  max: number | string | null | undefined,
+  locale = "fr-FR",
+  labels?: { from?: string; upTo?: string },
+): string | null {
+  const lo = min === null || min === undefined || min === "" ? null : Number(min);
+  const hi = max === null || max === undefined || max === "" ? null : Number(max);
+  const loOk = lo !== null && !Number.isNaN(lo);
+  const hiOk = hi !== null && !Number.isNaN(hi);
+
+  if (!loOk && !hiOk) return null;
+  if (loOk && hiOk) {
+    return lo === hi
+      ? formatXAF(lo, locale)
+      : `${formatXAF(lo, locale)} – ${formatXAF(hi, locale)}`;
+  }
+  if (loOk) return `${labels?.from ?? "From"} ${formatXAF(lo, locale)}`;
+  return `${labels?.upTo ?? "Up to"} ${formatXAF(hi, locale)}`;
+}
+
 /** Relative time helper (e.g. "il y a 3 jours"). */
 export function relativeTime(date: string | Date | null | undefined, locale = "fr-FR") {
   if (!date) return "—";

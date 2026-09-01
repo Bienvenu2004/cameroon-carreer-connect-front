@@ -12,9 +12,14 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { useToast } from "@/components/ui/toast-provider";
 import { apiErrorMessage } from "@/lib/api";
 import {
+  ALL_DIPLOMA_LEVELS, ALL_EXPERIENCE_LEVELS,
   ALL_JOB_LANGUAGES, ALL_JOB_SITES, ALL_JOB_TYPES, ALL_REGIONS,
+  type DiplomaLevel, type ExperienceLevel,
   type JobLanguage, type JobSite, type JobType, type Region,
 } from "@/types/api";
+
+/** Sentinel for "no preference", since a Select cannot hold an empty value. */
+const NONE = "__none__";
 
 export function JobEditor({ mode }: { mode: "create" | "edit" }) {
   const { id } = useParams();
@@ -50,7 +55,11 @@ export function JobEditor({ mode }: { mode: "create" | "edit" }) {
   // Required working language for the role — drives the language badge
   // and the language filter on the public jobs listing.
   const [requiredLanguage, setRequiredLanguage] = useState<JobLanguage | "">("");
-  const [salary, setSalary] = useState("");
+  const [salaryMin, setSalaryMin] = useState("");
+  const [salaryMax, setSalaryMax] = useState("");
+  const [experienceLevel, setExperienceLevel] = useState<ExperienceLevel | typeof NONE>(NONE);
+  const [minimumDiploma, setMinimumDiploma] = useState<DiplomaLevel | typeof NONE>(NONE);
+  const [applicationDeadline, setApplicationDeadline] = useState("");
   const [city, setCity] = useState("");
   const [region, setRegion] = useState<Region>("CENTRE");
   const [companyId, setCompanyId] = useState("");
@@ -64,7 +73,11 @@ export function JobEditor({ mode }: { mode: "create" | "edit" }) {
       if (j.type) setType(j.type);
       if (j.site) setSite(j.site);
       if (j.requiredLanguage) setRequiredLanguage(j.requiredLanguage);
-      setSalary(j.salary?.toString() ?? "");
+      setSalaryMin(j.salaryMin?.toString() ?? "");
+      setSalaryMax(j.salaryMax?.toString() ?? "");
+      setExperienceLevel(j.experienceLevel ?? NONE);
+      setMinimumDiploma(j.minimumDiploma ?? NONE);
+      setApplicationDeadline(j.applicationDeadline ?? "");
       setCity(j.location?.city ?? "");
       if (j.location?.region) setRegion(j.location.region);
       if (j.company?.id) setCompanyId(j.company.id);
@@ -95,8 +108,12 @@ export function JobEditor({ mode }: { mode: "create" | "edit" }) {
       fd.append("type", type);
       fd.append("site", site);
       if (requiredLanguage) fd.append("requiredLanguage", requiredLanguage);
-      if (salary) fd.append("salary", salary);
+      if (salaryMin) fd.append("salaryMin", salaryMin);
+      if (salaryMax) fd.append("salaryMax", salaryMax);
       fd.append("salaryCurrency", "XAF");
+      if (experienceLevel !== NONE) fd.append("experienceLevel", experienceLevel);
+      if (minimumDiploma !== NONE) fd.append("minimumDiploma", minimumDiploma);
+      if (applicationDeadline) fd.append("applicationDeadline", applicationDeadline);
       if (companyId) fd.append("companyId", companyId);
       fd.append("location.city", city);
       fd.append("location.region", region);
@@ -172,11 +189,74 @@ export function JobEditor({ mode }: { mode: "create" | "edit" }) {
             {t("jobEditor.requiredLanguageHint")}
           </p>
         </div>
+        {/* Pay as a band. Asking for one figure mostly produced blank salary
+            fields, which is the worst outcome in a market where pay is rarely
+            advertised at all -- a range is easier to commit to. */}
+        <div className="grid gap-4 sm:grid-cols-2">
+          <div className="space-y-2">
+            <Label>{t("jobEditor.salaryMin")}</Label>
+            <Input
+              type="number"
+              min="0"
+              value={salaryMin}
+              onChange={(e) => setSalaryMin(e.target.value)}
+            />
+          </div>
+          <div className="space-y-2">
+            <Label>{t("jobEditor.salaryMax")}</Label>
+            <Input
+              type="number"
+              min="0"
+              value={salaryMax}
+              onChange={(e) => setSalaryMax(e.target.value)}
+            />
+          </div>
+        </div>
+        <p className="-mt-2 text-xs text-muted-foreground">{t("jobEditor.salaryHint")}</p>
+
         <div className="grid gap-4 sm:grid-cols-3">
           <div className="space-y-2">
-            <Label>{t("jobEditor.salary")}</Label>
-            <Input type="number" min="0" value={salary} onChange={(e) => setSalary(e.target.value)} />
+            <Label>{t("jobEditor.experienceLevel")}</Label>
+            <Select
+              value={experienceLevel}
+              onValueChange={(v) => setExperienceLevel(v as ExperienceLevel | typeof NONE)}
+            >
+              <SelectTrigger><SelectValue /></SelectTrigger>
+              <SelectContent>
+                <SelectItem value={NONE}>{t("jobEditor.anyLevel")}</SelectItem>
+                {ALL_EXPERIENCE_LEVELS.map((l) => (
+                  <SelectItem key={l} value={l}>{t(`experienceLevels.${l}`)}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
+          <div className="space-y-2">
+            <Label>{t("jobEditor.minimumDiploma")}</Label>
+            <Select
+              value={minimumDiploma}
+              onValueChange={(v) => setMinimumDiploma(v as DiplomaLevel | typeof NONE)}
+            >
+              <SelectTrigger><SelectValue /></SelectTrigger>
+              <SelectContent>
+                <SelectItem value={NONE}>{t("jobEditor.anyDiploma")}</SelectItem>
+                {ALL_DIPLOMA_LEVELS.map((d) => (
+                  <SelectItem key={d} value={d}>{t(`diplomas.${d}`)}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+          <div className="space-y-2">
+            <Label>{t("jobEditor.deadline")}</Label>
+            <Input
+              type="date"
+              value={applicationDeadline}
+              onChange={(e) => setApplicationDeadline(e.target.value)}
+            />
+            <p className="text-xs text-muted-foreground">{t("jobEditor.deadlineHint")}</p>
+          </div>
+        </div>
+
+        <div className="grid gap-4 sm:grid-cols-2">
           <div className="space-y-2">
             <Label>{t("jobEditor.city")}</Label>
             <Input value={city} onChange={(e) => setCity(e.target.value)} />

@@ -8,7 +8,7 @@ import { Badge } from "@/components/ui/badge";
 import { WhatsAppShareButton } from "@/components/common/WhatsAppShareButton";
 import { TrustSafetyCard } from "@/components/common/TrustSafetyCard";
 import { ApplicationsApi, JobsApi, SavedJobsApi } from "@/api";
-import { formatXAF, relativeTime } from "@/lib/utils";
+import { formatSalaryRange, relativeTime } from "@/lib/utils";
 import { useAuthStore } from "@/stores/auth";
 import { useToast } from "@/components/ui/toast-provider";
 import { apiErrorMessage } from "@/lib/api";
@@ -143,9 +143,16 @@ export function JobDetailPage() {
               <span className="inline-flex items-center gap-1.5"><MapPin className="h-3.5 w-3.5" />
                 {job.location?.city}{job.location?.region && ` · ${t(`regions.${job.location.region}`)}`}
               </span>
-              {job.salary && (
+              {formatSalaryRange(job.salaryMin, job.salaryMax, locale, {
+                from: t("jobs.salaryFrom"),
+                upTo: t("jobs.salaryUpTo"),
+              }) && (
                 <span className="inline-flex items-center gap-1.5 font-medium text-foreground/90">
-                  {formatXAF(job.salary as number, locale)} / mois
+                  {formatSalaryRange(job.salaryMin, job.salaryMax, locale, {
+                    from: t("jobs.salaryFrom"),
+                    upTo: t("jobs.salaryUpTo"),
+                  })}{" "}
+                  {t("jobs.perMonth")}
                 </span>
               )}
               <span className="inline-flex items-center gap-1.5">

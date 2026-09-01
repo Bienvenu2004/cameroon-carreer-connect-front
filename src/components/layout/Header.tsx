@@ -107,6 +107,13 @@ export function Header() {
               `text-sm font-medium transition-colors ${isActive ? "text-primary" : "text-foreground/70 hover:text-foreground"}`}>
               {t("nav.companies")}
             </NavLink>
+            {/* Concours sit alongside jobs rather than under them: public-sector
+                recruitment is a distinct route into work here, not a category of
+                the private-sector listings. */}
+            <NavLink to="/concours" className={({ isActive }) =>
+              `text-sm font-medium transition-colors ${isActive ? "text-primary" : "text-foreground/70 hover:text-foreground"}`}>
+              {t("nav.concours")}
+            </NavLink>
             <NavLink to="/about" className={({ isActive }) =>
               `text-sm font-medium transition-colors ${isActive ? "text-primary" : "text-foreground/70 hover:text-foreground"}`}>
               {t("nav.about")}
@@ -191,6 +198,7 @@ export function Header() {
             <div className="container flex flex-col gap-1 py-4">
               <MobileLink to="/jobs" label={t("nav.jobs")} />
               <MobileLink to="/companies" label={t("nav.companies")} />
+              <MobileLink to="/concours" label={t("nav.concours")} />
               <MobileLink to="/about" label={t("nav.about")} />
 
               {user ? (

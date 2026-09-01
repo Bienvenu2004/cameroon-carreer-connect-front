@@ -1,4 +1,4 @@
-import { Bookmark, FileText, LayoutDashboard, Search as SearchIcon, Sparkles, User } from "lucide-react";
+import { Bookmark, FileText, LayoutDashboard, Mail, Search as SearchIcon, Sparkles, User } from "lucide-react";
 import { DashboardShell, type SidebarItem } from "@/components/layout/DashboardShell";
 
 const items: SidebarItem[] = [
@@ -8,6 +8,7 @@ const items: SidebarItem[] = [
   { to: "/seeker/applications", labelKey: "nav.applications", icon: FileText },
   { to: "/seeker/saved-jobs", labelKey: "nav.savedJobs", icon: Bookmark },
   { to: "/seeker/saved-searches", labelKey: "nav.savedSearches", icon: SearchIcon },
+  { to: "/seeker/invitations", labelKey: "nav.invitations", icon: Mail },
 ];
 
 export function SeekerLayout() {

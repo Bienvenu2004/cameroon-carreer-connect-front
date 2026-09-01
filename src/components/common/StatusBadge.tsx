@@ -8,6 +8,8 @@ const APP_VARIANT: Record<ApplicationStatus, "default" | "success" | "warning" |
   INTERVIEW: "warning",
   HIRED: "success",
   REJECTED: "destructive",
+  // Neutral on purpose: the candidate chose this, it is not a bad outcome.
+  WITHDRAWN: "secondary",
 };
 
 export function ApplicationStatusBadge({ status }: { status: ApplicationStatus }) {

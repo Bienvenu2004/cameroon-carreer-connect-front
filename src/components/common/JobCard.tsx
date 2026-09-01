@@ -2,7 +2,7 @@ import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { Briefcase, Languages, MapPin, BadgeCheck } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
-import { formatXAF, relativeTime } from "@/lib/utils";
+import { formatXAF, relativeTime, formatSalaryRange } from "@/lib/utils";
 import type { JobDto } from "@/types/api";
 
 export function JobCard({ job }: { job: JobDto }) {
@@ -11,6 +11,11 @@ export function JobCard({ job }: { job: JobDto }) {
   const company = job.company?.name ?? "—";
   const city = job.location?.city ?? "—";
   const region = job.location?.region;
+  const salary = formatSalaryRange(job.salaryMin, job.salaryMax, locale, {
+    from: t("jobs.salaryFrom"),
+    upTo: t("jobs.salaryUpTo"),
+  });
+
   return (
     <Link
       to={`/jobs/${job.id}`}
@@ -51,9 +56,9 @@ export function JobCard({ job }: { job: JobDto }) {
             {t(`jobSites.${job.site}`)}
           </span>
         )}
-        {job.salary && (
+        {salary && (
           <span className="inline-flex items-center gap-1.5 font-medium text-foreground/80">
-            {formatXAF(job.salary as number, locale)}
+            {salary}
           </span>
         )}
       </div>

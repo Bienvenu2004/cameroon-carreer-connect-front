@@ -74,8 +74,10 @@ export function RecommendedJobsPage() {
         const bd = b.job.createdAt ? Date.parse(b.job.createdAt) : 0;
         return bd - ad;
       }
-      const as = a.job.salary != null ? Number(a.job.salary) : -1;
-      const bs = b.job.salary != null ? Number(b.job.salary) : -1;
+      // Sort on the top of the band, falling back to the floor: a job offering
+      // "up to 600k" should outrank one offering "from 200k".
+      const as = Number(a.job.salaryMax ?? a.job.salaryMin ?? -1);
+      const bs = Number(b.job.salaryMax ?? b.job.salaryMin ?? -1);
       return bs - as;
     });
     return list;
