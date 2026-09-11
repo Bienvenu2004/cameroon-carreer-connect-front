@@ -1,14 +1,16 @@
 import { useTranslation } from "react-i18next";
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { isSocketConnected, subscribeToNotifications } from "@/lib/notificationSocket";
-import { Bell, CheckCheck } from "lucide-react";
+import { Bell, CheckCheck, ChevronRight } from "lucide-react";
 
 import { NotificationsApi } from "@/api";
 import { Button } from "@/components/ui/button";
 import {
-  DropdownMenu, DropdownMenuContent, DropdownMenuTrigger,
+  DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { notificationLink } from "@/lib/notificationLink";
 import { useAuthStore } from "@/stores/auth";
 import { relativeTime } from "@/lib/utils";
 import { cn } from "@/lib/utils";
@@ -24,8 +26,10 @@ import type { NotificationDto } from "@/types/api";
  *     for the first time, then kept in cache).
  *   - `enabled: !!user` so we don't pester /notifications endpoints for
  *     anonymous visitors.
- *   - Clicking a notification marks it as read; the unread badge updates
- *     on the next poll (or sooner if we invalidate the queries — we do).
+ *   - Clicking a notification marks it as read and takes the reader to what
+ *     it is about (see notificationLink): the job, the application, or their
+ *     own account. The menu closes as it navigates. A notification with no
+ *     meaningful destination is simply marked as read.
  *
  * Delivery is a live STOMP subscription over the backend's existing broker,
  * authenticated by the same HttpOnly cookie as everything else. Polling is kept
@@ -45,6 +49,7 @@ export function NotificationBell() {
   const locale = i18n.language?.startsWith("en") ? "en-GB" : "fr-FR";
   const user = useAuthStore((s) => s.user);
   const qc = useQueryClient();
+  const navigate = useNavigate();
   const [live, setLive] = useState(false);
 
   /* --------- live feed --------- */
@@ -166,19 +171,23 @@ export function NotificationBell() {
               {t("notifications.empty")}
             </div>
           ) : (
-            <ul className="divide-y divide-border/40">
-              {items.map((n) => (
-                <li key={n.id}>
+            <div className="divide-y divide-border/40">
+              {items.map((n) => {
+                const href = notificationLink(n, user.role);
+                return (
                   <NotificationRow
+                    key={n.id}
                     notification={n}
                     locale={locale}
-                    onClick={() => {
+                    linked={href !== null}
+                    onSelect={() => {
                       if (!n.read) markOne.mutate(n.id);
+                      if (href) navigate(href);
                     }}
                   />
-                </li>
-              ))}
-            </ul>
+                );
+              })}
+            </div>
           )}
         </div>
       </DropdownMenuContent>
@@ -188,21 +197,28 @@ export function NotificationBell() {
 
 /* ----------------------------- row ------------------------------------ */
 
+/**
+ * A menu item rather than a plain button, so that selecting it -- by click,
+ * tap or Enter -- closes the menu before navigating, and the arrow keys move
+ * between notifications.
+ */
 function NotificationRow({
   notification,
   locale,
-  onClick,
+  linked,
+  onSelect,
 }: {
   notification: NotificationDto;
   locale: string;
-  onClick: () => void;
+  /** Whether selecting the row goes somewhere, shown as a trailing chevron. */
+  linked: boolean;
+  onSelect: () => void;
 }) {
   return (
-    <button
-      type="button"
-      onClick={onClick}
+    <DropdownMenuItem
+      onSelect={onSelect}
       className={cn(
-        "block w-full px-3 py-2 text-left transition-colors hover:bg-accent/50",
+        "block w-full cursor-pointer rounded-none px-3 py-2 text-left hover:bg-accent/50",
         // Subtle visual cue for unread: tiny dot + bolder text. Read rows
         // fade slightly so the eye is drawn to what's new.
         !notification.read && "bg-primary/[0.04]"
@@ -231,7 +247,10 @@ function NotificationRow({
             </p>
           )}
         </div>
+        {linked && (
+          <ChevronRight className="mt-0.5 h-4 w-4 shrink-0 text-muted-foreground" aria-hidden />
+        )}
       </div>
-    </button>
+    </DropdownMenuItem>
   );
 }

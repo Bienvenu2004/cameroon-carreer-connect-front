@@ -76,7 +76,7 @@
     "comingSoon": "Bientôt disponible"
   },
   "home": {
-    "heroTitle": "Trouvez votre prochain emploi au Cameroun",
+    "heroTitle": "Trouvez l'emploi qui vous correspond",
     "heroSubtitle": "Des milliers d'offres dans toutes les régions, des employeurs vérifiés, et des outils pensés pour le marché camerounais.",
     "searchPlaceholder": "Titre, compétence ou entreprise",
     "regionPlaceholder": "Toutes les régions",
@@ -94,6 +94,49 @@
       "companies": "Entreprises vérifiées",
       "regions": "Régions couvertes",
       "totalViews": "Vues totales"
+    },
+    "heroEyebrow": "Employeurs vérifiés · Les dix régions",
+    "heroSubtitleCount_one": "Parcourez {{formatted}} offre ouverte d'employeurs vérifiés partout au Cameroun.",
+    "heroSubtitleCount_other": "Parcourez {{formatted}} offres ouvertes d'employeurs vérifiés partout au Cameroun.",
+    "heroImageAlt": "Une candidate travaillant sur son ordinateur",
+    "popularSearches": "Recherches populaires",
+    "popularTerms": [
+      "Développeur",
+      "Comptable",
+      "Commercial",
+      "Enseignant",
+      "Infirmier",
+      "Chauffeur",
+      "Stage",
+      "Marketing"
+    ],
+    "trustedBy": "Employeurs vérifiés sur JobsConnect",
+    "verifiedOnly": "Employeurs vérifiés",
+    "verifiedOnlySub": "Contrôlés avant de publier",
+    "categoriesTitle": "Rechercher par catégorie",
+    "categoriesSubtitle": "Explorez les opportunités dans le secteur qui vous intéresse.",
+    "allCategories": "Toutes les catégories",
+    "prev": "Précédent",
+    "next": "Suivant",
+    "goToSlide": "Aller à la diapositive {{n}}",
+    "featuredSubtitle": "Les dernières offres d'employeurs vérifiés.",
+    "allJobOffers": "Toutes les offres",
+    "anyIndustry": "Général",
+    "live": "En direct",
+    "regionsSubtitle": "Accédez directement aux offres près de chez vous.",
+    "employers": {
+      "eyebrow": "Pour les employeurs",
+      "title": "Recrutez les bonnes personnes, plus vite",
+      "body": "Publiez vos offres auprès de candidats de toutes les régions, et laissez la vérification leur montrer que vous êtes un employeur sérieux.",
+      "points": [
+        "Publiez une offre en quelques minutes",
+        "Un badge vérifié qui inspire confiance",
+        "Recherchez les candidats qui ont choisi d'être visibles",
+        "Soyez notifié dès qu'un candidat postule"
+      ],
+      "cta": "Publier une offre",
+      "ctaSeeker": "Je cherche un emploi",
+      "imageAlt": "Un employeur souriant à son bureau"
     }
   },
   "jobs": {
@@ -297,7 +340,9 @@
       "HIRED": "Offre acceptée",
       "REJECTED": "Non retenue",
       "WITHDRAWN": "Retirée par le candidat"
-    }
+    },
+    "focusedFromNotification": "Voici la candidature concernée par votre notification.",
+    "showAll": "Afficher toutes les candidatures"
   },
   "roles": {
     "JOB_SEEKER": "Chercheur d'emploi",

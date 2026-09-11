@@ -1,15 +1,9 @@
 import { useTranslation } from "react-i18next";
 import { Link } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
-import {
-  Banknote, Building2, Cpu, Factory, GraduationCap, HandHeart, HardHat,
-  Heart, Hotel, Landmark, Leaf, Megaphone, MoreHorizontal, Radio,
-  Scale, ShoppingBag, Shirt, Truck, Users, Zap,
-  type LucideIcon,
-} from "lucide-react";
-
 import { CompaniesApi } from "@/api";
-import { ALL_INDUSTRIES, type Industry } from "@/types/api";
+import { INDUSTRY_ICONS } from "@/lib/industryIcons";
+import { ALL_INDUSTRIES } from "@/types/api";
 
 /**
  * Browse employers by industry.
@@ -27,29 +21,6 @@ import { ALL_INDUSTRIES, type Industry } from "@/types/api";
  * disappears when it has no companies makes the grid look broken rather than
  * honest — and the count tells the visitor the truth before they click.
  */
-const ICONS: Record<Industry, LucideIcon> = {
-  AGRICULTURE: Leaf,
-  BANKING_FINANCE: Banknote,
-  CONSTRUCTION: HardHat,
-  CONSULTING: Users,
-  EDUCATION: GraduationCap,
-  ENERGY_UTILITIES: Zap,
-  GOVERNMENT: Landmark,
-  HEALTHCARE: Heart,
-  HOSPITALITY_TOURISM: Hotel,
-  INFORMATION_TECHNOLOGY: Cpu,
-  LEGAL: Scale,
-  LOGISTICS_TRANSPORT: Truck,
-  MANUFACTURING: Factory,
-  MEDIA_COMMUNICATION: Megaphone,
-  NGO_NONPROFIT: HandHeart,
-  REAL_ESTATE: Building2,
-  RETAIL_TRADE: ShoppingBag,
-  TELECOMMUNICATIONS: Radio,
-  TEXTILES_FASHION: Shirt,
-  OTHER: MoreHorizontal,
-};
-
 export function IndustriesPage() {
   const { t } = useTranslation();
 
@@ -74,7 +45,7 @@ export function IndustriesPage() {
 
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {ALL_INDUSTRIES.map((industry) => {
-            const Icon = ICONS[industry];
+            const Icon = INDUSTRY_ICONS[industry];
             const count = counts.get(industry) ?? 0;
 
             return (

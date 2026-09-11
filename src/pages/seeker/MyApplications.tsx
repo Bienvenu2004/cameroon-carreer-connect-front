@@ -1,8 +1,9 @@
 import { useState } from "react";
 import type { JobApplicationDto } from "@/types/api";
 import { useTranslation } from "react-i18next";
-import { Link } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
+import { BellRing } from "lucide-react";
 
 import { ApplicationsApi } from "@/api";
 import { ApplicationStatusBadge } from "@/components/common/StatusBadge";
@@ -17,17 +18,38 @@ export function MyApplications() {
   const [page, setPage] = useState(0);
   const [detail, setDetail] = useState<JobApplicationDto | null>(null);
 
+  /**
+   * Set when the page is opened from a notification about one application (a
+   * status change): the list narrows to that application and its history
+   * opens, so the candidate lands on what changed rather than on page one of
+   * everything. Closing the dialog keeps the narrowed list; "Show all" clears it.
+   */
+  const [searchParams, setSearchParams] = useSearchParams();
+  const focusedId = searchParams.get("application");
+  const [dismissedFocusId, setDismissedFocusId] = useState<string | null>(null);
+
   const filter = {
-    page,
+    page: focusedId ? 0 : page,
     size: 20,
     sortBy: "createdAt",
     sortOrder: "DESC" as const,
+    ...(focusedId ? { applicationId: focusedId } : {}),
   };
 
   const { data, isLoading } = useQuery({
     queryKey: ["my-applications-full", filter],
     queryFn: () => ApplicationsApi.list(filter),
   });
+
+  const focused =
+    focusedId && dismissedFocusId !== focusedId
+      ? data?.content.find((a) => a.id === focusedId) ?? null
+      : null;
+
+  const showAll = () => {
+    setSearchParams({}, { replace: true });
+    setPage(0);
+  };
 
   return (
     <div>
@@ -36,13 +58,33 @@ export function MyApplications() {
         <p className="mt-1 text-sm text-muted-foreground">{t("applications.subtitle")}</p>
       </header>
 
+      {focusedId && (
+        <div className="mb-4 flex flex-wrap items-center justify-between gap-3 rounded-xl border border-primary/20 bg-primary/5 px-4 py-3 text-sm">
+          <span className="inline-flex items-center gap-2 text-foreground">
+            <BellRing className="h-4 w-4 text-primary" aria-hidden="true" />
+            {t("applications.focusedFromNotification")}
+          </span>
+          <Button variant="link" size="sm" className="h-auto p-0" onClick={showAll}>
+            {t("applications.showAll")}
+          </Button>
+        </div>
+      )}
+
       {isLoading && <div className="text-muted-foreground">{t("common.loading")}</div>}
 
       {data && data.content.length === 0 && (
-        <div className="rounded-2xl border border-dashed border-border bg-card/50 p-12 text-center">
-          <p className="text-muted-foreground">{t("applications.noApplications")}</p>
-          <Button asChild className="mt-4"><Link to="/jobs">{t("applications.browseJobs")}</Link></Button>
-        </div>
+        focusedId ? (
+          // The notified application may since have been removed.
+          <div className="rounded-2xl border border-dashed border-border bg-card/50 p-12 text-center">
+            <p className="text-muted-foreground">{t("errors.notFound")}</p>
+            <Button className="mt-4" onClick={showAll}>{t("applications.showAll")}</Button>
+          </div>
+        ) : (
+          <div className="rounded-2xl border border-dashed border-border bg-card/50 p-12 text-center">
+            <p className="text-muted-foreground">{t("applications.noApplications")}</p>
+            <Button asChild className="mt-4"><Link to="/jobs">{t("applications.browseJobs")}</Link></Button>
+          </div>
+        )
       )}
 
       {data && data.content.length > 0 && (
@@ -59,7 +101,10 @@ export function MyApplications() {
             </thead>
             <tbody>
               {data.content.map((a) => (
-                <tr key={a.id} className="border-b border-border/40 last:border-0 hover:bg-accent/30">
+                <tr
+                  key={a.id}
+                  className={`border-b border-border/40 last:border-0 hover:bg-accent/30${a.id === focusedId ? " bg-primary/5" : ""}`}
+                >
                   <td className="p-4">
                     <div className="font-medium">{a.jobTitle ?? "—"}</div>
                     <div className="text-xs text-muted-foreground">{a.companyName}</div>
@@ -93,7 +138,13 @@ export function MyApplications() {
         </>
       )}
 
-      <ApplicationDetailDialog application={detail} onClose={() => setDetail(null)} />
+      <ApplicationDetailDialog
+        application={detail ?? focused}
+        onClose={() => {
+          setDetail(null);
+          if (focusedId) setDismissedFocusId(focusedId);
+        }}
+      />
     </div>
   );
 }

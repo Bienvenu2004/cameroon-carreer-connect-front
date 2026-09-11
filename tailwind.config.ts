@@ -96,11 +96,29 @@ export default {
           from: { opacity: "0", transform: "translateY(4px)" },
           to: { opacity: "1", transform: "translateY(0)" },
         },
+        /* Home page: floating cards, the employer logo marquee, drifting glows. */
+        float: {
+          "0%, 100%": { transform: "translateY(0)" },
+          "50%": { transform: "translateY(-10px)" },
+        },
+        marquee: {
+          from: { transform: "translateX(0)" },
+          to: { transform: "translateX(-50%)" },
+        },
+        blob: {
+          "0%, 100%": { transform: "translate(0, 0) scale(1)" },
+          "33%": { transform: "translate(24px, -16px) scale(1.06)" },
+          "66%": { transform: "translate(-16px, 12px) scale(0.96)" },
+        },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
         "accordion-up": "accordion-up 0.2s ease-out",
         "fade-in": "fade-in 0.18s ease-out",
+        float: "float 6s ease-in-out infinite",
+        "float-slow": "float 9s ease-in-out infinite",
+        marquee: "marquee 36s linear infinite",
+        blob: "blob 18s ease-in-out infinite",
       },
       backgroundImage: {
 

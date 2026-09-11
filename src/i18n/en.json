@@ -76,7 +76,7 @@
     "comingSoon": "Coming soon"
   },
   "home": {
-    "heroTitle": "Find your next job in Cameroon",
+    "heroTitle": "Find the perfect job for you",
     "heroSubtitle": "Thousands of opportunities across every region, verified employers, and tools built for the Cameroonian job market.",
     "searchPlaceholder": "Title, skill, or company",
     "regionPlaceholder": "All regions",
@@ -94,6 +94,49 @@
       "companies": "Verified companies",
       "regions": "Regions covered",
       "totalViews": "Total job views"
+    },
+    "heroEyebrow": "Every employer verified · All ten regions",
+    "heroSubtitleCount_one": "Search {{formatted}} open position from verified employers across Cameroon.",
+    "heroSubtitleCount_other": "Search {{formatted}} open positions from verified employers across Cameroon.",
+    "heroImageAlt": "A job seeker working at her computer",
+    "popularSearches": "Popular searches",
+    "popularTerms": [
+      "Developer",
+      "Accountant",
+      "Sales",
+      "Teacher",
+      "Nurse",
+      "Driver",
+      "Internship",
+      "Marketing"
+    ],
+    "trustedBy": "Verified employers on JobsConnect",
+    "verifiedOnly": "Verified employers",
+    "verifiedOnlySub": "Checked before they can post",
+    "categoriesTitle": "Search by category",
+    "categoriesSubtitle": "Explore opportunities in the industry you want to work in.",
+    "allCategories": "All categories",
+    "prev": "Previous",
+    "next": "Next",
+    "goToSlide": "Go to slide {{n}}",
+    "featuredSubtitle": "The latest openings from verified employers.",
+    "allJobOffers": "All job offers",
+    "anyIndustry": "General",
+    "live": "Live",
+    "regionsSubtitle": "Jump straight to offers near you.",
+    "employers": {
+      "eyebrow": "For employers",
+      "title": "Hire the right people, faster",
+      "body": "Publish your offers to candidates in every region, and let verification show them you are a genuine employer.",
+      "points": [
+        "Post an offer in minutes",
+        "A verified badge candidates can trust",
+        "Search candidates who chose to be found",
+        "Get notified the moment someone applies"
+      ],
+      "cta": "Post a job",
+      "ctaSeeker": "I'm looking for work",
+      "imageAlt": "An employer smiling at his desk"
     }
   },
   "jobs": {
@@ -297,7 +340,9 @@
       "HIRED": "Offer made",
       "REJECTED": "Not selected",
       "WITHDRAWN": "Withdrawn by candidate"
-    }
+    },
+    "focusedFromNotification": "Showing the application from your notification.",
+    "showAll": "Show all applications"
   },
   "roles": {
     "JOB_SEEKER": "Job seeker",

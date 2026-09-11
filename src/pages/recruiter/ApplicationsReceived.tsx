@@ -1,9 +1,9 @@
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { Link } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
 import {
-  Briefcase, Calendar, Download, Eye, Facebook, FileText, Github, Globe, Languages,
+  BellRing, Briefcase, Calendar, Download, Eye, Facebook, FileText, Github, Globe, Languages,
   Linkedin, Link as LinkIcon, Mail, MapPin, Phone, Twitter, UserCircle2, Video,
 } from "lucide-react";
 
@@ -48,22 +48,43 @@ export function ApplicationsReceived() {
   const [openApp, setOpenApp] = useState<JobApplicationDto | null>(null);
 
   /**
+   * Set when the page is opened from a "new application" notification: the list
+   * narrows to that application and its candidate's profile opens, so the
+   * recruiter lands on the application the notification announced. Closing the
+   * dialog keeps the narrowed list; "Show all" clears it.
+   */
+  const [searchParams, setSearchParams] = useSearchParams();
+  const focusedId = searchParams.get("application");
+  const [dismissedFocusId, setDismissedFocusId] = useState<string | null>(null);
+
+  /**
    * A status change awaiting confirmation (INTERVIEW/HIRED/REJECTED). Holds
    * the target application and the requested status; null when no dialog open.
    */
   const [pending, setPending] = useState<{ app: JobApplicationDto; status: ApplicationStatus } | null>(null);
 
   const filter = {
-    page,
+    page: focusedId ? 0 : page,
     size: 20,
     sortBy: "createdAt",
     sortOrder: "DESC" as const,
+    ...(focusedId ? { applicationId: focusedId } : {}),
   };
 
   const { data, isLoading } = useQuery({
     queryKey: ["recruiter-applications", filter],
     queryFn: () => ApplicationsApi.list(filter),
   });
+
+  const focusedApp =
+    focusedId && dismissedFocusId !== focusedId
+      ? data?.content.find((a) => a.id === focusedId && a.profileId) ?? null
+      : null;
+
+  const showAllApplications = () => {
+    setSearchParams({}, { replace: true });
+    setPage(0);
+  };
 
   const update = useMutation({
     mutationFn: ({ id, payload }: { id: string; payload: ApplicationStatus | UpdateApplicationStatusPayload }) =>
@@ -100,6 +121,18 @@ export function ApplicationsReceived() {
         <p className="mt-1 text-sm text-muted-foreground">{t("applications.receivedSubtitle")}</p>
       </header>
 
+      {focusedId && (
+        <div className="mb-4 flex flex-wrap items-center justify-between gap-3 rounded-xl border border-primary/20 bg-primary/5 px-4 py-3 text-sm">
+          <span className="inline-flex items-center gap-2 text-foreground">
+            <BellRing className="h-4 w-4 text-primary" aria-hidden="true" />
+            {t("applications.focusedFromNotification")}
+          </span>
+          <Button variant="link" size="sm" className="h-auto p-0" onClick={showAllApplications}>
+            {t("applications.showAll")}
+          </Button>
+        </div>
+      )}
+
       {isLoading && <div className="text-muted-foreground">{t("common.loading")}</div>}
 
       <div className="overflow-hidden rounded-2xl border border-border/60 bg-card elev-1">
@@ -115,7 +148,7 @@ export function ApplicationsReceived() {
           </thead>
           <tbody>
             {data?.content.map((a) => (
-              <tr key={a.id} className="border-b border-border/40 last:border-0 hover:bg-accent/30">
+              <tr key={a.id} className={`border-b border-border/40 last:border-0 hover:bg-accent/30${a.id === focusedId ? " bg-primary/5" : ""}`}>
                 <td className="p-4">
                   {a.jobId
                     ? <Link to={`/jobs/${a.jobId}`} className="font-medium hover:text-primary">{a.jobTitle ?? "—"}</Link>
@@ -161,8 +194,11 @@ export function ApplicationsReceived() {
       )}
 
       <CandidateProfileDialog
-        app={openApp}
-        onClose={() => setOpenApp(null)}
+        app={openApp ?? focusedApp}
+        onClose={() => {
+          setOpenApp(null);
+          if (focusedId) setDismissedFocusId(focusedId);
+        }}
       />
 
       <StatusChangeDialog
