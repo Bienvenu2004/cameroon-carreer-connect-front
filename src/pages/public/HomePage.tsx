@@ -2,12 +2,13 @@ import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Link, useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
-import { Search, MapPin, Briefcase, Users2, BadgeCheck, ArrowRight, Building2, Sparkles } from "lucide-react";
+import { Search, MapPin, Briefcase, Users2, BadgeCheck, ArrowRight, Building2 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { JobCard } from "@/components/common/JobCard";
+import { ActivityFeed } from "@/components/common/ActivityFeed";
 import { JobsApi } from "@/api";
 import { ALL_REGIONS, type Region } from "@/types/api";
 import { formatNumber } from "@/lib/utils";
@@ -37,15 +38,41 @@ export function HomePage() {
   return (
     <div>
       {/* HERO */}
-      <section className="relative overflow-hidden">
-        <div className="absolute inset-0 bg-hero-mesh opacity-90" aria-hidden />
-        <div className="container relative py-20 lg:py-28">
+      {/*
+        Flat ground, deliberately.
+
+        This used to carry a two-stop radial mesh at 90% opacity, which put the
+        search form -- the most important element on the page -- on a surface
+        that shifted underneath it. The form competed with its own background
+        instead of being the thing the eye lands on. A hairline rule does the
+        separation that the gradient was being asked to do.
+      */}
+      <section className="relative border-b border-border/60">
+        <div className="container mx-auto max-w-6xl relative py-20 lg:py-28">
           <div className="mx-auto max-w-3xl text-center">
-            <span className="inline-flex items-center gap-2 rounded-full border border-primary/20 bg-primary/5 px-4 py-1.5 text-xs font-medium uppercase tracking-wider text-primary-700">
-              <Sparkles className="h-3.5 w-3.5" />
-              {t("home.heroEyebrow")}
-            </span>
-            <h1 className="mt-6 font-display text-4xl font-bold leading-tight tracking-tight text-foreground sm:text-5xl lg:text-display-2">
+            {/*
+              The brand mark, where a "National platform" pill used to sit.
+
+              The glyph rather than the full lockup: the header renders the
+              lockup 80px above this, and repeating it identically would read as
+              a mistake rather than as branding. Swap the src to
+              /logo/logo-full.png if the wordmark is wanted here instead.
+
+              Decorative, so alt is empty — the header logo already announces the
+              brand to a screen reader, and the h1 immediately below carries the
+              meaning. Announcing the name a second time is noise.
+            */}
+            <img
+              src="/logo/logo-mark.png"
+              alt=""
+              aria-hidden="true"
+              width={255}
+              height={288}
+              loading="eager"
+              decoding="async"
+              className="mx-auto h-16 w-auto dark:brightness-0 dark:invert sm:h-20"
+            />
+            <h1 className="mt-5 font-display text-4xl font-bold leading-tight tracking-tight text-foreground sm:text-5xl lg:text-display-2">
               {t("home.heroTitle")}
             </h1>
             <p className="mt-5 text-lg leading-relaxed text-muted-foreground">
@@ -90,7 +117,7 @@ export function HomePage() {
       </section>
 
       {/* FEATURED JOBS */}
-      <section className="container py-16">
+      <section className="container mx-auto max-w-6xl py-16">
         <div className="flex items-end justify-between">
           <div>
             <h2 className="font-display text-2xl font-semibold">{t("home.featuredJobs")}</h2>
@@ -116,7 +143,21 @@ export function HomePage() {
       </section>
 
       {/* BROWSE BY REGION */}
-      <section className="container py-12">
+      {/*
+        Recent platform activity, for the visitor with no account.
+        The question a first-time visitor silently asks is "is anyone actually
+        using this?", and a list of real things that happened this month answers
+        it better than any claim the copy could make.
+      */}
+      <section className="container mx-auto max-w-6xl py-12">
+        <h2 className="font-display text-2xl font-semibold">{t("feed.title")}</h2>
+        <p className="mt-1 text-sm text-muted-foreground">{t("feed.subtitle")}</p>
+        <div className="mt-5 rounded-2xl border border-border/60 bg-card p-5">
+          <ActivityFeed scope="platform" limit={6} />
+        </div>
+      </section>
+
+      <section className="container mx-auto max-w-6xl py-12">
         <h2 className="font-display text-2xl font-semibold">{t("home.browseByRegion")}</h2>
         <div className="mt-6 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5">
           {ALL_REGIONS.map((r) => (
@@ -141,7 +182,7 @@ export function HomePage() {
       </section>
 
       {/* CTA dual */}
-      <section className="container py-16">
+      <section className="container mx-auto max-w-6xl py-16">
         <div className="grid gap-6 md:grid-cols-2">
           <CTACard
             icon={Users2}
@@ -188,13 +229,25 @@ function CTACard({
   tone: "primary" | "gold";
 }) {
   return (
-    <div className={`relative overflow-hidden rounded-2xl border p-8 elev-1 ${tone === "primary" ? "border-primary/20 bg-primary/5" : "border-gold/30 bg-gold/5"}`}>
-      <div className={`mb-4 grid h-12 w-12 place-items-center rounded-xl ${tone === "primary" ? "bg-primary text-primary-foreground" : "bg-gold text-gold-foreground"}`}>
+    /*
+      Both cards sit on the same neutral surface. Tinting the panels themselves
+      made two equally loud options, so a visitor had no signal about which one
+      was meant for them; the colour now lives only in the icon and in one
+      filled button.
+
+      Seeker is the filled action and recruiter is outlined -- not because the
+      recruiter matters less, but because a page has one primary action and the
+      public home page is read overwhelmingly by people looking for work.
+    */
+    <div className="relative rounded-2xl border border-border/60 bg-card p-8 elev-1">
+      <div className={`mb-4 grid h-12 w-12 place-items-center rounded-xl ${
+        tone === "primary" ? "bg-primary/10 text-primary" : "bg-gold/15 text-gold-strong"
+      }`}>
         <Icon className="h-5 w-5" />
       </div>
       <h3 className="font-display text-xl font-semibold">{title}</h3>
       <p className="mt-1 text-sm text-muted-foreground">{subtitle}</p>
-      <Button asChild className={`mt-5 ${tone === "gold" ? "" : ""}`} variant={tone === "gold" ? "gold" : "default"}>
+      <Button asChild className="mt-5" variant={tone === "gold" ? "outline" : "default"}>
         <Link to={to}>{cta}</Link>
       </Button>
     </div>

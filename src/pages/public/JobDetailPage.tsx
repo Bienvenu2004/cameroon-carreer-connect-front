@@ -1,12 +1,15 @@
 import { useTranslation } from "react-i18next";
 import { Link, useParams, useNavigate } from "react-router-dom";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { ArrowLeft, BadgeCheck, Bookmark, Briefcase, Building2, Check, Heart, Languages, MapPin } from "lucide-react";
+import { CalendarClock, Landmark, ArrowLeft, BadgeCheck, Bookmark, Briefcase, Building2, Check, Heart, Languages, MapPin } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { ApplicationsApi, JobsApi, SavedJobsApi } from "@/api";
-import { formatXAF, relativeTime } from "@/lib/utils";
+import { WhatsAppShareButton } from "@/components/common/WhatsAppShareButton";
+import { TrustSafetyCard } from "@/components/common/TrustSafetyCard";
+import { JobCard } from "@/components/common/JobCard";
+import { ApplicationsApi, JobsApi, SavedJobsApi, ResponsivenessApi } from "@/api";
+import { formatSalaryRange, relativeTime } from "@/lib/utils";
 import { useAuthStore } from "@/stores/auth";
 import { useToast } from "@/components/ui/toast-provider";
 import { apiErrorMessage } from "@/lib/api";
@@ -70,6 +73,34 @@ export function JobDetailPage() {
     onError: (e) => toast({ title: t("common.errorOccurred"), description: apiErrorMessage(e), variant: "destructive" }),
   });
 
+  /* ---------------- discovery ----------------
+   * A job page used to be a dead end: no related roles, no other openings at
+   * the same employer, nothing to do but go back.
+   *
+   * Declared above the loading/not-found guards because hooks must run in the
+   * same order on every render. `enabled` keeps them from firing before the
+   * job (and its company) are known.
+   */
+  const companyId = job?.company?.id;
+
+  const similar = useQuery({
+    queryKey: ["job-similar", id],
+    queryFn: () => JobsApi.similar(id!, 4),
+    enabled: !!id && !!job,
+  });
+
+  const alsoAtCompany = useQuery({
+    queryKey: ["job-company-jobs", id],
+    queryFn: () => JobsApi.otherAtCompany(id!, 4),
+    enabled: !!id && !!companyId,
+  });
+
+  const responsiveness = useQuery({
+    queryKey: ["responsiveness", companyId],
+    queryFn: () => ResponsivenessApi.forCompany(companyId!),
+    enabled: !!companyId,
+  });
+
   if (isLoading) {
     return <div className="container py-16 text-center text-muted-foreground">{t("common.loading")}</div>;
   }
@@ -88,7 +119,8 @@ export function JobDetailPage() {
   // and the backend auto-closed it, or the recruiter closed it manually)
   // can no longer receive applications or be saved. The backend rejects
   // such attempts; we hide the buttons up-front for clean UX.
-  const isJobClosed = !job.isActive;
+
+  const isJobClosed = !job.isActive || !!job.expired;
 
   const handleApply = () => {
     if (!user) { nav(`/login?redirect=/jobs/${id}`); return; }
@@ -132,6 +164,14 @@ export function JobDetailPage() {
                 <Badge variant="success" className="gap-1"><BadgeCheck className="h-3 w-3" /> Verified</Badge>
               )}
             </div>
+            {job.publicSector && (
+              <div className="mb-3 inline-flex items-center gap-1.5 rounded-full bg-primary/10 px-3 py-1 text-xs font-semibold uppercase tracking-wider text-primary">
+                <Landmark className="h-3.5 w-3.5" />
+                {t("concours.badge")}
+                {job.publicSectorBody ? ` · ${job.publicSectorBody}` : ""}
+              </div>
+            )}
+
             <h1 className="mt-3 font-display text-3xl font-bold tracking-tight text-foreground">{job.title}</h1>
             <Link to={company ? `/companies/${company.id}` : "#"} className="mt-2 inline-flex items-center gap-2 text-sm font-medium text-foreground/80 hover:text-primary">
               <Building2 className="h-4 w-4" />
@@ -141,15 +181,40 @@ export function JobDetailPage() {
               <span className="inline-flex items-center gap-1.5"><MapPin className="h-3.5 w-3.5" />
                 {job.location?.city}{job.location?.region && ` · ${t(`regions.${job.location.region}`)}`}
               </span>
-              {job.salary && (
+              {formatSalaryRange(job.salaryMin, job.salaryMax, locale, {
+                from: t("jobs.salaryFrom"),
+                upTo: t("jobs.salaryUpTo"),
+              }) && (
                 <span className="inline-flex items-center gap-1.5 font-medium text-foreground/90">
-                  {formatXAF(job.salary as number, locale)} / mois
+                  {formatSalaryRange(job.salaryMin, job.salaryMax, locale, {
+                    from: t("jobs.salaryFrom"),
+                    upTo: t("jobs.salaryUpTo"),
+                  })}{" "}
+                  {t("jobs.perMonth")}
                 </span>
               )}
               <span className="inline-flex items-center gap-1.5">
                 <Briefcase className="h-3.5 w-3.5" />
                 {t("jobs.postedAt")} {relativeTime(job.postedDate ?? job.createdAt, locale)}
               </span>
+              {/* Urgency the candidate can act on. Nothing on this platform used
+                  to age out, so a January posting looked exactly like one made
+                  this morning. */}
+              {job.applicationDeadline && !job.expired && (
+                <span className={`inline-flex items-center gap-1.5 font-medium ${
+                  (job.daysUntilDeadline ?? 99) <= 3 ? "text-destructive" : "text-foreground/90"
+                }`}>
+                  <CalendarClock className="h-3.5 w-3.5" />
+                  {job.daysUntilDeadline === 0
+                    ? t("jobs.closesToday")
+                    : t("jobs.closesIn", { count: job.daysUntilDeadline ?? 0 })}
+                </span>
+              )}
+              {job.expired && (
+                <span className="inline-flex items-center gap-1.5 font-medium text-destructive">
+                  <CalendarClock className="h-3.5 w-3.5" /> {t("jobs.expired")}
+                </span>
+              )}
             </div>
           </div>
 
@@ -209,7 +274,40 @@ export function JobDetailPage() {
                 {t("jobs.seekerOnlyAction")}
               </div>
             )}
+
+            {/* Share is available to everyone, on any job state — WhatsApp
+                is the primary way jobs spread in Cameroon. */}
+            <WhatsAppShareButton
+              url={typeof window !== "undefined" ? window.location.href : ""}
+              title={job.title}
+              className="mt-2 w-full"
+            />
           </div>
+
+          {/* Anti-scam trust notice + report action. */}
+          <TrustSafetyCard jobId={id} />
+
+          {/* What the employer actually does with applications. A verification
+              badge says the company is real; this says whether applying is worth
+              a candidate's evening and their data bundle. */}
+          {responsiveness.data?.enoughData && (
+            <div className="mt-4 rounded-2xl border border-border/60 bg-card p-5 elev-1">
+              <div className="font-display text-sm font-semibold text-foreground">
+                {t("responsiveness.title")}
+              </div>
+              <p className="mt-2 text-sm text-foreground/80">
+                {t("responsiveness.rate", { rate: responsiveness.data.responseRate })}
+              </p>
+              {responsiveness.data.averageDaysToRespond != null && (
+                <p className="text-sm text-foreground/80">
+                  {t("responsiveness.speed", { days: responsiveness.data.averageDaysToRespond })}
+                </p>
+              )}
+              <p className="mt-2 text-xs leading-relaxed text-muted-foreground">
+                {t("responsiveness.explain")}
+              </p>
+            </div>
+          )}
 
           {company && (
             <Link to={`/companies/${company.id}`} className="mt-4 block rounded-2xl border border-border/60 bg-card p-6 elev-1 transition-all hover:elev-2">
@@ -225,6 +323,34 @@ export function JobDetailPage() {
           )}
         </aside>
       </div>
+    
+      {/* --------------------------------------------------------------
+          Discovery. Rendered after the two-column layout so it reads as a
+          footer to the page rather than competing with the job itself.
+          Each block is hidden entirely when empty: an empty "similar jobs"
+          heading is worse than no heading.
+         -------------------------------------------------------------- */}
+      {(alsoAtCompany.data?.length ?? 0) > 0 && (
+        <section className="mt-12">
+          <h2 className="font-display text-lg font-semibold tracking-tight">
+            {t("jobs.moreFromEmployer")}
+          </h2>
+          <div className="mt-4 grid gap-3 sm:grid-cols-2">
+            {alsoAtCompany.data!.map((j) => <JobCard key={j.id} job={j} />)}
+          </div>
+        </section>
+      )}
+
+      {(similar.data?.length ?? 0) > 0 && (
+        <section className="mt-10">
+          <h2 className="font-display text-lg font-semibold tracking-tight">
+            {t("jobs.similar")}
+          </h2>
+          <div className="mt-4 grid gap-3 sm:grid-cols-2">
+            {similar.data!.map((j) => <JobCard key={j.id} job={j} />)}
+          </div>
+        </section>
+      )}
     </div>
   );
 }

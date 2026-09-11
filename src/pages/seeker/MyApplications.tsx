@@ -1,10 +1,12 @@
 import { useState } from "react";
+import type { JobApplicationDto } from "@/types/api";
 import { useTranslation } from "react-i18next";
 import { Link } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 
 import { ApplicationsApi } from "@/api";
 import { ApplicationStatusBadge } from "@/components/common/StatusBadge";
+import { ApplicationDetailDialog } from "@/components/seeker/ApplicationDetailDialog";
 import { Button } from "@/components/ui/button";
 import { Pagination } from "@/components/common/Pagination";
 import { relativeTime } from "@/lib/utils";
@@ -13,6 +15,7 @@ export function MyApplications() {
   const { t, i18n } = useTranslation();
   const locale = i18n.language?.startsWith("en") ? "en-GB" : "fr-FR";
   const [page, setPage] = useState(0);
+  const [detail, setDetail] = useState<JobApplicationDto | null>(null);
 
   const filter = {
     page,
@@ -64,6 +67,11 @@ export function MyApplications() {
                   <td className="p-4 text-muted-foreground">{relativeTime(a.applyDate, locale)}</td>
                   <td className="p-4"><ApplicationStatusBadge status={a.status} /></td>
                   <td className="p-4 text-right">
+                    {/* The history and the way out both live behind one click,
+                        so the table stays a table. */}
+                    <Button variant="link" size="sm" onClick={() => setDetail(a)}>
+                      {t("applications.timeline")}
+                    </Button>
                     {a.jobId && (
                       <Button variant="link" size="sm" asChild>
                         <Link to={`/jobs/${a.jobId}`}>{t("common.view")}</Link>
@@ -84,6 +92,8 @@ export function MyApplications() {
         />
         </>
       )}
+
+      <ApplicationDetailDialog application={detail} onClose={() => setDetail(null)} />
     </div>
   );
 }

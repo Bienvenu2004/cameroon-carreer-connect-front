@@ -6,12 +6,15 @@ import { Briefcase, User } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { PasswordInput } from "@/components/ui/password-input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/components/ui/toast-provider";
 import { AuthApi } from "@/api";
 import { apiErrorMessage } from "@/lib/api";
 import type { UserRole } from "@/types/api";
 import { cn } from "@/lib/utils";
+import { GoogleAuthButton } from "@/components/common/GoogleAuthButton";
+import { isGoogleAuthEnabled } from "@/lib/googleAuth";
 import { AuthShell } from "./AuthShell";
 
 /**
@@ -76,15 +79,27 @@ export function RegisterPage() {
         </div>
         <div className="space-y-2">
           <Label htmlFor="password">{t("auth.password")}</Label>
-          <Input id="password" type="password" autoComplete="new-password" required minLength={8} value={password} onChange={(e) => setPassword(e.target.value)} />
+          <PasswordInput id="password" autoComplete="new-password" required minLength={8} value={password} onChange={(e) => setPassword(e.target.value)} />
           <p className="text-xs text-muted-foreground">{t("auth.passwordMin")}</p>
         </div>
         <div className="space-y-2">
           <Label htmlFor="confirm">{t("auth.confirmPassword")}</Label>
-          <Input id="confirm" type="password" autoComplete="new-password" required minLength={8} value={confirm} onChange={(e) => setConfirm(e.target.value)} />
+          <PasswordInput id="confirm" autoComplete="new-password" required minLength={8} value={confirm} onChange={(e) => setConfirm(e.target.value)} />
         </div>
         <Button type="submit" className="w-full" size="lg" loading={m.isPending}>{t("auth.signUp")}</Button>
       </form>
+
+      {isGoogleAuthEnabled() && (
+        <>
+          <div className="my-6 flex items-center gap-3">
+            <span className="h-px flex-1 bg-border" />
+            <span className="text-xs uppercase tracking-wide text-muted-foreground">{t("auth.orContinueWith")}</span>
+            <span className="h-px flex-1 bg-border" />
+          </div>
+          {/* The role selected above is applied when Google creates the account. */}
+          <GoogleAuthButton role={role} text="signup_with" />
+        </>
+      )}
 
       <p className="mt-6 text-center text-sm text-muted-foreground">
         {t("auth.haveAccount")} <Link to="/login" className="font-medium text-primary hover:underline">{t("auth.signIn")}</Link>

@@ -1,5 +1,7 @@
 import { useTranslation } from "react-i18next";
+import { useEffect, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { isSocketConnected, subscribeToNotifications } from "@/lib/notificationSocket";
 import { Bell, CheckCheck } from "lucide-react";
 
 import { NotificationsApi } from "@/api";
@@ -25,26 +27,56 @@ import type { NotificationDto } from "@/types/api";
  *   - Clicking a notification marks it as read; the unread badge updates
  *     on the next poll (or sooner if we invalidate the queries — we do).
  *
- * Why polling not WebSocket: this is the "Item 2a" easy version. STOMP
- * wiring already exists on the backend (`/retms-websocket`) but plugging
- * a real-time subscriber on top of the JWT cookie auth + reconnect logic
- * is its own feature. Polling is good enough for now and trivially
- * scalable for hundreds of concurrent users.
+ * Delivery is a live STOMP subscription over the backend's existing broker,
+ * authenticated by the same HttpOnly cookie as everything else. Polling is kept
+ * as a slow safety net rather than the primary mechanism: if the socket cannot
+ * connect -- a proxy that mangles upgrades, a captive portal, a network that
+ * blocks long-lived connections -- notifications still arrive, just later.
+ *
+ * Hence two intervals. While the socket is live we poll rarely, because the
+ * socket is doing the work and every extra request costs a user on metered
+ * mobile data. When it is not, we fall back to the old cadence.
  */
 const POLL_INTERVAL_MS = 30_000;
+const SOCKET_BACKUP_POLL_MS = 5 * 60_000;
 
 export function NotificationBell() {
   const { t, i18n } = useTranslation();
   const locale = i18n.language?.startsWith("en") ? "en-GB" : "fr-FR";
   const user = useAuthStore((s) => s.user);
   const qc = useQueryClient();
+  const [live, setLive] = useState(false);
+
+  /* --------- live feed --------- */
+  useEffect(() => {
+    if (!user) return;
+
+    const unsubscribe = subscribeToNotifications(() => {
+      // Refetch rather than splicing the pushed payload into the cache: the
+      // notification arrives on its own, but the unread count and the ordering
+      // are the server's to decide, and one cheap request keeps them honest.
+      void qc.invalidateQueries({ queryKey: ["notifications"] });
+    });
+
+    // The client connects asynchronously, so ask again shortly after mounting
+    // rather than reading a value that is still false.
+    const probe = window.setInterval(() => setLive(isSocketConnected()), 2000);
+
+    return () => {
+      window.clearInterval(probe);
+      unsubscribe();
+      setLive(false);
+    };
+  }, [user, qc]);
+
+  const pollInterval = live ? SOCKET_BACKUP_POLL_MS : POLL_INTERVAL_MS;
 
   /* --------- unread count: cheap COUNT, polled --------- */
   const unread = useQuery({
     queryKey: ["notifications", "unread-count"],
     queryFn: () => NotificationsApi.unreadCount(),
     enabled: !!user,
-    refetchInterval: POLL_INTERVAL_MS,
+    refetchInterval: pollInterval,
     // Pause when the tab is hidden so we don't burn quota in a background
     // tab. React Query already handles this for refetchOnWindowFocus.
     refetchIntervalInBackground: false,
@@ -55,7 +87,7 @@ export function NotificationBell() {
     queryKey: ["notifications", "list", 10],
     queryFn: () => NotificationsApi.list(0, 10),
     enabled: !!user,
-    refetchInterval: POLL_INTERVAL_MS,
+    refetchInterval: pollInterval,
     refetchIntervalInBackground: false,
   });
 

@@ -17,7 +17,7 @@ export function DashboardShell({ items, titleKey }: { items: SidebarItem[]; titl
   return (
     <div className="flex min-h-screen flex-col bg-background">
       <Header />
-      <div className="container flex-1 py-8 lg:grid lg:grid-cols-[240px_1fr] lg:gap-10">
+      <div className="mx-auto w-full max-w-[1800px] flex-1 px-4 py-8 sm:px-5 lg:grid lg:grid-cols-[200px_1fr] lg:gap-6 lg:px-8">
         <aside className="hidden lg:block">
           <div className="sticky top-24">
             <h2 className="font-display text-xl font-semibold">{t(titleKey)}</h2>

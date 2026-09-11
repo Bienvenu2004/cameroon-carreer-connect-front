@@ -1,0 +1,18 @@
+{
+  "name": "JobsConnect CMR",
+  "short_name": "JobsConnect",
+  "description": "La plateforme nationale de recherche d'emploi et de recrutement au Cameroun.",
+  "lang": "fr",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#0D6E5B",
+  "icons": [
+    { "src": "/logo/favicon-32.png", "sizes": "32x32", "type": "image/png" },
+    { "src": "/logo/favicon-48.png", "sizes": "48x48", "type": "image/png" },
+    { "src": "/logo/apple-touch-icon.png", "sizes": "180x180", "type": "image/png" },
+    { "src": "/logo/favicon-512.png", "sizes": "512x512", "type": "image/png" },
+    { "src": "/logo/favicon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}

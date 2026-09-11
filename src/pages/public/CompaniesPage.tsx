@@ -1,12 +1,14 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Link } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
-import { Building2, Filter, MapPin, Briefcase, Search } from "lucide-react";
+import { Briefcase, Building2, Filter, MapPin, Search, X } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
+} from "@/components/ui/select";
 import { Pagination } from "@/components/common/Pagination";
 import { CompaniesApi } from "@/api";
 import {
@@ -24,7 +26,11 @@ const ALL = "ALL" as const;
  *   - industry  (exact match on Industry enum)
  *   - status    (locked to APPROVED — admins use a separate page for moderation)
  *
- * Pagination is server-side via PageResponseDto.
+ * Filter UX intentionally mirrors the Jobs page: hero search row, labeled
+ * selects with self-describing "All X" placeholders, and removable active-
+ * filter chips. Consistency across the catalog pages reduces cognitive
+ * load — once a user learns the pattern on /jobs they get it for free on
+ * /companies.
  */
 export function CompaniesPage() {
   const { t } = useTranslation();
@@ -54,50 +60,113 @@ export function CompaniesPage() {
     queryFn: () => CompaniesApi.list(filter),
   });
 
-  const clear = () => {
+  const clearAll = () => {
     setKeyword(""); setRegion(ALL); setIndustry(ALL);
   };
+
+  const activeFilters = useMemo(() => {
+    const out: { key: string; label: string; value: string; onRemove: () => void }[] = [];
+    if (region !== ALL) out.push({
+      key: "region", label: t("jobs.region"), value: t(`regions.${region}`),
+      onRemove: () => setRegion(ALL),
+    });
+    if (industry !== ALL) out.push({
+      key: "industry", label: t("jobs.industry"), value: t(`industries.${industry}`),
+      onRemove: () => setIndustry(ALL),
+    });
+    return out;
+  }, [region, industry, t]);
+
+  const activeCount = activeFilters.length + (keyword ? 1 : 0);
 
   return (
     <div className="container py-10">
       <h1 className="font-display text-3xl font-bold tracking-tight">{t("nav.companies")}</h1>
       <p className="mt-1 text-muted-foreground">{t("home.heroSubtitle")}</p>
 
-      <div className="mt-6 rounded-2xl border border-border/60 bg-card p-4 elev-1">
-        <div className="flex items-center gap-2 text-sm font-medium text-foreground/80">
-          <Filter className="h-4 w-4" /> {t("jobs.filters")}
-          <Button type="button" variant="link" className="ml-auto h-auto p-0 text-xs" onClick={clear}>
+      <div className="mt-6 rounded-2xl border border-border/60 bg-card p-5 elev-1">
+        {/* Filters first — they set the scope. Search refines within. */}
+        <div className="flex items-center gap-2">
+          <Filter className="h-4 w-4 text-muted-foreground" />
+          <span className="text-sm font-semibold">{t("jobs.filters")}</span>
+          {activeCount > 0 && (
+            <span className="inline-flex items-center rounded-full bg-primary/10 px-2 py-0.5 text-[11px] font-medium text-primary">
+              {t("jobs.activeFiltersCount", { count: activeCount })}
+            </span>
+          )}
+          <Button
+            type="button"
+            variant="ghost"
+            size="sm"
+            onClick={clearAll}
+            disabled={activeCount === 0}
+            className="ml-auto h-8 px-2 text-xs text-muted-foreground hover:text-foreground disabled:opacity-40"
+          >
             {t("jobs.clearFilters")}
           </Button>
         </div>
-        <div className="mt-3 grid gap-3 md:grid-cols-2 lg:grid-cols-4">
-          <div className="relative lg:col-span-2">
-            <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+
+        {/* Labeled filter grid */}
+        <div className="mt-3 grid gap-3 sm:grid-cols-2">
+          <LabeledSelect
+            label={t("jobs.region")}
+            value={region}
+            onValueChange={(v) => setRegion(v as Region | typeof ALL)}
+            placeholder={t("jobs.allRegions")}
+            allLabel={t("jobs.allRegions")}
+            options={ALL_REGIONS.map((r) => ({ v: r, l: t(`regions.${r}`) }))}
+          />
+          <LabeledSelect
+            label={t("jobs.industry")}
+            value={industry}
+            onValueChange={(v) => setIndustry(v as Industry | typeof ALL)}
+            placeholder={t("jobs.allIndustries")}
+            allLabel={t("jobs.allIndustries")}
+            options={ALL_INDUSTRIES.map((i) => ({ v: i, l: t(`industries.${i}`) }))}
+          />
+        </div>
+
+        {/* Active filter chips */}
+        {activeFilters.length > 0 && (
+          <div className="mt-4 flex flex-wrap items-center gap-1.5">
+            <span className="text-xs text-muted-foreground">
+              {t("jobs.activeFilters")}:
+            </span>
+            {activeFilters.map((f) => (
+              <FilterChip
+                key={f.key}
+                label={f.label}
+                value={f.value}
+                onRemove={f.onRemove}
+                removeAria={t("jobs.removeFilter")}
+              />
+            ))}
+          </div>
+        )}
+
+        {/* Hero search row — kept BELOW the filters so the user first
+            picks the scope, then types the search term inside it. */}
+        <div className="mt-5 border-t border-border/40 pt-5">
+          <div className="relative">
+            <Search className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
             <Input
               value={keyword}
               onChange={(e) => setKeyword(e.target.value)}
-              placeholder={t("common.search")}
-              className="pl-9"
+              placeholder={t("companies.searchPlaceholder")}
+              className="h-11 pl-10 text-base"
+              aria-label={t("companies.searchPlaceholder")}
             />
+            {keyword && (
+              <button
+                type="button"
+                onClick={() => setKeyword("")}
+                aria-label={t("common.clear")}
+                className="absolute right-2 top-1/2 inline-flex h-7 w-7 -translate-y-1/2 items-center justify-center rounded-md text-muted-foreground transition hover:bg-muted hover:text-foreground"
+              >
+                <X className="h-3.5 w-3.5" />
+              </button>
+            )}
           </div>
-          <Select value={region} onValueChange={(v) => setRegion(v as Region | typeof ALL)}>
-            <SelectTrigger><SelectValue placeholder={t("jobs.region")} /></SelectTrigger>
-            <SelectContent>
-              <SelectItem value={ALL}>{t("jobs.all")}</SelectItem>
-              {ALL_REGIONS.map((r) => (
-                <SelectItem key={r} value={r}>{t(`regions.${r}`)}</SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-          <Select value={industry} onValueChange={(v) => setIndustry(v as Industry | typeof ALL)}>
-            <SelectTrigger><SelectValue placeholder={t("jobs.industry")} /></SelectTrigger>
-            <SelectContent>
-              <SelectItem value={ALL}>{t("jobs.all")}</SelectItem>
-              {ALL_INDUSTRIES.map((i) => (
-                <SelectItem key={i} value={i}>{t(`industries.${i}`)}</SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
         </div>
       </div>
 
@@ -110,7 +179,11 @@ export function CompaniesPage() {
           <div key={i} className="h-40 animate-pulse rounded-xl border border-border/60 bg-muted/40" />
         ))}
         {data?.content.map((c) => (
-          <Link key={c.id} to={`/companies/${c.id}`} className="group rounded-xl border border-border/60 bg-card p-5 elev-1 transition-all hover:-translate-y-0.5 hover:border-primary/40 hover:elev-2">
+          <Link
+            key={c.id}
+            to={`/companies/${c.id}`}
+            className="group rounded-xl border border-border/60 bg-card p-5 elev-1 transition-all hover:-translate-y-0.5 hover:border-primary/40 hover:elev-2"
+          >
             <div className="flex items-center gap-3">
               <div className="grid h-12 w-12 place-items-center rounded-lg bg-primary/10 text-primary">
                 <Building2 className="h-5 w-5" />
@@ -125,10 +198,14 @@ export function CompaniesPage() {
             )}
             <div className="mt-3 flex flex-wrap gap-x-4 gap-y-1 text-xs text-muted-foreground">
               {c.address?.city && (
-                <span className="inline-flex items-center gap-1"><MapPin className="h-3 w-3" />{c.address.city}</span>
+                <span className="inline-flex items-center gap-1">
+                  <MapPin className="h-3 w-3" />{c.address.city}
+                </span>
               )}
               {(c.activeJobs ?? 0) > 0 && (
-                <span className="inline-flex items-center gap-1 font-medium text-primary"><Briefcase className="h-3 w-3" />{c.activeJobs} {t("nav.jobs").toLowerCase()}</span>
+                <span className="inline-flex items-center gap-1 font-medium text-primary">
+                  <Briefcase className="h-3 w-3" />{c.activeJobs} {t("nav.jobs").toLowerCase()}
+                </span>
               )}
             </div>
           </Link>
@@ -150,5 +227,61 @@ export function CompaniesPage() {
         />
       )}
     </div>
+  );
+}
+
+/* -------------------- bits -------------------- */
+
+function LabeledSelect({
+  label, value, onValueChange, placeholder, allLabel, options,
+}: {
+  label: string;
+  value: string;
+  onValueChange: (v: string) => void;
+  placeholder: string;
+  allLabel: string;
+  options: { v: string; l: string }[];
+}) {
+  return (
+    <div className="space-y-1">
+      <label className="block text-[11px] font-medium uppercase tracking-wider text-muted-foreground">
+        {label}
+      </label>
+      <Select value={value} onValueChange={onValueChange}>
+        <SelectTrigger aria-label={label}>
+          <SelectValue placeholder={placeholder} />
+        </SelectTrigger>
+        <SelectContent>
+          <SelectItem value={ALL}>{allLabel}</SelectItem>
+          {options.map((o) => (
+            <SelectItem key={o.v} value={o.v}>{o.l}</SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
+    </div>
+  );
+}
+
+function FilterChip({
+  label, value, onRemove, removeAria,
+}: {
+  label: string;
+  value: string;
+  onRemove: () => void;
+  removeAria: string;
+}) {
+  return (
+    <span className="inline-flex items-center gap-1.5 rounded-full border border-primary/20 bg-primary/5 py-0.5 pl-2.5 pr-1 text-xs font-medium text-primary">
+      <span className="text-primary/70">{label}:</span>
+      <span>{value}</span>
+      <button
+        type="button"
+        onClick={onRemove}
+        aria-label={`${removeAria} — ${label}`}
+        className="inline-flex h-5 w-5 items-center justify-center rounded-full text-primary/60 transition hover:bg-primary/10 hover:text-primary"
+      >
+        <X className="h-3 w-3" />
+      </button>
+    </span>
   );
 }

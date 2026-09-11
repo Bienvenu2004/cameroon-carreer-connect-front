@@ -2,14 +2,18 @@ import { useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
-  Briefcase, Download, Facebook, FileText, Github, Globe, Languages,
-  Linkedin, Link as LinkIcon, Mail, MapPin, Pencil, Phone, Twitter,
-  Upload, User as UserIcon, X,
+  Briefcase, Calendar, Download, Eye, Facebook, FileText, Github, Globe, Languages,
+  Linkedin, Link as LinkIcon, Mail, MapPin, Pencil, Phone, Plus, Sparkles, Trash2, Twitter,
+  Upload, User as UserIcon, Video, X,
 } from "lucide-react";
 
 import { SeekerApi, SkillsApi } from "@/api";
 import { SPOKEN_LANGUAGES } from "@/data/spokenLanguages";
 import { TagAutocomplete } from "@/components/common/TagAutocomplete";
+import {
+  EducationEditor, educationFromDto, type EducationDraft,
+} from "@/components/seeker/EducationEditor";
+import { ProfileCompleteness } from "@/components/seeker/ProfileCompleteness";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -20,13 +24,40 @@ import {
 } from "@/components/ui/select";
 import { useToast } from "@/components/ui/toast-provider";
 import { useAuthStore } from "@/stores/auth";
-import { apiErrorMessage } from "@/lib/api";
+import { apiErrorMessage, storageUrl } from "@/lib/api";
+import { downloadResumeFromProfile } from "@/lib/resume";
 import { initials } from "@/lib/utils";
 import {
   ALL_REGIONS,
   type JobSeekerProfileDto,
   type Region,
+  type WorkExperienceDto,
 } from "@/types/api";
+
+/* Controlled vocabularies for the work-preference dropdowns.
+ *
+ * The backend stores both fields as free-form `String`, but offering a
+ * fixed option list in the UI keeps the data clean for the AI matcher
+ * and downstream analytics. Adding/changing a value here is the only
+ * step needed — the read view picks it up via the same i18n keys.
+ *
+ * EmploymentType options reuse the existing `jobTypes.*` translations
+ * (a strict subset — REMOTE belongs on the job-site axis, not here).
+ */
+const EMPLOYMENT_TYPE_OPTIONS = [
+  "FULL_TIME", "PART_TIME", "CONTRACT", "TEMPORARY", "INTERN", "FREELANCE",
+] as const;
+const WORK_AUTH_OPTIONS = [
+  "CITIZEN", "PERMANENT_RESIDENT", "WORK_PERMIT", "NEEDS_SPONSORSHIP",
+] as const;
+
+/**
+ * Sentinel value used in the dropdowns to represent "no preference"
+ * because Radix Select doesn't allow an empty string for SelectItem
+ * values. Translated to "" on submit so the backend receives a cleared
+ * field rather than the literal "NONE".
+ */
+const NONE_VALUE = "__NONE__";
 
 /* ============================================================================
  *  Job-Seeker Profile page
@@ -101,12 +132,34 @@ export function SeekerProfilePage() {
  *  View mode
  * ==========================================================================*/
 function ProfileView({ profile }: { profile: JobSeekerProfileDto }) {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const user = useAuthStore((s) => s.user);
 
   const fullName = [profile.firstName, profile.lastName]
     .filter(Boolean)
     .join(" ");
+
+  // Build a downloadable résumé straight from the structured profile data —
+  // no upload required. Labels are translated here so the generated PDF
+  // matches the user's current language.
+  const generateResume = () => {
+    const locale = i18n.language?.startsWith("en") ? "en-GB" : "fr-FR";
+    downloadResumeFromProfile(profile, {
+      email: user?.email,
+      locale,
+      labels: {
+        resume: t("profile.resumeDocTitle"),
+        experience: t("profile.workExperience"),
+        skills: t("profile.skills"),
+        languages: t("profile.spokenLanguages"),
+        links: t("profile.portfolioLinks"),
+        present: t("profile.xp.present"),
+        footer: t("profile.resumeGeneratedOn", {
+          date: new Date().toLocaleDateString(locale),
+        }),
+      },
+    });
+  };
 
   return (
     <div className="space-y-4">
@@ -133,6 +186,14 @@ function ProfileView({ profile }: { profile: JobSeekerProfileDto }) {
           </div>
         </div>
       </Card>
+
+      {/* Completeness ------------------------------------------------------
+          Placed first in the read-only view because it is the one thing on this
+          page that tells the seeker what to do next. */}
+      <ProfileCompleteness
+        score={profile.completeness}
+        hints={profile.completenessHints}
+      />
 
       {/* Personal info ----------------------------------------------------- */}
       <Section title={t("profile.personalInfo")}>
@@ -173,11 +234,26 @@ function ProfileView({ profile }: { profile: JobSeekerProfileDto }) {
         <Field
           icon={Briefcase}
           label={t("profile.workAuth")}
-          value={profile.workAuthorization}
+          // Translate known enum values; gracefully fall back to the raw
+          // string for legacy free-form entries written before this field
+          // became a dropdown.
+          value={
+            profile.workAuthorization
+              ? t(`workAuth.${profile.workAuthorization}`, {
+                  defaultValue: profile.workAuthorization,
+                })
+              : undefined
+          }
         />
         <Field
           label={t("profile.employmentType")}
-          value={profile.employmentType}
+          value={
+            profile.employmentType
+              ? t(`jobTypes.${profile.employmentType}`, {
+                  defaultValue: profile.employmentType,
+                })
+              : undefined
+          }
         />
       </Section>
 
@@ -195,6 +271,30 @@ function ProfileView({ profile }: { profile: JobSeekerProfileDto }) {
         ) : (
           <div className="mt-3 text-sm text-muted-foreground">
             {t("profile.notSet")}
+          </div>
+        )}
+      </Card>
+
+      {/* Work experience --------------------------------------------------- */}
+      <Card>
+        <div className="flex items-center justify-between gap-2">
+          <SectionHeader title={t("profile.workExperience")} />
+          {typeof profile.totalYearsOfExperience === "number" && profile.totalYearsOfExperience > 0 && (
+            <Badge variant="secondary" className="gap-1">
+              <Briefcase className="h-3 w-3" />
+              {t("profile.yearsOfExperience", { count: profile.totalYearsOfExperience })}
+            </Badge>
+          )}
+        </div>
+        {profile.experiences && profile.experiences.length > 0 ? (
+          <ol className="mt-4 space-y-4">
+            {profile.experiences.map((xp, i) => (
+              <ExperienceReadRow key={xp.id ?? i} xp={xp} />
+            ))}
+          </ol>
+        ) : (
+          <div className="mt-3 text-sm text-muted-foreground">
+            {t("profile.experiencesEmpty")}
           </div>
         )}
       </Card>
@@ -241,9 +341,20 @@ function ProfileView({ profile }: { profile: JobSeekerProfileDto }) {
 
       {/* Documents --------------------------------------------------------- */}
       <Card>
-        <SectionHeader title={t("profile.documents")} />
+        <div className="flex flex-wrap items-center justify-between gap-2">
+          <SectionHeader title={t("profile.documents")} />
+          {/* Auto-generate a résumé from the structured profile — works even
+              when the seeker never uploaded a CV. Opens the browser's
+              print / "Save as PDF" dialog. */}
+          <Button size="sm" variant="outline" onClick={generateResume}>
+            <Sparkles className="h-4 w-4" /> {t("profile.generateResume")}
+          </Button>
+        </div>
+        <p className="mt-2 text-xs text-muted-foreground">
+          {t("profile.generateResumeHint")}
+        </p>
         <div className="mt-3">
-          {profile.resume?.url ? (
+          {profile.resume?.id ? (
             <div className="flex items-center justify-between gap-3 rounded-xl border border-border/40 bg-muted/30 p-3">
               <div className="flex min-w-0 items-center gap-2">
                 <FileText className="h-4 w-4 shrink-0 text-primary" />
@@ -251,20 +362,58 @@ function ProfileView({ profile }: { profile: JobSeekerProfileDto }) {
                   {profile.resume.name ?? "resume"}
                 </span>
               </div>
-              <Button asChild size="sm" variant="outline">
-                <a
-                  href={profile.resume.url}
-                  target="_blank"
-                  rel="noreferrer noopener"
-                  download={profile.resume.name ?? undefined}
-                >
-                  <Download className="h-4 w-4" /> {t("profile.downloadResume")}
-                </a>
-              </Button>
+              <div className="flex items-center gap-2">
+                {/* Stream through the backend so PDFs preview/download with the
+                    correct type and filename (raw Cloudinary URLs lack the
+                    .pdf extension and download as unknown files). */}
+                <Button asChild size="sm" variant="outline">
+                  <a
+                    href={storageUrl(profile.resume.id)}
+                    target="_blank"
+                    rel="noreferrer noopener"
+                  >
+                    <Eye className="h-4 w-4" /> {t("profile.viewResume")}
+                  </a>
+                </Button>
+                <Button asChild size="sm" variant="outline">
+                  <a
+                    href={storageUrl(profile.resume.id, { download: true })}
+                    target="_blank"
+                    rel="noreferrer noopener"
+                  >
+                    <Download className="h-4 w-4" /> {t("profile.downloadResume")}
+                  </a>
+                </Button>
+              </div>
             </div>
           ) : (
             <div className="text-sm text-muted-foreground">
               {t("profile.noResume")}
+            </div>
+          )}
+        </div>
+      </Card>
+
+      {/* Video introduction ------------------------------------------------ */}
+      <Card>
+        <SectionHeader title={t("profile.videoResume")} />
+        <div className="mt-3">
+          {profile.videoResume?.url ? (
+            // Streams directly from the Cloudinary video URL (HTTP range /
+            // CDN) — playback only. controlsList=nodownload hides the
+            // browser's download button; there is no download link.
+            <video
+              src={profile.videoResume.url}
+              controls
+              controlsList="nodownload"
+              preload="metadata"
+              className="w-full max-h-[420px] rounded-xl border border-border/50 bg-black"
+            >
+              {t("profile.videoUnsupported")}
+            </video>
+          ) : (
+            <div className="text-sm text-muted-foreground">
+              {t("profile.noVideoResume")}
             </div>
           )}
         </div>
@@ -309,6 +458,7 @@ function ProfileEditForm({
   );
 
   const [resumeFile, setResumeFile] = useState<File | null>(null);
+  const [videoFile, setVideoFile] = useState<File | null>(null);
   const [photoFile, setPhotoFile] = useState<File | null>(null);
   const photoPreviewUrl = useMemo(
     () => (photoFile ? URL.createObjectURL(photoFile) : null),
@@ -374,6 +524,26 @@ function ProfileEditForm({
     return SPOKEN_LANGUAGES.filter((l) => l.toLowerCase().includes(q));
   }, [languageQuery]);
 
+  // Work experience rows. Client-side draft list mutated through the
+  // ExperiencesEditor; sent on submit as indexed multipart keys
+  // (experiences[0].title, experiences[0].startDate, ...). The backend
+  // service treats this list as authoritative — anything absent gets
+  // deleted via orphanRemoval on the OneToMany.
+  const [experiences, setExperiences] = useState<WorkExperienceDraft[]>(
+    () => (profile.experiences ?? []).map(fromDto)
+  );
+
+  // Education rows. Same contract as experiences: the list sent on submit is
+  // authoritative, and anything absent is removed via orphanRemoval.
+  const [educations, setEducations] = useState<EducationDraft[]>(
+    () => (profile.educations ?? []).map(educationFromDto)
+  );
+
+  // Whether recruiters may find this profile in candidate search. Opt-in, and
+  // off until the seeker says otherwise — being searchable by employers is a
+  // different thing from having signed up to look for work.
+  const [searchable, setSearchable] = useState(profile.searchable ?? false);
+
   // Portfolio / social links — plain URL inputs, all optional.
   const [githubUrl, setGithubUrl]       = useState(profile.githubUrl ?? "");
   const [linkedinUrl, setLinkedinUrl]   = useState(profile.linkedinUrl ?? "");
@@ -418,10 +588,44 @@ function ProfileEditForm({
       // MultipartFiles are guarded server-side, but skipping the field
       // avoids needlessly wrapping an empty Part.
       if (resumeFile) fd.append("resume", resumeFile);
+      if (videoFile) fd.append("videoResume", videoFile);
       if (photoFile) fd.append("profilePhoto", photoFile);
 
       // Skills replace the whole list — service does setSkills(newList).
       skills.forEach((name, i) => fd.append(`skills[${i}].name`, name));
+
+      // Work experiences — same indexed-multipart pattern. Client-side
+      // validation here is a quick early-exit; the backend re-validates
+      // every row server-side regardless.
+      const xpError = validateExperiencesClient(experiences, t);
+      if (xpError) throw new Error(xpError);
+      experiences.forEach((xp, i) => {
+        fd.append(`experiences[${i}].title`, xp.title.trim());
+        fd.append(`experiences[${i}].companyName`, xp.companyName.trim());
+        if (xp.city.trim()) fd.append(`experiences[${i}].city`, xp.city.trim());
+        if (xp.country.trim()) fd.append(`experiences[${i}].country`, xp.country.trim());
+        fd.append(`experiences[${i}].startDate`, xp.startDate);
+        if (!xp.isCurrent && xp.endDate) {
+          fd.append(`experiences[${i}].endDate`, xp.endDate);
+        }
+        fd.append(`experiences[${i}].isCurrent`, String(xp.isCurrent));
+        if (xp.description.trim()) {
+          fd.append(`experiences[${i}].description`, xp.description.trim());
+        }
+      });
+
+      educations.forEach((ed, i) => {
+        fd.append(`educations[${i}].level`, ed.level);
+        if (ed.fieldOfStudy.trim()) fd.append(`educations[${i}].fieldOfStudy`, ed.fieldOfStudy.trim());
+        if (ed.institution.trim()) fd.append(`educations[${i}].institution`, ed.institution.trim());
+        if (ed.city.trim()) fd.append(`educations[${i}].city`, ed.city.trim());
+        if (ed.startDate) fd.append(`educations[${i}].startDate`, ed.startDate);
+        if (!ed.isCurrent && ed.endDate) fd.append(`educations[${i}].endDate`, ed.endDate);
+        fd.append(`educations[${i}].isCurrent`, String(ed.isCurrent));
+        if (ed.description.trim()) fd.append(`educations[${i}].description`, ed.description.trim());
+      });
+
+      fd.append("searchable", String(searchable));
 
       return SeekerApi.update(fd);
     },
@@ -430,6 +634,12 @@ function ProfileEditForm({
       // Force a refetch so the new file URLs / persisted values render in
       // the view that comes after we leave edit mode.
       void qc.invalidateQueries({ queryKey: ["seeker-profile"] });
+      // Profile mutations (especially new experience rows / skills / region)
+      // change what the AI matcher sees. Evict the cached recommendations
+      // so the dashboard re-fetches with the fresh signal next visit —
+      // otherwise the user waits up to 5 minutes for the staleTime to
+      // expire and wonders why their new role didn't move the needle.
+      void qc.invalidateQueries({ queryKey: ["ai-recommendations"] });
       onSaved();
     },
     onError: (e) =>
@@ -580,18 +790,45 @@ function ProfileEditForm({
         <div className="mt-3 grid gap-4 sm:grid-cols-2">
           <div className="space-y-2">
             <Label>{t("profile.workAuth")}</Label>
-            <Input
-              value={workAuthorization}
-              onChange={(e) => setWorkAuthorization(e.target.value)}
-            />
+            {/* Backend stores this as a free String, but offering a
+                controlled vocabulary in the UI keeps data clean for the
+                AI matcher and downstream analytics. NONE_VALUE maps to
+                "" on submit so the user can clear the preference. */}
+            <Select
+              value={workAuthorization || NONE_VALUE}
+              onValueChange={(v) =>
+                setWorkAuthorization(v === NONE_VALUE ? "" : v)
+              }
+            >
+              <SelectTrigger aria-label={t("profile.workAuth")}>
+                <SelectValue placeholder={t("profile.notSpecified")} />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value={NONE_VALUE}>{t("profile.notSpecified")}</SelectItem>
+                {WORK_AUTH_OPTIONS.map((v) => (
+                  <SelectItem key={v} value={v}>{t(`workAuth.${v}`)}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
           <div className="space-y-2">
             <Label>{t("profile.employmentType")}</Label>
-            <Input
-              value={employmentType}
-              onChange={(e) => setEmploymentType(e.target.value)}
-              placeholder="FULL_TIME / PART_TIME / ..."
-            />
+            <Select
+              value={employmentType || NONE_VALUE}
+              onValueChange={(v) =>
+                setEmploymentType(v === NONE_VALUE ? "" : v)
+              }
+            >
+              <SelectTrigger aria-label={t("profile.employmentType")}>
+                <SelectValue placeholder={t("profile.notSpecified")} />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value={NONE_VALUE}>{t("profile.notSpecified")}</SelectItem>
+                {EMPLOYMENT_TYPE_OPTIONS.map((v) => (
+                  <SelectItem key={v} value={v}>{t(`jobTypes.${v}`)}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
         </div>
       </Card>
@@ -612,6 +849,48 @@ function ProfileEditForm({
             placeholder={t("profile.skillsPlaceholder")}
           />
         </div>
+      </Card>
+
+      {/* Work experience -------------------------------------------------- */}
+      <Card>
+        <SectionHeader title={t("profile.workExperience")} />
+        <ExperiencesEditor values={experiences} onChange={setExperiences} />
+      </Card>
+
+      {/* Education --------------------------------------------------------
+          The diploma is the first thing most Cameroonian recruiters screen on,
+          and adverts here are written as "Bac+3 minimum" — a profile that
+          cannot express Bac+3 cannot be searched the way they think. */}
+      <Card>
+        <SectionHeader title={t("profile.education")} />
+        <p className="mt-1 text-xs text-muted-foreground">{t("profile.educationSubtitle")}</p>
+        <div className="mt-3">
+          <EducationEditor rows={educations} onChange={setEducations} />
+        </div>
+      </Card>
+
+      {/* Visibility -------------------------------------------------------
+          Appearing in an employer-facing search is materially different from
+          posting an application, so it is an explicit choice rather than
+          something that happens to people who signed up to look for work. */}
+      <Card>
+        <SectionHeader title={t("profile.visibility")} />
+        <label className="mt-3 flex cursor-pointer items-start gap-3">
+          <input
+            type="checkbox"
+            checked={searchable}
+            onChange={(e) => setSearchable(e.target.checked)}
+            className="mt-0.5 h-4 w-4 shrink-0 rounded border-border accent-primary"
+          />
+          <span>
+            <span className="block text-sm font-medium text-foreground">
+              {t("profile.searchable")}
+            </span>
+            <span className="mt-1 block text-xs leading-relaxed text-muted-foreground">
+              {t("profile.searchableHint")}
+            </span>
+          </span>
+        </label>
       </Card>
 
       {/* Spoken languages ------------------------------------------------- */}
@@ -715,6 +994,45 @@ function ProfileEditForm({
               variant="ghost"
               size="sm"
               onClick={() => setResumeFile(null)}
+            >
+              <X className="h-3.5 w-3.5" /> {t("common.cancel")}
+            </Button>
+          )}
+        </div>
+      </Card>
+
+      {/* Video introduction ----------------------------------------------- */}
+      <Card>
+        <SectionHeader title={t("profile.videoResume")} />
+        <p className="mt-2 text-xs text-muted-foreground">
+          {t("profile.videoResumeHint")}
+        </p>
+        <div className="mt-3 space-y-3">
+          <label className="inline-flex cursor-pointer items-center gap-2 rounded-md border border-dashed border-border px-4 py-3 text-sm hover:bg-accent">
+            <Video className="h-4 w-4 text-primary" />
+            <span>{videoFile?.name ?? t("profile.uploadVideoResume")}</span>
+            <input
+              type="file"
+              // FileServiceImpl.ALLOWED_FILES permits mp4/webm/quicktime/avi/wmv/mpeg.
+              accept="video/mp4,video/webm,video/quicktime,video/x-msvideo,video/x-ms-wmv,video/mpeg"
+              className="sr-only"
+              onChange={(e) => setVideoFile(e.target.files?.[0] ?? null)}
+            />
+          </label>
+          <p className="text-xs text-muted-foreground">
+            {t("profile.videoResumeFormats")}
+          </p>
+          {!videoFile && profile.videoResume?.name && (
+            <p className="text-xs text-muted-foreground">
+              {t("profile.currentVideoResume")}: {profile.videoResume.name}
+            </p>
+          )}
+          {videoFile && (
+            <Button
+              type="button"
+              variant="ghost"
+              size="sm"
+              onClick={() => setVideoFile(null)}
             >
               <X className="h-3.5 w-3.5" /> {t("common.cancel")}
             </Button>
@@ -885,4 +1203,268 @@ function LinkRow({
       </div>
     </a>
   );
+}
+
+/* ===================================================================== *
+ *  Work-experience editor + read row
+ * ===================================================================== */
+
+/**
+ * Local draft shape — strings for everything so the controlled inputs
+ * don't have to deal with null vs "" vs undefined edge cases. The
+ * submit-time mapping into FormData handles the conversion back to
+ * the backend's typed payload.
+ */
+type WorkExperienceDraft = {
+  id?: string;
+  title: string;
+  companyName: string;
+  city: string;
+  country: string;
+  startDate: string;   // yyyy-MM-dd or ""
+  endDate: string;     // yyyy-MM-dd or ""
+  isCurrent: boolean;
+  description: string;
+};
+
+function fromDto(d: WorkExperienceDto): WorkExperienceDraft {
+  return {
+    id: d.id,
+    title: d.title ?? "",
+    companyName: d.companyName ?? "",
+    city: d.city ?? "",
+    country: d.country ?? "",
+    startDate: d.startDate ?? "",
+    endDate: d.endDate ?? "",
+    isCurrent: !!d.isCurrent,
+    description: d.description ?? "",
+  };
+}
+
+function emptyDraft(): WorkExperienceDraft {
+  return {
+    title: "", companyName: "", city: "", country: "",
+    startDate: "", endDate: "", isCurrent: false, description: "",
+  };
+}
+
+/**
+ * Client-side validation mirroring the backend rules. Cheap early-exit
+ * before we POST a 50-field FormData that the server would reject anyway.
+ * Returns a translated error string, or null when every row is valid.
+ */
+function validateExperiencesClient(
+  list: WorkExperienceDraft[],
+  t: (k: string) => string,
+): string | null {
+  const today = new Date().toISOString().slice(0, 10); // yyyy-MM-dd
+  for (const [i, xp] of list.entries()) {
+    const where = `#${i + 1}`;
+    if (!xp.title.trim()) return `${t("profile.xp.errTitle")} (${where})`;
+    if (!xp.companyName.trim()) return `${t("profile.xp.errCompany")} (${where})`;
+    if (!xp.startDate) return `${t("profile.xp.errStart")} (${where})`;
+    if (xp.startDate > today) return `${t("profile.xp.errStartFuture")} (${where})`;
+    if (!xp.isCurrent) {
+      if (!xp.endDate) return `${t("profile.xp.errEnd")} (${where})`;
+      if (xp.endDate < xp.startDate) return `${t("profile.xp.errEndBefore")} (${where})`;
+    }
+  }
+  return null;
+}
+
+/**
+ * Read-view row. Two-line layout: title @ company, then dates +
+ * location; description rendered as small paragraph beneath when set.
+ */
+function ExperienceReadRow({ xp }: { xp: WorkExperienceDto }) {
+  const { t, i18n } = useTranslation();
+  const locale = i18n.language?.startsWith("en") ? "en-GB" : "fr-FR";
+  const range = formatRange(xp.startDate, xp.endDate, xp.isCurrent, locale, t);
+  const loc = [xp.city, xp.country].filter(Boolean).join(", ");
+
+  return (
+    <li className="flex gap-3">
+      <div className="mt-1 inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-md bg-primary/10 text-primary">
+        <Briefcase className="h-4 w-4" />
+      </div>
+      <div className="min-w-0 flex-1">
+        <div className="font-display text-base font-semibold leading-tight">
+          {xp.title}
+        </div>
+        <div className="text-sm text-foreground/80">
+          {xp.companyName}
+          {loc && <span className="text-muted-foreground"> · {loc}</span>}
+        </div>
+        <div className="mt-0.5 flex items-center gap-1 text-xs text-muted-foreground">
+          <Calendar className="h-3 w-3" />
+          {range}
+        </div>
+        {xp.description && (
+          <p className="mt-2 whitespace-pre-wrap text-sm text-foreground/85">
+            {xp.description}
+          </p>
+        )}
+      </div>
+    </li>
+  );
+}
+
+/**
+ * Inline-editable list of experience rows. No modal — keeps the form
+ * focused, lets the user fix mistakes between rows without losing scroll
+ * position. Add button at the bottom; trash icon per row.
+ */
+function ExperiencesEditor({
+  values, onChange,
+}: {
+  values: WorkExperienceDraft[];
+  onChange: (next: WorkExperienceDraft[]) => void;
+}) {
+  const { t } = useTranslation();
+
+  const update = (i: number, patch: Partial<WorkExperienceDraft>) => {
+    const next = values.slice();
+    next[i] = { ...next[i], ...patch };
+    // isCurrent ↔ endDate invariant — clear endDate when isCurrent flips on
+    if (patch.isCurrent === true) next[i].endDate = "";
+    onChange(next);
+  };
+
+  const remove = (i: number) => onChange(values.filter((_, j) => j !== i));
+  const add = () => onChange([...values, emptyDraft()]);
+
+  return (
+    <div className="mt-3 space-y-3">
+      {values.length === 0 && (
+        <div className="rounded-lg border border-dashed border-border bg-muted/30 p-4 text-sm text-muted-foreground">
+          {t("profile.xp.empty")}
+        </div>
+      )}
+
+      {values.map((xp, i) => (
+        <div
+          key={xp.id ?? `new-${i}`}
+          className="rounded-lg border border-border/60 bg-background p-4"
+        >
+          <div className="flex items-center justify-between gap-2">
+            <span className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
+              {t("profile.xp.rowLabel", { n: i + 1 })}
+            </span>
+            <button
+              type="button"
+              onClick={() => remove(i)}
+              aria-label={t("profile.xp.remove")}
+              className="inline-flex h-7 w-7 items-center justify-center rounded-md text-muted-foreground transition hover:bg-destructive/10 hover:text-destructive"
+            >
+              <Trash2 className="h-4 w-4" />
+            </button>
+          </div>
+
+          <div className="mt-3 grid gap-3 sm:grid-cols-2">
+            <div className="space-y-1.5 sm:col-span-2">
+              <Label>{t("profile.xp.title")}</Label>
+              <Input
+                value={xp.title}
+                onChange={(e) => update(i, { title: e.target.value })}
+                placeholder={t("profile.xp.titlePlaceholder")}
+              />
+            </div>
+            <div className="space-y-1.5">
+              <Label>{t("profile.xp.company")}</Label>
+              <Input
+                value={xp.companyName}
+                onChange={(e) => update(i, { companyName: e.target.value })}
+                placeholder={t("profile.xp.companyPlaceholder")}
+              />
+            </div>
+            <div className="grid grid-cols-2 gap-2">
+              <div className="space-y-1.5">
+                <Label>{t("profile.xp.city")}</Label>
+                <Input
+                  value={xp.city}
+                  onChange={(e) => update(i, { city: e.target.value })}
+                />
+              </div>
+              <div className="space-y-1.5">
+                <Label>{t("profile.xp.country")}</Label>
+                <Input
+                  value={xp.country}
+                  onChange={(e) => update(i, { country: e.target.value })}
+                />
+              </div>
+            </div>
+            <div className="space-y-1.5">
+              <Label>{t("profile.xp.startDate")}</Label>
+              <Input
+                type="date"
+                value={xp.startDate}
+                max={new Date().toISOString().slice(0, 10)}
+                onChange={(e) => update(i, { startDate: e.target.value })}
+              />
+            </div>
+            <div className="space-y-1.5">
+              <Label>{t("profile.xp.endDate")}</Label>
+              <Input
+                type="date"
+                value={xp.endDate}
+                min={xp.startDate || undefined}
+                max={new Date().toISOString().slice(0, 10)}
+                disabled={xp.isCurrent}
+                onChange={(e) => update(i, { endDate: e.target.value })}
+              />
+            </div>
+            <label className="sm:col-span-2 inline-flex items-center gap-2 text-sm">
+              <input
+                type="checkbox"
+                checked={xp.isCurrent}
+                onChange={(e) => update(i, { isCurrent: e.target.checked })}
+                className="h-4 w-4 rounded border-input text-primary focus:ring-primary"
+              />
+              {t("profile.xp.isCurrent")}
+            </label>
+            <div className="space-y-1.5 sm:col-span-2">
+              <Label>{t("profile.xp.description")}</Label>
+              <textarea
+                value={xp.description}
+                onChange={(e) => update(i, { description: e.target.value })}
+                rows={3}
+                placeholder={t("profile.xp.descriptionPlaceholder")}
+                className="w-full resize-y rounded-md border border-input bg-background px-3 py-2 text-sm shadow-sm placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-primary"
+              />
+            </div>
+          </div>
+        </div>
+      ))}
+
+      <Button type="button" variant="outline" size="sm" onClick={add} className="gap-1.5">
+        <Plus className="h-4 w-4" />
+        {t("profile.xp.add")}
+      </Button>
+    </div>
+  );
+}
+
+/**
+ * Render a date range as "Jan 2022 — Jun 2024" or "Jan 2022 — Present"
+ * in the user's locale. Falls back to the raw ISO string if Intl can't
+ * parse it (defensive — shouldn't happen with backend LocalDate output).
+ */
+function formatRange(
+  start: string | undefined,
+  end: string | null | undefined,
+  isCurrent: boolean,
+  locale: string,
+  t: (k: string) => string,
+): string {
+  const fmt = (iso?: string | null) => {
+    if (!iso) return "";
+    const d = new Date(iso);
+    if (isNaN(d.getTime())) return iso;
+    return new Intl.DateTimeFormat(locale, { year: "numeric", month: "short" }).format(d);
+  };
+  const s = fmt(start);
+  const e = isCurrent ? t("profile.xp.present") : fmt(end);
+  if (!s && !e) return "";
+  if (!e) return s;
+  return `${s} — ${e}`;
 }

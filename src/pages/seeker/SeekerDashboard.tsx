@@ -6,6 +6,8 @@ import { ArrowRight, Bookmark, FileText, Search as SearchIcon } from "lucide-rea
 import { ApplicationsApi, JobsApi, SavedJobsApi, SavedSearchApi } from "@/api";
 import { useAuthStore } from "@/stores/auth";
 import { JobCard } from "@/components/common/JobCard";
+import { RecommendationsSection } from "@/components/seeker/RecommendationsSection";
+import { ActivityFeed } from "@/components/common/ActivityFeed";
 import { Button } from "@/components/ui/button";
 
 export function SeekerDashboard() {
@@ -22,7 +24,7 @@ export function SeekerDashboard() {
     <div className="space-y-8">
       <div>
         <h1 className="font-display text-3xl font-bold tracking-tight">
-          Bonjour, {name} 👋
+          {t("greetings.hello")}, {name} 👋
         </h1>
         <p className="mt-1 text-muted-foreground">{t("home.heroSubtitle")}</p>
       </div>
@@ -32,6 +34,24 @@ export function SeekerDashboard() {
         <StatCard icon={Bookmark} label={t("nav.savedJobs")} value={saved.data?.totalElements ?? 0} link="/seeker/saved-jobs" />
         <StatCard icon={SearchIcon} label={t("nav.savedSearches")} value={searches.data?.length ?? 0} link="/seeker/saved-searches" />
       </div>
+
+      <RecommendationsSection />
+
+      {/*
+        What the employers this seeker follows have been up to.
+        Falls back server-side to platform-wide activity when they follow
+        nobody, so a new account still sees a live platform rather than a
+        heading with nothing under it.
+      */}
+      <section className="rounded-2xl border border-border/60 bg-card p-5">
+        <div className="mb-4 flex items-baseline justify-between gap-3">
+          <h2 className="font-display text-lg font-semibold">{t("feed.title")}</h2>
+          <Link to="/seeker/following" className="text-sm text-primary hover:underline">
+            {t("nav.following")}
+          </Link>
+        </div>
+        <ActivityFeed scope="following" limit={8} />
+      </section>
 
       <section>
         <div className="flex items-end justify-between">
