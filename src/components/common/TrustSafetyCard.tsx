@@ -2,14 +2,11 @@ import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Flag, ShieldCheck } from "lucide-react";
 
-<<<<<<< HEAD
-=======
 import { useMutation } from "@tanstack/react-query";
 
 import { JobsApi } from "@/api";
 import { apiErrorMessage } from "@/lib/api";
 import { ALL_REPORT_REASONS, type ReportReason } from "@/types/api";
->>>>>>> develop
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/components/ui/toast-provider";
 
@@ -22,14 +19,6 @@ import { useToast } from "@/components/ui/toast-provider";
  * platform apart from the WhatsApp groups and notice boards it competes
  * with.
  *
-<<<<<<< HEAD
- * The report action is currently client-side only: it acknowledges the
- * report and thanks the user. A backend endpoint (POST /reports) can be
- * slotted into `submitReport` later without touching this UI.
- */
-const REPORT_REASONS = ["scam", "misleading", "offensive", "filled", "other"] as const;
-type ReportReason = (typeof REPORT_REASONS)[number];
-=======
  * Reports now reach an administrator's moderation queue. Upholding one takes the
  * listing down; either way the reporter is told what came of it, because someone
  * who flags a fraudulent advert and hears nothing learns that reporting is
@@ -40,7 +29,6 @@ type ReportReason = (typeof REPORT_REASONS)[number];
  * site enough to register, and demanding an account first would filter out the
  * reports that matter most.
  */
->>>>>>> develop
 
 export function TrustSafetyCard({ jobId }: { jobId: string }) {
   const { t } = useTranslation();
@@ -48,17 +36,6 @@ export function TrustSafetyCard({ jobId }: { jobId: string }) {
   const [open, setOpen] = useState(false);
   const [reported, setReported] = useState(false);
 
-<<<<<<< HEAD
-  const submitReport = (reason: ReportReason) => {
-    // TODO: wire to a backend endpoint (POST /api/hjp/jobs/{id}/report).
-    // For now we acknowledge locally so users can flag suspicious posts.
-    void jobId;
-    void reason;
-    setReported(true);
-    setOpen(false);
-    toast({ title: t("safety.reportThanks"), variant: "success" });
-  };
-=======
   const report = useMutation({
     mutationFn: (reason: ReportReason) => JobsApi.report(jobId, { reason }),
     onSuccess: () => {
@@ -72,7 +49,6 @@ export function TrustSafetyCard({ jobId }: { jobId: string }) {
       toast({ title: apiErrorMessage(e, t("safety.reportFailed")), variant: "destructive" });
     },
   });
->>>>>>> develop
 
   return (
     <div className="mt-4 rounded-2xl border border-border/60 bg-card p-5 elev-1">
@@ -109,14 +85,6 @@ export function TrustSafetyCard({ jobId }: { jobId: string }) {
               <div className="px-1 pb-1 text-xs font-medium text-foreground">
                 {t("safety.reportReasonPrompt")}
               </div>
-<<<<<<< HEAD
-              {REPORT_REASONS.map((reason) => (
-                <button
-                  key={reason}
-                  type="button"
-                  onClick={() => submitReport(reason)}
-                  className="block w-full rounded px-2 py-1.5 text-left text-xs text-foreground/80 transition hover:bg-destructive/5 hover:text-destructive"
-=======
               {ALL_REPORT_REASONS.map((reason) => (
                 <button
                   key={reason}
@@ -124,7 +92,6 @@ export function TrustSafetyCard({ jobId }: { jobId: string }) {
                   disabled={report.isPending}
                   onClick={() => report.mutate(reason)}
                   className="block w-full rounded px-2 py-1.5 text-left text-xs text-foreground/80 transition hover:bg-destructive/5 hover:text-destructive disabled:opacity-50"
->>>>>>> develop
                 >
                   {t(`safety.reasons.${reason}`)}
                 </button>

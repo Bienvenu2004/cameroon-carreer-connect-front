@@ -7,14 +7,9 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { WhatsAppShareButton } from "@/components/common/WhatsAppShareButton";
 import { TrustSafetyCard } from "@/components/common/TrustSafetyCard";
-<<<<<<< HEAD
-import { ApplicationsApi, JobsApi, SavedJobsApi } from "@/api";
-import { formatXAF, relativeTime } from "@/lib/utils";
-=======
 import { JobCard } from "@/components/common/JobCard";
 import { ApplicationsApi, JobsApi, SavedJobsApi, ResponsivenessApi } from "@/api";
 import { formatSalaryRange, relativeTime } from "@/lib/utils";
->>>>>>> develop
 import { useAuthStore } from "@/stores/auth";
 import { useToast } from "@/components/ui/toast-provider";
 import { apiErrorMessage } from "@/lib/api";
@@ -292,8 +287,6 @@ export function JobDetailPage() {
           {/* Anti-scam trust notice + report action. */}
           <TrustSafetyCard jobId={id} />
 
-<<<<<<< HEAD
-=======
           {/* What the employer actually does with applications. A verification
               badge says the company is real; this says whether applying is worth
               a candidate's evening and their data bundle. */}
@@ -316,7 +309,6 @@ export function JobDetailPage() {
             </div>
           )}
 
->>>>>>> develop
           {company && (
             <Link to={`/companies/${company.id}`} className="mt-4 block rounded-2xl border border-border/60 bg-card p-6 elev-1 transition-all hover:elev-2">
               <div className="text-xs uppercase tracking-wider text-muted-foreground">{t("nav.companies")}</div>

@@ -142,9 +142,6 @@
       "BILINGUAL": "Bilingual"
     },
     "shareOnWhatsApp": "Share on WhatsApp",
-<<<<<<< HEAD
-    "shareMessage": "Check out this job: {{title}}"
-=======
     "shareMessage": "Job opening: {{title}}",
     "salaryFrom": "From",
     "salaryUpTo": "Up to",
@@ -169,7 +166,6 @@
     "applicantCount_one": "{{count}} person has applied",
     "applicantCount_other": "{{count}} people have applied",
     "noApplicantsYet": "Be the first to apply"
->>>>>>> develop
   },
   "companies": {
     "searchPlaceholder": "Search by company name…"
@@ -719,14 +715,6 @@
     "reportThanks": "Thanks — our team will review this listing.",
     "reported": "Thanks, you've reported this job. Our team will review it.",
     "reasons": {
-<<<<<<< HEAD
-      "scam": "Scam or asks for money",
-      "misleading": "Misleading or fake",
-      "offensive": "Offensive or inappropriate",
-      "filled": "Position already filled",
-      "other": "Something else"
-    }
-=======
       "SCAM": "Scam or asks for money",
       "MISLEADING": "Misleading or fake",
       "OFFENSIVE": "Offensive or inappropriate",
@@ -847,6 +835,5 @@
     "wasVerified": "was verified as an employer",
     "filled": "filled a position through JobsConnect",
     "filledNamed": "filled the {{job}} role through JobsConnect"
->>>>>>> develop
   }
 }

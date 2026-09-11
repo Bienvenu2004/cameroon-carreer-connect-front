@@ -142,9 +142,6 @@
       "BILINGUAL": "Bilingue"
     },
     "shareOnWhatsApp": "Partager sur WhatsApp",
-<<<<<<< HEAD
-    "shareMessage": "Découvrez cette offre d'emploi : {{title}}"
-=======
     "shareMessage": "Offre d'emploi : {{title}}",
     "salaryFrom": "À partir de",
     "salaryUpTo": "Jusqu'à",
@@ -169,7 +166,6 @@
     "applicantCount_one": "{{count}} personne a postulé",
     "applicantCount_other": "{{count}} personnes ont postulé",
     "noApplicantsYet": "Soyez le premier à postuler"
->>>>>>> develop
   },
   "companies": {
     "searchPlaceholder": "Rechercher par nom d'entreprise…"
@@ -719,14 +715,6 @@
     "reportThanks": "Merci — notre équipe va examiner cette offre.",
     "reported": "Merci, vous avez signalé cette offre. Notre équipe va l'examiner.",
     "reasons": {
-<<<<<<< HEAD
-      "scam": "Arnaque ou demande d'argent",
-      "misleading": "Trompeuse ou fausse",
-      "offensive": "Offensante ou inappropriée",
-      "filled": "Poste déjà pourvu",
-      "other": "Autre chose"
-    }
-=======
       "SCAM": "Arnaque ou demande d'argent",
       "MISLEADING": "Trompeuse ou fausse",
       "OFFENSIVE": "Offensante ou inappropriée",
@@ -847,6 +835,5 @@
     "wasVerified": "a été vérifié en tant qu'employeur",
     "filled": "a pourvu un poste via JobsConnect",
     "filledNamed": "a pourvu le poste {{job}} via JobsConnect"
->>>>>>> develop
   }
 }
