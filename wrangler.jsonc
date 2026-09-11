@@ -1,0 +1,19 @@
+// Cloudflare Workers deployment for the JobConnect single-page application.
+//
+// Cloudflare runs `npx wrangler versions upload` after `npm run build`. Without this
+// file that command has nothing to upload and fails with "Missing entry-point to
+// Worker script or to assets directory". The app has no server-side code of its
+// own -- the API is the Spring Boot backend -- so the Worker only serves the
+// static files Vite writes to dist/.
+{
+  // Must match the Worker's name in the Cloudflare dashboard, or the upload is refused.
+  "name": "cameroon-carreer-connect-front",
+  "compatibility_date": "2026-08-28",
+  "assets": {
+    "directory": "./dist",
+    // React Router resolves routes in the browser. Without this, opening or
+    // refreshing a deep link such as /jobs/<id> would return a 404, because no
+    // file exists at that path; instead, unknown paths are answered with index.html.
+    "not_found_handling": "single-page-application"
+  }
+}
