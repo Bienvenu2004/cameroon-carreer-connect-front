@@ -132,13 +132,38 @@ function isCsrfRejection(error: AxiosError): boolean {
   return text.includes("CSRF");
 }
 
+/**
+ * Reduce any language tag to one of the two the platform actually supports.
+ *
+ * i18next can hand back a regional tag ("en-GB") depending on what the browser
+ * reports, so everything that needs to know the language funnels through here
+ * and gets the same answer. Anything that isn't English falls to French, which
+ * matches i18next's `fallbackLng`.
+ */
+export function normalizeLang(lng?: string | null): "fr" | "en" {
+  return lng?.toLowerCase().startsWith("en") ? "en" : "fr";
+}
+
+/**
+ * The language currently sent on every request.
+ *
+ * Exported because anything caching a server response that the server
+ * localizes has to key that cache on the same value this header carries —
+ * otherwise switching language keeps serving the previous language from cache
+ * until the entry goes stale.
+ */
+export function currentLang(): "fr" | "en" {
+  return normalizeLang(
+    typeof window !== "undefined" ? localStorage.getItem("lang") : null,
+  );
+}
+
 /* ---------------- request interceptor: language + client-type ---------------- */
 api.interceptors.request.use((config: InternalAxiosRequestConfig) => {
   // Forward the chosen UI language so the backend's MessageSource can
-  // localize error / success messages.
-  const lang =
-    (typeof window !== "undefined" && localStorage.getItem("lang")) || "fr";
-  config.headers["Accept-Language"] = lang;
+  // localize error / success messages — and so the AI writes its
+  // recommendation explanations in the language being read.
+  config.headers["Accept-Language"] = currentLang();
 
   // CRITICAL: AuthService.getResponse() only sets HttpOnly access_token /
   // refresh_token cookies when X-Client-Type === "web". With the default

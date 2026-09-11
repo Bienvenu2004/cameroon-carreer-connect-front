@@ -4,6 +4,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Sparkles, SlidersHorizontal } from "lucide-react";
 
 import { AiApi, SavedJobsApi, SeekerApi } from "@/api";
+import { normalizeLang } from "@/lib/api";
 import {
   RecommendationCard,
   computeMatchingFactors,
@@ -31,11 +32,15 @@ type TierFilter = "all" | "topMatch" | "greatMatch" | "goodMatch" | "fairMatch";
 const TIERS: TierFilter[] = ["all", "topMatch", "greatMatch", "goodMatch", "fairMatch"];
 
 export function RecommendedJobsPage() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const qc = useQueryClient();
+  const lang = normalizeLang(i18n.language);
 
   const recsQ = useQuery({
-    queryKey: ["ai-recommendations"],
+    // Keyed on the language: the explanations come back from the model in
+    // whichever language the request asked for, so a French answer must not
+    // be served from cache after the reader switches to English.
+    queryKey: ["ai-recommendations", lang],
     queryFn: () => AiApi.recommendations(),
     staleTime: 5 * 60 * 1000,
     refetchOnWindowFocus: false,
