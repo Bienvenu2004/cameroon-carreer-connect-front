@@ -12,7 +12,7 @@ export function AuthShell({ children }: { children: React.ReactNode }) {
       <aside className="relative hidden overflow-hidden bg-primary text-primary-foreground lg:flex lg:flex-col lg:justify-between">
         <div className="absolute inset-0 bg-[radial-gradient(at_30%_20%,hsl(var(--gold)/0.18),transparent_55%)]" aria-hidden />
         <div className="relative p-10">
-          <Logo className="text-primary-foreground" />
+          <Logo light />
         </div>
         <div className="relative space-y-6 p-10">
           <h2 className="font-display text-3xl font-bold tracking-tight leading-tight">

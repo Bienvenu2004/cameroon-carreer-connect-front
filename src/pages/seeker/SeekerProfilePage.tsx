@@ -10,6 +10,10 @@ import {
 import { SeekerApi, SkillsApi } from "@/api";
 import { SPOKEN_LANGUAGES } from "@/data/spokenLanguages";
 import { TagAutocomplete } from "@/components/common/TagAutocomplete";
+import {
+  EducationEditor, educationFromDto, type EducationDraft,
+} from "@/components/seeker/EducationEditor";
+import { ProfileCompleteness } from "@/components/seeker/ProfileCompleteness";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -182,6 +186,14 @@ function ProfileView({ profile }: { profile: JobSeekerProfileDto }) {
           </div>
         </div>
       </Card>
+
+      {/* Completeness ------------------------------------------------------
+          Placed first in the read-only view because it is the one thing on this
+          page that tells the seeker what to do next. */}
+      <ProfileCompleteness
+        score={profile.completeness}
+        hints={profile.completenessHints}
+      />
 
       {/* Personal info ----------------------------------------------------- */}
       <Section title={t("profile.personalInfo")}>
@@ -521,6 +533,17 @@ function ProfileEditForm({
     () => (profile.experiences ?? []).map(fromDto)
   );
 
+  // Education rows. Same contract as experiences: the list sent on submit is
+  // authoritative, and anything absent is removed via orphanRemoval.
+  const [educations, setEducations] = useState<EducationDraft[]>(
+    () => (profile.educations ?? []).map(educationFromDto)
+  );
+
+  // Whether recruiters may find this profile in candidate search. Opt-in, and
+  // off until the seeker says otherwise — being searchable by employers is a
+  // different thing from having signed up to look for work.
+  const [searchable, setSearchable] = useState(profile.searchable ?? false);
+
   // Portfolio / social links — plain URL inputs, all optional.
   const [githubUrl, setGithubUrl]       = useState(profile.githubUrl ?? "");
   const [linkedinUrl, setLinkedinUrl]   = useState(profile.linkedinUrl ?? "");
@@ -590,6 +613,19 @@ function ProfileEditForm({
           fd.append(`experiences[${i}].description`, xp.description.trim());
         }
       });
+
+      educations.forEach((ed, i) => {
+        fd.append(`educations[${i}].level`, ed.level);
+        if (ed.fieldOfStudy.trim()) fd.append(`educations[${i}].fieldOfStudy`, ed.fieldOfStudy.trim());
+        if (ed.institution.trim()) fd.append(`educations[${i}].institution`, ed.institution.trim());
+        if (ed.city.trim()) fd.append(`educations[${i}].city`, ed.city.trim());
+        if (ed.startDate) fd.append(`educations[${i}].startDate`, ed.startDate);
+        if (!ed.isCurrent && ed.endDate) fd.append(`educations[${i}].endDate`, ed.endDate);
+        fd.append(`educations[${i}].isCurrent`, String(ed.isCurrent));
+        if (ed.description.trim()) fd.append(`educations[${i}].description`, ed.description.trim());
+      });
+
+      fd.append("searchable", String(searchable));
 
       return SeekerApi.update(fd);
     },
@@ -819,6 +855,42 @@ function ProfileEditForm({
       <Card>
         <SectionHeader title={t("profile.workExperience")} />
         <ExperiencesEditor values={experiences} onChange={setExperiences} />
+      </Card>
+
+      {/* Education --------------------------------------------------------
+          The diploma is the first thing most Cameroonian recruiters screen on,
+          and adverts here are written as "Bac+3 minimum" — a profile that
+          cannot express Bac+3 cannot be searched the way they think. */}
+      <Card>
+        <SectionHeader title={t("profile.education")} />
+        <p className="mt-1 text-xs text-muted-foreground">{t("profile.educationSubtitle")}</p>
+        <div className="mt-3">
+          <EducationEditor rows={educations} onChange={setEducations} />
+        </div>
+      </Card>
+
+      {/* Visibility -------------------------------------------------------
+          Appearing in an employer-facing search is materially different from
+          posting an application, so it is an explicit choice rather than
+          something that happens to people who signed up to look for work. */}
+      <Card>
+        <SectionHeader title={t("profile.visibility")} />
+        <label className="mt-3 flex cursor-pointer items-start gap-3">
+          <input
+            type="checkbox"
+            checked={searchable}
+            onChange={(e) => setSearchable(e.target.checked)}
+            className="mt-0.5 h-4 w-4 shrink-0 rounded border-border accent-primary"
+          />
+          <span>
+            <span className="block text-sm font-medium text-foreground">
+              {t("profile.searchable")}
+            </span>
+            <span className="mt-1 block text-xs leading-relaxed text-muted-foreground">
+              {t("profile.searchableHint")}
+            </span>
+          </span>
+        </label>
       </Card>
 
       {/* Spoken languages ------------------------------------------------- */}

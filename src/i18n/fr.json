@@ -1,10 +1,10 @@
 {
   "greetings": {
-    "welcome": "Bienvenue sur JobConnect Cameroun !",
+    "welcome": "Bienvenue sur JobsConnect CMR !",
     "hello": "Bonjour"
   },
   "brand": {
-    "name": "JobConnect Cameroun",
+    "name": "JobsConnect CMR",
     "tagline": "Votre prochain emploi commence ici."
   },
   "nav": {
@@ -27,7 +27,13 @@
     "login": "Se connecter",
     "register": "S'inscrire",
     "openMenu": "Ouvrir le menu",
-    "close": "Fermer"
+    "close": "Fermer",
+    "candidates": "Trouver des candidats",
+    "invitations": "Invitations",
+    "reports": "Signalements",
+    "concours": "Concours",
+    "industries": "Secteurs",
+    "following": "Suivis"
   },
   "notifications": {
     "title": "Notifications",
@@ -70,7 +76,6 @@
     "comingSoon": "Bientôt disponible"
   },
   "home": {
-    "heroEyebrow": "Plateforme nationale",
     "heroTitle": "Trouvez votre prochain emploi au Cameroun",
     "heroSubtitle": "Des milliers d'offres dans toutes les régions, des employeurs vérifiés, et des outils pensés pour le marché camerounais.",
     "searchPlaceholder": "Titre, compétence ou entreprise",
@@ -137,7 +142,34 @@
       "BILINGUAL": "Bilingue"
     },
     "shareOnWhatsApp": "Partager sur WhatsApp",
+<<<<<<< HEAD
     "shareMessage": "Découvrez cette offre d'emploi : {{title}}"
+=======
+    "shareMessage": "Offre d'emploi : {{title}}",
+    "salaryFrom": "À partir de",
+    "salaryUpTo": "Jusqu'à",
+    "perMonth": "/ mois",
+    "salaryRange": "Fourchette de salaire",
+    "experienceLevel": "Niveau d'expérience",
+    "minimumDiploma": "Diplôme minimum",
+    "anyLevel": "Tous les niveaux",
+    "anyDiploma": "Tous les diplômes",
+    "postedWithin": "Publiée depuis",
+    "anyTime": "N'importe quand",
+    "last24h": "Dernières 24 heures",
+    "last7d": "7 derniers jours",
+    "last30d": "30 derniers jours",
+    "deadline": "Date limite",
+    "closesIn": "Clôture dans {{count}} jours",
+    "closesToday": "Clôture aujourd'hui",
+    "closed": "Clôturée",
+    "expired": "Candidatures closes",
+    "similar": "Offres similaires",
+    "moreFromEmployer": "Autres offres de cet employeur",
+    "applicantCount_one": "{{count}} personne a postulé",
+    "applicantCount_other": "{{count}} personnes ont postulé",
+    "noApplicantsYet": "Soyez le premier à postuler"
+>>>>>>> develop
   },
   "companies": {
     "searchPlaceholder": "Rechercher par nom d'entreprise…"
@@ -224,7 +256,8 @@
       "REVIEWED": "Examinée",
       "INTERVIEW": "Entretien",
       "HIRED": "Embauché",
-      "REJECTED": "Refusée"
+      "REJECTED": "Refusée",
+      "WITHDRAWN": "Retirée"
     },
     "received": "Candidatures reçues",
     "receivedSubtitle": "Examinez et faites évoluer les candidatures sur vos offres.",
@@ -249,6 +282,25 @@
       "note": "Note (facultatif)",
       "notePlaceholder": "Ce que le candidat doit apporter ou savoir",
       "scheduled": "Entretien planifié"
+    },
+    "withdraw": "Retirer ma candidature",
+    "withdrawConfirm": "Retirer cette candidature ?",
+    "withdrawExplain": "L'employeur sera informé que vous n'êtes plus disponible. Cette action est définitive.",
+    "withdrawReason": "Motif (facultatif)",
+    "withdrawReasonHint": "Vous n'êtes pas obligé d'en donner un.",
+    "withdrawn": "Candidature retirée",
+    "timeline": "Historique",
+    "timelineEmpty": "Rien ne s'est encore passé.",
+    "reason": "Message de l'employeur",
+    "rejectionReason": "Motif (facultatif, visible par le candidat)",
+    "rejectionReasonHint": "Une seule phrase change beaucoup pour quelqu'un qui attend une réponse.",
+    "events": {
+      "APPLIED": "Candidature envoyée",
+      "REVIEWED": "Candidature examinée",
+      "INTERVIEW": "Invité à un entretien",
+      "HIRED": "Offre acceptée",
+      "REJECTED": "Non retenue",
+      "WITHDRAWN": "Retirée par le candidat"
     }
   },
   "roles": {
@@ -362,7 +414,31 @@
     "currentVideoResume": "Vidéo actuelle",
     "videoResumeFormats": "MP4, WebM ou MOV · restez bref · max 50 Mo",
     "noVideoResume": "Aucune vidéo de présentation ajoutée pour le moment.",
-    "videoUnsupported": "Votre navigateur ne prend pas en charge la lecture vidéo."
+    "videoUnsupported": "Votre navigateur ne prend pas en charge la lecture vidéo.",
+    "education": "Formation",
+    "educationSubtitle": "Vos diplômes. La plupart des employeurs ici filtrent d'abord sur le diplôme.",
+    "addEducation": "Ajouter un diplôme",
+    "diploma": "Diplôme",
+    "fieldOfStudy": "Filière",
+    "institution": "École ou université",
+    "studyingHere": "J'étudie encore ici",
+    "noEducation": "Aucun diplôme ajouté pour l'instant.",
+    "visibility": "Visibilité auprès des employeurs",
+    "searchable": "Permettre aux employeurs de me trouver",
+    "searchableHint": "Les employeurs qui recherchent des candidats pourront voir votre profil et vous inviter à postuler. Ils ne voient jamais votre téléphone ni votre e-mail — seulement une invitation que vous pouvez ignorer. Vous pouvez désactiver ceci à tout moment.",
+    "searchableOn": "Les employeurs peuvent vous trouver",
+    "searchableOff": "Masqué des recherches employeurs",
+    "completeness": "Profil complété",
+    "completenessHint": "Un profil complet apparaît dans plus de recherches et reçoit de meilleures recommandations.",
+    "completeness.name": "Ajoutez votre nom",
+    "completeness.contact": "Ajoutez un numéro de téléphone",
+    "completeness.location": "Ajoutez votre ville ou région",
+    "completeness.skills": "Ajoutez vos compétences",
+    "completeness.education": "Ajoutez vos diplômes",
+    "completeness.experience": "Ajoutez votre expérience professionnelle",
+    "completeness.resume": "Téléversez votre CV",
+    "completeness.languages": "Ajoutez les langues que vous parlez",
+    "completeness.photo": "Ajoutez une photo"
   },
   "company": {
     "listTitle": "Mes entreprises",
@@ -420,7 +496,16 @@
     "requiredLanguagePlaceholder": "Choisir une langue",
     "noApprovedCompanies": "Vous devez avoir une entreprise approuvée avant de publier des offres.",
     "manageCompanies": "Gérer mes entreprises",
-    "companyPlaceholder": "Choisir une entreprise"
+    "companyPlaceholder": "Choisir une entreprise",
+    "salaryMin": "Salaire à partir de (XAF)",
+    "salaryMax": "Salaire jusqu'à (XAF)",
+    "salaryHint": "Une fourchette est plus facile à annoncer qu'un chiffre unique, et les offres qui indiquent le salaire reçoivent beaucoup plus de candidatures.",
+    "experienceLevel": "Niveau d'expérience",
+    "minimumDiploma": "Diplôme minimum",
+    "anyLevel": "Tous les niveaux",
+    "anyDiploma": "Tous les diplômes",
+    "deadline": "Date limite",
+    "deadlineHint": "Les candidatures se ferment automatiquement après cette date. Laissez vide pour garder l'offre ouverte."
   },
   "quickPost": {
     "cta": "Publication rapide",
@@ -509,7 +594,11 @@
     "RETAIL_TRADE": "Commerce & Distribution",
     "TELECOMMUNICATIONS": "Télécommunications",
     "TEXTILES_FASHION": "Textile & Mode",
-    "OTHER": "Autre"
+    "OTHER": "Autre",
+    "title": "Parcourir les entreprises par secteur",
+    "subtitle": "Choisissez un secteur et découvrez les employeurs vérifiés qui recrutent.",
+    "companyCount_one": "{{count}} entreprise",
+    "companyCount_other": "{{count}} entreprises"
   },
   "workAuth": {
     "CITIZEN": "Citoyen camerounais",
@@ -630,11 +719,134 @@
     "reportThanks": "Merci — notre équipe va examiner cette offre.",
     "reported": "Merci, vous avez signalé cette offre. Notre équipe va l'examiner.",
     "reasons": {
+<<<<<<< HEAD
       "scam": "Arnaque ou demande d'argent",
       "misleading": "Trompeuse ou fausse",
       "offensive": "Offensante ou inappropriée",
       "filled": "Poste déjà pourvu",
       "other": "Autre chose"
     }
+=======
+      "SCAM": "Arnaque ou demande d'argent",
+      "MISLEADING": "Trompeuse ou fausse",
+      "OFFENSIVE": "Offensante ou inappropriée",
+      "ALREADY_FILLED": "Poste déjà pourvu",
+      "OTHER": "Autre chose"
+    },
+    "reportFailed": "Impossible d'envoyer ce signalement. Veuillez réessayer."
+  },
+  "diplomas": {
+    "BEPC": "BEPC",
+    "CAP": "CAP",
+    "PROBATOIRE": "Probatoire",
+    "BACCALAUREAT": "Baccalauréat (Bac)",
+    "BTS": "BTS (Bac+2)",
+    "DUT": "DUT (Bac+2)",
+    "LICENCE": "Licence (Bac+3)",
+    "MASTER_1": "Master 1 (Bac+4)",
+    "MASTER_2": "Master 2 (Bac+5)",
+    "DOCTORAT": "Doctorat"
+  },
+  "concours": {
+    "title": "Concours & fonction publique",
+    "subtitle": "Les recrutements publiés par les ministères et organismes publics, rassemblés au même endroit.",
+    "reference": "Référence",
+    "body": "Organisme recruteur",
+    "badge": "Concours",
+    "none": "Aucun concours ouvert pour le moment. Revenez bientôt.",
+    "intro": "Au Cameroun, les concours sont annoncés dans de nombreux avis ministériels séparés. Nous les rassemblons ici avec leurs dates limites pour que rien ne vous échappe."
+  },
+  "candidates": {
+    "title": "Trouver des candidats",
+    "subtitle": "Recherchez les personnes qui ont choisi d'être visibles par les employeurs.",
+    "search": "Rechercher un poste ou une filière",
+    "skills": "Compétences",
+    "skillsHint": "Les candidats doivent avoir toutes ces compétences.",
+    "minimumDiploma": "Diplôme minimum",
+    "language": "Langue parlée",
+    "activeWithin": "Inscrit depuis",
+    "anyTime": "N'importe quand",
+    "last30d": "30 derniers jours",
+    "last90d": "90 derniers jours",
+    "results_one": "{{count}} candidat",
+    "results_other": "{{count}} candidats",
+    "none": "Aucun candidat ne correspond à ces critères pour l'instant.",
+    "noneHint": "Les candidats n'apparaissent ici qu'après avoir choisi d'être visibles, le vivier s'étoffe donc avec le temps.",
+    "invite": "Inviter à postuler",
+    "inviteFor": "Pour quelle offre ?",
+    "inviteMessage": "Message (facultatif)",
+    "inviteSend": "Envoyer l'invitation",
+    "invited": "Invitation envoyée",
+    "alreadyInvited": "Déjà invité",
+    "noOpenJobs": "Vous devez avoir une offre ouverte avant de pouvoir inviter quelqu'un.",
+    "yearsExperience_one": "{{count}} an d'expérience",
+    "yearsExperience_other": "{{count}} ans d'expérience",
+    "privacyNote": "Seuls les candidats qui ont donné leur accord apparaissent ici. Aucune coordonnée n'est affichée — invitez quelqu'un et il choisit de répondre ou non."
+  },
+  "invitations": {
+    "title": "Invitations",
+    "subtitle": "Les employeurs qui vous ont invité à postuler.",
+    "none": "Aucune invitation pour l'instant.",
+    "noneHint": "Activez « Permettre aux employeurs de me trouver » dans votre profil pour être repéré par les recruteurs.",
+    "from": "De",
+    "viewJob": "Voir l'offre",
+    "applied": "Vous avez postulé",
+    "jobClosed": "Cette offre est clôturée",
+    "pending_one": "{{count}} nouvelle invitation",
+    "pending_other": "{{count}} nouvelles invitations"
+  },
+  "reports": {
+    "title": "Offres signalées",
+    "subtitle": "Offres signalées par les utilisateurs. Valider un signalement retire l'offre.",
+    "pending": "En attente",
+    "all": "Toutes",
+    "reason": "Motif",
+    "details": "Détails",
+    "reportCount_one": "{{count}} signalement",
+    "reportCount_other": "{{count}} signalements",
+    "uphold": "Valider et retirer l'offre",
+    "dismiss": "Rejeter",
+    "note": "Note (facultative)",
+    "resolved": "Signalement traité",
+    "none": "Rien à examiner.",
+    "statuses": {
+      "PENDING": "En attente",
+      "UPHELD": "Validé",
+      "DISMISSED": "Rejeté"
+    },
+    "listingLive": "Offre en ligne",
+    "listingDown": "Offre retirée"
+  },
+  "responsiveness": {
+    "title": "Réactivité de cet employeur",
+    "rate": "Répond à {{rate}} % des candidatures",
+    "speed": "Généralement sous {{days}} jours",
+    "notEnough": "Pas encore assez de candidatures pour se prononcer.",
+    "explain": "Mesuré à partir de la vitesse à laquelle les candidatures dépassent l'état « Envoyée »."
+  },
+  "follow": {
+    "follow": "Recevoir les alertes",
+    "following": "Alertes activées",
+    "nowFollowing": "Vous serez notifié",
+    "nowFollowingHint": "Nous vous préviendrons dès que cet employeur publiera une offre.",
+    "unfollowed": "Alertes désactivées",
+    "title": "Employeurs que vous suivez",
+    "subtitle": "Vous serez prévenu dès que l'un d'eux publie une offre.",
+    "none": "Vous ne suivez encore aucun employeur.",
+    "noneHint": "Suivez un employeur et nous vous préviendrons dès qu'il publie — inutile de revenir vérifier.",
+    "openJobs_one": "{{count}} offre ouverte",
+    "openJobs_other": "{{count}} offres ouvertes",
+    "noOpenJobs": "Aucune offre ouverte actuellement",
+    "followers_one": "{{count}} abonné",
+    "followers_other": "{{count}} abonnés"
+  },
+  "feed": {
+    "title": "Activité récente",
+    "subtitle": "Ce que font les employeurs sur la plateforme.",
+    "postedAJob": "a publié",
+    "wasVerified": "a été vérifié en tant qu'employeur",
+    "filled": "a pourvu un poste via JobsConnect",
+    "filledNamed": "a pourvu le poste {{job}} via JobsConnect"
+>>>>>>> develop
   }
 }

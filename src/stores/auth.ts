@@ -1,5 +1,6 @@
 import { create } from "zustand";
 import { getCookie, removeCookie, setCookie } from "@/lib/cookies";
+import { invalidateCsrfToken } from "@/lib/csrf";
 
 export type UserRole = "JOB_SEEKER" | "RECRUITER" | "SYSTEM_ADMIN";
 
@@ -190,11 +191,15 @@ export const useAuthStore = create<AuthState>((set, get) => ({
 
   loginSession({ user }) {
     const slim = pickAuthUser(user);
+    // The backend may issue a different CSRF token now the session has changed;
+    // drop the cached one so the next mutation fetches a current one.
+    invalidateCsrfToken();
     set({ user: slim, status: "authenticated" });
     persistUser(slim);
   },
 
   logout() {
+    invalidateCsrfToken();
     set({ user: null, status: "unauthenticated" });
     persistUser(null);
   },

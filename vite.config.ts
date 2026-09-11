@@ -1,3 +1,4 @@
+/// <reference types="vitest/config" />
 import { defineConfig, loadEnv } from "vite";
 import react from "@vitejs/plugin-react";
 import path from "path";
@@ -29,6 +30,45 @@ export default defineConfig(({ mode }) => {
 
   return {
     plugins: [react()],
+    test: {
+      environment: "jsdom",
+      globals: true,
+      include: ["src/**/*.{test,spec}.{ts,tsx}"],
+      coverage: { reporter: ["text", "html"], reportsDirectory: "coverage" },
+    },
+    build: {
+      rollupOptions: {
+        output: {
+          /**
+           * Split the shared third-party libraries out of the entry chunk.
+           *
+           * Routes are already code-split (see router.tsx), but without this the
+           * vendor code they share is hoisted back into one entry chunk and the
+           * split buys nothing. Recharts in particular is only ever needed by the
+           * three dashboards, so it has no business in the payload an anonymous
+           * visitor downloads to read a job advert.
+           *
+           * These chunks are also long-lived: they only change when a dependency
+           * is upgraded, so returning visitors keep them cached across deploys.
+           *
+           * Recharts is deliberately NOT listed. Naming a library here makes its
+           * chunk part of the initial graph, so a manual `vendor-charts` entry got
+           * modulepreloaded on the home page -- 410 kB for a visitor who will never
+           * open a dashboard. Left alone, Rollup keeps it inside the async chunks of
+           * the only two pages that import it, which is exactly what we want.
+           *
+           * react-hook-form and zod are also not listed: Rollup folds them
+           * into vendor-react anyway (they share its dependency graph), and naming
+           * them here only produced an empty 36-byte chunk and an extra request.
+           */
+          manualChunks: {
+            "vendor-react": ["react", "react-dom", "react-router-dom"],
+            "vendor-i18n": ["i18next", "react-i18next", "i18next-browser-languagedetector"],
+            "vendor-query": ["@tanstack/react-query", "axios"],
+          },
+        },
+      },
+    },
     resolve: {
       alias: {
         "@": path.resolve(__dirname, "./src"),
@@ -40,7 +80,6 @@ export default defineConfig(({ mode }) => {
         "/api": apiProxy,
         "/storage": apiProxy,
         "/retms-websocket": { ...apiProxy, ws: true },
-        "/hjp-websocket": { ...apiProxy, ws: true },
       },
     },
   };

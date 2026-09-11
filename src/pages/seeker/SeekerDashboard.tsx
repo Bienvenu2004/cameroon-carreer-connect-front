@@ -7,6 +7,7 @@ import { ApplicationsApi, JobsApi, SavedJobsApi, SavedSearchApi } from "@/api";
 import { useAuthStore } from "@/stores/auth";
 import { JobCard } from "@/components/common/JobCard";
 import { RecommendationsSection } from "@/components/seeker/RecommendationsSection";
+import { ActivityFeed } from "@/components/common/ActivityFeed";
 import { Button } from "@/components/ui/button";
 
 export function SeekerDashboard() {
@@ -35,6 +36,22 @@ export function SeekerDashboard() {
       </div>
 
       <RecommendationsSection />
+
+      {/*
+        What the employers this seeker follows have been up to.
+        Falls back server-side to platform-wide activity when they follow
+        nobody, so a new account still sees a live platform rather than a
+        heading with nothing under it.
+      */}
+      <section className="rounded-2xl border border-border/60 bg-card p-5">
+        <div className="mb-4 flex items-baseline justify-between gap-3">
+          <h2 className="font-display text-lg font-semibold">{t("feed.title")}</h2>
+          <Link to="/seeker/following" className="text-sm text-primary hover:underline">
+            {t("nav.following")}
+          </Link>
+        </div>
+        <ActivityFeed scope="following" limit={8} />
+      </section>
 
       <section>
         <div className="flex items-end justify-between">

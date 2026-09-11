@@ -4,6 +4,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Sparkles, ChevronLeft, ChevronRight } from "lucide-react";
 
 import { AiApi, SavedJobsApi, SeekerApi } from "@/api";
+import { normalizeLang } from "@/lib/api";
 import {
   RecommendationCard,
   computeMatchingFactors,
@@ -27,11 +28,15 @@ const PAGE_SIZE = 3;
 const MAX_FACTOR_TAGS = 4;
 
 export function RecommendationsSection() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const qc = useQueryClient();
+  const lang = normalizeLang(i18n.language);
 
   const recsQ = useQuery({
-    queryKey: ["ai-recommendations"],
+    // Keyed on the language: the explanations come back from the model in
+    // whichever language the request asked for, so a French answer must not
+    // be served from cache after the reader switches to English.
+    queryKey: ["ai-recommendations", lang],
     queryFn: () => AiApi.recommendations(),
     staleTime: 5 * 60 * 1000,
     refetchOnWindowFocus: false,
@@ -89,7 +94,7 @@ export function RecommendationsSection() {
         {!isLoading && !isError && isEmpty && <EmptyNotice message={t("ai.empty")} />}
 
         {!isLoading && !isError && recs.length > 0 && (
-          <div className="rounded-2xl border border-border/60 bg-gradient-to-br from-primary/[0.04] via-card to-card p-4 sm:p-5">
+          <div className="rounded-2xl border border-border/60 bg-card p-4 sm:p-5">
             <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
               {visible.map((r) => {
                 const { tags, extra } = computeMatchingFactors(

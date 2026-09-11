@@ -4,6 +4,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Sparkles, SlidersHorizontal } from "lucide-react";
 
 import { AiApi, SavedJobsApi, SeekerApi } from "@/api";
+import { normalizeLang } from "@/lib/api";
 import {
   RecommendationCard,
   computeMatchingFactors,
@@ -31,11 +32,15 @@ type TierFilter = "all" | "topMatch" | "greatMatch" | "goodMatch" | "fairMatch";
 const TIERS: TierFilter[] = ["all", "topMatch", "greatMatch", "goodMatch", "fairMatch"];
 
 export function RecommendedJobsPage() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const qc = useQueryClient();
+  const lang = normalizeLang(i18n.language);
 
   const recsQ = useQuery({
-    queryKey: ["ai-recommendations"],
+    // Keyed on the language: the explanations come back from the model in
+    // whichever language the request asked for, so a French answer must not
+    // be served from cache after the reader switches to English.
+    queryKey: ["ai-recommendations", lang],
     queryFn: () => AiApi.recommendations(),
     staleTime: 5 * 60 * 1000,
     refetchOnWindowFocus: false,
@@ -74,8 +79,10 @@ export function RecommendedJobsPage() {
         const bd = b.job.createdAt ? Date.parse(b.job.createdAt) : 0;
         return bd - ad;
       }
-      const as = a.job.salary != null ? Number(a.job.salary) : -1;
-      const bs = b.job.salary != null ? Number(b.job.salary) : -1;
+      // Sort on the top of the band, falling back to the floor: a job offering
+      // "up to 600k" should outrank one offering "from 200k".
+      const as = Number(a.job.salaryMax ?? a.job.salaryMin ?? -1);
+      const bs = Number(b.job.salaryMax ?? b.job.salaryMin ?? -1);
       return bs - as;
     });
     return list;

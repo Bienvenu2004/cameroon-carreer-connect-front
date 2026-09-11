@@ -2,17 +2,54 @@
 <html lang="fr">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="description" content="JobConnect Cameroun — la plateforme nationale de recherche d'emploi et de recrutement. The national platform for job search and recruitment in Cameroon." />
+
+    <!--
+      Icons. The .ico carries 16/32/48 for browsers that still ask for it; the
+      PNGs are what modern browsers pick. All of them are the white "j" on an
+      emerald tile rather than the bare mark: the mark is a dark emerald, and on
+      a dark browser tab strip it would disappear.
+    -->
+    <link rel="icon" href="/logo/favicon.ico" sizes="any" />
+    <link rel="icon" type="image/png" sizes="32x32" href="/logo/favicon-32.png" />
+    <link rel="icon" type="image/png" sizes="16x16" href="/logo/favicon-16.png" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/logo/apple-touch-icon.png" />
+    <link rel="manifest" href="/site.webmanifest" />
+
     <meta name="theme-color" content="#0D6E5B" />
+    <meta name="description" content="JobsConnect CMR — la plateforme nationale de recherche d'emploi et de recrutement. The national platform for job search and recruitment in Cameroon." />
+
+    <!--
+      Share card. WhatsApp is how job listings actually circulate here, so a
+      shared link that renders as a branded card rather than a bare URL is part
+      of the anti-scam story, not decoration: a preview that looks like the site
+      is one more signal that the link is what it claims to be.
+    -->
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="JobsConnect CMR" />
+    <meta property="og:title" content="JobsConnect CMR" />
+    <meta property="og:description" content="La plateforme nationale de recherche d'emploi et de recrutement au Cameroun." />
+    <meta property="og:image" content="/logo/og-image.png" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="JobsConnect CMR" />
+    <meta name="twitter:image" content="/logo/og-image.png" />
+
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
       href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap"
       rel="stylesheet"
     />
-    <title>JobConnect Cameroun</title>
+
+    <!--
+      The header logo is above the fold on every route, so fetch it alongside
+      the JavaScript rather than after it.
+    -->
+    <link rel="preload" as="image" href="/logo/logo-full.png" />
+
+    <title>JobsConnect CMR</title>
     <script>
       (function(){var t=localStorage.getItem("jcc_theme")||"system";var d=t==="system"?window.matchMedia("(prefers-color-scheme:dark)").matches:t==="dark";if(d)document.documentElement.classList.add("dark");})();
     </script>
