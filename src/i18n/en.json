@@ -140,8 +140,8 @@
     }
   },
   "jobs": {
-    "title": "Jobs",
-    "subtitle": "Find the role that fits you.",
+    "title": "Every opening in Cameroon, in one place",
+    "subtitle": "Filter by region, industry, pay and working language, then apply in two clicks.",
     "filters": "Filters",
     "clearFilters": "Clear filters",
     "activeFilters": "Active",
@@ -208,10 +208,25 @@
     "moreFromEmployer": "More from this employer",
     "applicantCount_one": "{{count}} person has applied",
     "applicantCount_other": "{{count}} people have applied",
-    "noApplicantsYet": "Be the first to apply"
+    "noApplicantsYet": "Be the first to apply",
+    "heroEyebrow": "Every offer, one place",
+    "heroImageAlt": "Aerial view of a Douala neighbourhood",
+    "statOpen": "Open positions",
+    "statEmployers": "Verified employers",
+    "statRegions": "Regions covered",
+    "quickFilters": "Quick filters"
   },
   "companies": {
-    "searchPlaceholder": "Search by company name…"
+    "searchPlaceholder": "Search by company name…",
+    "title": "Employers hiring in Cameroon",
+    "subtitle": "Every employer listed here is verified before a single advert goes live.",
+    "heroEyebrow": "Verified employers",
+    "heroImageAlt": "Office towers in Yaoundé at sunset",
+    "statCompanies": "Employers listed",
+    "statIndustries": "Industries represented",
+    "statOpenJobs": "Open positions",
+    "hiringNow": "Hiring now",
+    "viewProfile": "View profile"
   },
   "aiSearch": {
     "modeClassic": "Classic",
@@ -639,7 +654,18 @@
     "title": "Browse companies by industry",
     "subtitle": "Pick a sector and see the verified employers hiring in it.",
     "companyCount_one": "{{count}} company",
-    "companyCount_other": "{{count}} companies"
+    "companyCount_other": "{{count}} companies",
+    "heroEyebrow": "Browse by industry",
+    "heroImageAlt": "The Nouvelle Liberté statue in Douala, built from salvaged metal",
+    "statIndustries": "Industries",
+    "statCompanies": "Employers listed",
+    "statActive": "Industries with employers",
+    "empty": "No employer yet",
+    "ctaTitle": "Not the industry you had in mind?",
+    "ctaBody": "Browse every verified employer, or go straight to the offers.",
+    "ctaCompanies": "All employers",
+    "ctaJobs": "All offers",
+    "ctaImageAlt": "The Limbe Wildlife Centre"
   },
   "workAuth": {
     "CITIZEN": "Cameroonian citizen",
@@ -787,7 +813,13 @@
     "body": "Recruiting body",
     "badge": "Concours",
     "none": "No concours are open at the moment. Check back soon.",
-    "intro": "Public-sector recruitment in Cameroon is announced across many separate ministry notices. We collect them here with their deadlines so nothing is missed."
+    "intro": "Public-sector recruitment in Cameroon is announced across many separate ministry notices. We collect them here with their deadlines so nothing is missed.",
+    "heroImageAlt": "A young woman holding the Cameroonian flag",
+    "statOpen": "Open concours",
+    "statNextDeadline": "Next deadline",
+    "statBodies": "Ministries and public bodies",
+    "closingSoon": "Closing soon",
+    "noDeadline": "No deadline"
   },
   "candidates": {
     "title": "Find candidates",

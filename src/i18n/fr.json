@@ -140,8 +140,8 @@
     }
   },
   "jobs": {
-    "title": "Offres d'emploi",
-    "subtitle": "Trouvez le poste qui vous correspond.",
+    "title": "Toutes les offres du Cameroun, au même endroit",
+    "subtitle": "Filtrez par région, secteur, salaire et langue de travail, puis postulez en deux clics.",
     "filters": "Filtres",
     "clearFilters": "Effacer les filtres",
     "activeFilters": "Actifs",
@@ -208,10 +208,25 @@
     "moreFromEmployer": "Autres offres de cet employeur",
     "applicantCount_one": "{{count}} personne a postulé",
     "applicantCount_other": "{{count}} personnes ont postulé",
-    "noApplicantsYet": "Soyez le premier à postuler"
+    "noApplicantsYet": "Soyez le premier à postuler",
+    "heroEyebrow": "Toutes les offres, au même endroit",
+    "heroImageAlt": "Vue aérienne d'un quartier de Douala",
+    "statOpen": "Postes ouverts",
+    "statEmployers": "Employeurs vérifiés",
+    "statRegions": "Régions couvertes",
+    "quickFilters": "Filtres rapides"
   },
   "companies": {
-    "searchPlaceholder": "Rechercher par nom d'entreprise…"
+    "searchPlaceholder": "Rechercher par nom d'entreprise…",
+    "title": "Les employeurs qui recrutent au Cameroun",
+    "subtitle": "Chaque employeur référencé ici est vérifié avant la publication de la moindre annonce.",
+    "heroEyebrow": "Employeurs vérifiés",
+    "heroImageAlt": "Tours de bureaux à Yaoundé au coucher du soleil",
+    "statCompanies": "Employeurs référencés",
+    "statIndustries": "Secteurs représentés",
+    "statOpenJobs": "Postes ouverts",
+    "hiringNow": "Recrute",
+    "viewProfile": "Voir le profil"
   },
   "aiSearch": {
     "modeClassic": "Classique",
@@ -639,7 +654,18 @@
     "title": "Parcourir les entreprises par secteur",
     "subtitle": "Choisissez un secteur et découvrez les employeurs vérifiés qui recrutent.",
     "companyCount_one": "{{count}} entreprise",
-    "companyCount_other": "{{count}} entreprises"
+    "companyCount_other": "{{count}} entreprises",
+    "heroEyebrow": "Parcourir par secteur",
+    "heroImageAlt": "La statue Nouvelle Liberté à Douala, faite de métal de récupération",
+    "statIndustries": "Secteurs",
+    "statCompanies": "Employeurs référencés",
+    "statActive": "Secteurs avec employeurs",
+    "empty": "Aucun employeur pour l'instant",
+    "ctaTitle": "Ce n'est pas le secteur que vous cherchiez ?",
+    "ctaBody": "Parcourez tous les employeurs vérifiés, ou allez directement aux offres.",
+    "ctaCompanies": "Tous les employeurs",
+    "ctaJobs": "Toutes les offres",
+    "ctaImageAlt": "Le centre de faune de Limbe"
   },
   "workAuth": {
     "CITIZEN": "Citoyen camerounais",
@@ -787,7 +813,13 @@
     "body": "Organisme recruteur",
     "badge": "Concours",
     "none": "Aucun concours ouvert pour le moment. Revenez bientôt.",
-    "intro": "Au Cameroun, les concours sont annoncés dans de nombreux avis ministériels séparés. Nous les rassemblons ici avec leurs dates limites pour que rien ne vous échappe."
+    "intro": "Au Cameroun, les concours sont annoncés dans de nombreux avis ministériels séparés. Nous les rassemblons ici avec leurs dates limites pour que rien ne vous échappe.",
+    "heroImageAlt": "Une jeune femme tenant le drapeau camerounais",
+    "statOpen": "Concours ouverts",
+    "statNextDeadline": "Prochaine échéance",
+    "statBodies": "Ministères et organismes publics",
+    "closingSoon": "Bientôt clos",
+    "noDeadline": "Sans échéance"
   },
   "candidates": {
     "title": "Trouver des candidats",

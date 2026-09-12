@@ -2,15 +2,19 @@ import { useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Link } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
-import { Briefcase, Building2, Filter, MapPin, Search, X } from "lucide-react";
+import { ArrowRight, BadgeCheck, Briefcase, Building2, Filter, MapPin, Search, X } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from "@/components/ui/select";
+import { PageHero } from "@/components/common/PageHero";
 import { Pagination } from "@/components/common/Pagination";
+import { Reveal } from "@/components/common/motion";
 import { CompaniesApi } from "@/api";
+import { storageUrl } from "@/lib/api";
+import { featuredJobsQuery, industryCountsQuery } from "@/lib/publicQueries";
 import {
   ALL_INDUSTRIES, ALL_REGIONS,
   type Industry, type Region,
@@ -60,6 +64,12 @@ export function CompaniesPage() {
     queryFn: () => CompaniesApi.list(filter),
   });
 
+  // Banner figures describe the whole directory rather than the current filter.
+  // Both queries are shared with the home page, so they are usually cached.
+  const industries = useQuery(industryCountsQuery);
+  const catalogue = useQuery(featuredJobsQuery);
+  const industriesRepresented = industries.data?.filter((row) => row.count > 0).length ?? 0;
+
   const clearAll = () => {
     setKeyword(""); setRegion(ALL); setIndustry(ALL);
   };
@@ -80,11 +90,23 @@ export function CompaniesPage() {
   const activeCount = activeFilters.length + (keyword ? 1 : 0);
 
   return (
-    <div className="container py-10">
-      <h1 className="font-display text-3xl font-bold tracking-tight">{t("nav.companies")}</h1>
-      <p className="mt-1 text-muted-foreground">{t("home.heroSubtitle")}</p>
+    <>
+      <PageHero
+        eyebrow={t("companies.heroEyebrow")}
+        icon={BadgeCheck}
+        title={t("companies.title")}
+        subtitle={t("companies.subtitle")}
+        image="/images/pages/companies-yaounde.jpg"
+        imageAlt={t("companies.heroImageAlt")}
+        stats={[
+          { label: t("companies.statCompanies"), value: data?.totalElements ?? 0 },
+          { label: t("companies.statIndustries"), value: industriesRepresented },
+          { label: t("companies.statOpenJobs"), value: catalogue.data?.totalElements ?? 0 },
+        ]}
+      />
 
-      <div className="mt-6 rounded-2xl border border-border/60 bg-card p-5 elev-1">
+      <div className="container py-10">
+      <div className="rounded-2xl border border-border/60 bg-card p-5 elev-1">
         {/* Filters first — they set the scope. Search refines within. */}
         <div className="flex items-center gap-2">
           <Filter className="h-4 w-4 text-muted-foreground" />
@@ -178,37 +200,64 @@ export function CompaniesPage() {
         {isLoading && Array.from({ length: 6 }).map((_, i) => (
           <div key={i} className="h-40 animate-pulse rounded-xl border border-border/60 bg-muted/40" />
         ))}
-        {data?.content.map((c) => (
-          <Link
-            key={c.id}
-            to={`/companies/${c.id}`}
-            className="group rounded-xl border border-border/60 bg-card p-5 elev-1 transition-all hover:-translate-y-0.5 hover:border-primary/40 hover:elev-2"
-          >
-            <div className="flex items-center gap-3">
-              <div className="grid h-12 w-12 place-items-center rounded-lg bg-primary/10 text-primary">
-                <Building2 className="h-5 w-5" />
+        {data?.content.map((c, index) => (
+          <Reveal key={c.id} delay={Math.min(index, 8) * 45}>
+            <Link
+              to={`/companies/${c.id}`}
+              className="group relative flex h-full flex-col overflow-hidden rounded-2xl border border-border/60 bg-card p-5 elev-1 transition-all hover:-translate-y-0.5 hover:border-primary/40 hover:elev-2"
+            >
+              <span
+                aria-hidden="true"
+                className="pointer-events-none absolute -right-12 -top-12 h-28 w-28 rounded-full bg-primary/5 transition-transform duration-500 group-hover:scale-150"
+              />
+              <div className="relative flex items-center gap-3">
+                {/* The employer's own logo where there is one: a wall of
+                    identical placeholder icons is what made this grid dull. */}
+                {c.logo?.id ? (
+                  <img
+                    src={storageUrl(c.logo.id)}
+                    alt=""
+                    loading="lazy"
+                    decoding="async"
+                    className="h-12 w-12 shrink-0 rounded-lg object-cover ring-1 ring-border/60"
+                  />
+                ) : (
+                  <div className="grid h-12 w-12 shrink-0 place-items-center rounded-lg bg-primary/10 text-primary">
+                    <Building2 className="h-5 w-5" />
+                  </div>
+                )}
+                <div className="min-w-0">
+                  <div className="flex items-center gap-1.5">
+                    <span className="truncate font-display text-base font-semibold group-hover:text-primary">{c.name}</span>
+                    {c.status === "APPROVED" && (
+                      <BadgeCheck className="h-4 w-4 shrink-0 text-primary" aria-label={t("companies.heroEyebrow")} />
+                    )}
+                  </div>
+                  {c.industry && <div className="text-xs text-muted-foreground">{t(`industries.${c.industry}`)}</div>}
+                </div>
               </div>
-              <div className="min-w-0">
-                <div className="truncate font-display text-base font-semibold group-hover:text-primary">{c.name}</div>
-                {c.industry && <div className="text-xs text-muted-foreground">{t(`industries.${c.industry}`)}</div>}
+              {c.description && (
+                <p className="relative mt-3 line-clamp-2 text-sm text-foreground/75">{c.description}</p>
+              )}
+              <div className="relative mt-4 flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-muted-foreground">
+                {c.address?.city && (
+                  <span className="inline-flex items-center gap-1">
+                    <MapPin className="h-3 w-3" />{c.address.city}
+                  </span>
+                )}
+                {(c.activeJobs ?? 0) > 0 && (
+                  <span className="inline-flex items-center gap-1 rounded-full bg-primary/10 px-2 py-0.5 font-medium text-primary">
+                    <Briefcase className="h-3 w-3" />
+                    {t("companies.hiringNow")} · {c.activeJobs}
+                  </span>
+                )}
+                <span className="ml-auto inline-flex items-center gap-1 font-medium text-primary opacity-0 transition-opacity group-hover:opacity-100">
+                  {t("companies.viewProfile")}
+                  <ArrowRight className="h-3 w-3" aria-hidden="true" />
+                </span>
               </div>
-            </div>
-            {c.description && (
-              <p className="mt-3 line-clamp-2 text-sm text-foreground/75">{c.description}</p>
-            )}
-            <div className="mt-3 flex flex-wrap gap-x-4 gap-y-1 text-xs text-muted-foreground">
-              {c.address?.city && (
-                <span className="inline-flex items-center gap-1">
-                  <MapPin className="h-3 w-3" />{c.address.city}
-                </span>
-              )}
-              {(c.activeJobs ?? 0) > 0 && (
-                <span className="inline-flex items-center gap-1 font-medium text-primary">
-                  <Briefcase className="h-3 w-3" />{c.activeJobs} {t("nav.jobs").toLowerCase()}
-                </span>
-              )}
-            </div>
-          </Link>
+            </Link>
+          </Reveal>
         ))}
         {data && data.content.length === 0 && (
           <div className="col-span-full rounded-xl border border-dashed border-border bg-card/50 p-10 text-center text-muted-foreground">
@@ -226,7 +275,8 @@ export function CompaniesPage() {
           onChange={setPage}
         />
       )}
-    </div>
+      </div>
+    </>
   );
 }
 

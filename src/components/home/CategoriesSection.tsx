@@ -8,8 +8,8 @@ import { INDUSTRY_ICONS } from "@/lib/industryIcons";
 import { cn } from "@/lib/utils";
 import { ALL_INDUSTRIES } from "@/types/api";
 
-import { industryCountsQuery } from "./homeQueries";
-import { Reveal } from "./motion";
+import { industryCountsQuery } from "@/lib/publicQueries";
+import { Reveal } from "@/components/common/motion";
 
 /**
  * Industry categories as a swipeable carousel.

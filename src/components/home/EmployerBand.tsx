@@ -3,8 +3,8 @@ import { Link } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { ArrowRight, BadgeCheck, Check } from "lucide-react";
 
-import { industryCountsQuery } from "./homeQueries";
-import { CountUp, Reveal } from "./motion";
+import { industryCountsQuery } from "@/lib/publicQueries";
+import { CountUp, Reveal } from "@/components/common/motion";
 
 /**
  * The closing band: the case for employers, with the job seeker's sign-up

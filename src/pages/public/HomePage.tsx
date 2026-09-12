@@ -7,7 +7,7 @@ import { CategoriesSection } from "@/components/home/CategoriesSection";
 import { EmployerBand } from "@/components/home/EmployerBand";
 import { FeaturedJobsSection } from "@/components/home/FeaturedJobsSection";
 import { HeroSection } from "@/components/home/HeroSection";
-import { Reveal } from "@/components/home/motion";
+import { Reveal } from "@/components/common/motion";
 import { ALL_REGIONS } from "@/types/api";
 
 /**

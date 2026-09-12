@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useSearchParams } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
-import { Filter, Search, Sparkles, X } from "lucide-react";
+import { Briefcase, Filter, Search, Sparkles, X } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -11,9 +11,12 @@ import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from "@/components/ui/select";
 import { JobCard } from "@/components/common/JobCard";
+import { PageHero } from "@/components/common/PageHero";
 import { Pagination } from "@/components/common/Pagination";
+import { Reveal } from "@/components/common/motion";
 import { AiSearchPanel } from "@/components/jobs/AiSearchPanel";
 import { JobsApi } from "@/api";
+import { featuredJobsQuery, industryCountsQuery } from "@/lib/publicQueries";
 import {
   ALL_DIPLOMA_LEVELS, ALL_EXPERIENCE_LEVELS, ALL_INDUSTRIES, ALL_JOB_LANGUAGES, ALL_JOB_SITES, ALL_JOB_TYPES, ALL_REGIONS,
   type DiplomaLevel, type ExperienceLevel, type Industry, type JobLanguage, type JobSite, type JobType, type Region,
@@ -106,6 +109,13 @@ export function JobsPage() {
     queryFn: () => JobsApi.list(filter),
   });
 
+  // Banner figures describe the catalogue, not the current filter: a visitor
+  // who has narrowed to one region should still see how large the whole board
+  // is. Both queries are the home page's, so arriving from there costs nothing.
+  const catalogue = useQuery(featuredJobsQuery);
+  const industries = useQuery(industryCountsQuery);
+  const verifiedEmployers = industries.data?.reduce((sum, row) => sum + row.count, 0) ?? 0;
+
   /* ---------- URL sync helpers ---------- */
   const writeUrl = (next: {
     keyword?: string;
@@ -172,14 +182,65 @@ export function JobsPage() {
   const activeCount = activeFilters.length + (keyword ? 1 : 0);
 
   return (
-    <div className="container py-10">
-      <header className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
-        <div>
-          <h1 className="font-display text-3xl font-bold tracking-tight">{t("jobs.title")}</h1>
-          <p className="mt-1 text-muted-foreground">{t("jobs.subtitle")}</p>
+    <>
+      <PageHero
+        eyebrow={t("jobs.heroEyebrow")}
+        icon={Briefcase}
+        title={t("jobs.title")}
+        subtitle={t("jobs.subtitle")}
+        image="/images/pages/jobs-douala.jpg"
+        imageAlt={t("jobs.heroImageAlt")}
+        stats={[
+          { label: t("jobs.statOpen"), value: catalogue.data?.totalElements ?? 0 },
+          { label: t("jobs.statEmployers"), value: verifiedEmployers },
+          { label: t("jobs.statRegions"), value: ALL_REGIONS.length },
+        ]}
+      >
+        {/* The four filters people reach for first, one click from the top of
+            the page. Each toggles, so a second click undoes it. */}
+        <div className="mt-6 flex flex-wrap items-center gap-2">
+          <span className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground">
+            {t("jobs.quickFilters")}
+          </span>
+          <QuickChip
+            label={t("jobs.remote")}
+            active={site === "REMOTE"}
+            onClick={() => {
+              const next = site === "REMOTE" ? ALL : ("REMOTE" as JobSite);
+              setSite(next);
+              writeUrl({ site: next });
+            }}
+          />
+          <QuickChip
+            label={t("regions.LITTORAL")}
+            active={region === "LITTORAL"}
+            onClick={() => {
+              const next = region === "LITTORAL" ? ALL : ("LITTORAL" as Region);
+              setRegion(next);
+              writeUrl({ region: next });
+            }}
+          />
+          <QuickChip
+            label={t("regions.CENTRE")}
+            active={region === "CENTRE"}
+            onClick={() => {
+              const next = region === "CENTRE" ? ALL : ("CENTRE" as Region);
+              setRegion(next);
+              writeUrl({ region: next });
+            }}
+          />
+          <QuickChip
+            label={t("jobs.last7d")}
+            active={postedWithin === "7"}
+            onClick={() => setPostedWithin(postedWithin === "7" ? ALL : "7")}
+          />
         </div>
+      </PageHero>
+
+      <div className="container py-10">
+      <div className="flex justify-end">
         <ModeToggle mode={mode} setMode={setMode} />
-      </header>
+      </div>
 
       {mode === "ai" && (
         <div className="mt-6">
@@ -385,7 +446,11 @@ export function JobsPage() {
         {isLoading && Array.from({ length: 6 }).map((_, i) => (
           <div key={i} className="h-44 animate-pulse rounded-xl border border-border/60 bg-muted/40" />
         ))}
-        {data?.content.map((j) => <JobCard key={j.id} job={j} />)}
+        {data?.content.map((j, index) => (
+          <Reveal key={j.id} delay={Math.min(index, 8) * 45}>
+            <JobCard job={j} />
+          </Reveal>
+        ))}
         {data?.content.length === 0 && (
           <div className="col-span-full rounded-xl border border-dashed border-border bg-card/50 p-10 text-center text-muted-foreground">
             {t("jobs.noJobsFound")}
@@ -403,7 +468,34 @@ export function JobsPage() {
         />
       )}
       </>}
-    </div>
+      </div>
+    </>
+  );
+}
+
+/* A one-click filter in the banner. Reflects state, so it also shows what is
+   already applied when the page is opened from a link that set it. */
+function QuickChip({
+  label, active, onClick,
+}: {
+  label: string;
+  active: boolean;
+  onClick: () => void;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      aria-pressed={active}
+      className={
+        "rounded-full border px-3 py-1 text-xs font-medium transition " +
+        (active
+          ? "border-primary bg-primary text-primary-foreground"
+          : "border-border bg-card/80 text-foreground/80 backdrop-blur hover:border-primary/40 hover:text-primary")
+      }
+    >
+      {label}
+    </button>
   );
 }
 

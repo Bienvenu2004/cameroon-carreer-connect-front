@@ -9,8 +9,8 @@ import { storageUrl } from "@/lib/api";
 import { cn } from "@/lib/utils";
 import { ALL_REGIONS, type CompanyDto, type Region } from "@/types/api";
 
-import { featuredJobsQuery, homeEmployersQuery, industryCountsQuery } from "./homeQueries";
-import { CountUp, Reveal } from "./motion";
+import { featuredJobsQuery, homeEmployersQuery, industryCountsQuery } from "@/lib/publicQueries";
+import { CountUp, Reveal } from "@/components/common/motion";
 
 /**
  * Split hero: search on the left, a layered photograph on the right.

@@ -8,8 +8,8 @@ import { INDUSTRY_ICONS } from "@/lib/industryIcons";
 import { relativeTime } from "@/lib/utils";
 import type { JobDto } from "@/types/api";
 
-import { featuredJobsQuery } from "./homeQueries";
-import { Reveal } from "./motion";
+import { featuredJobsQuery } from "@/lib/publicQueries";
+import { Reveal } from "@/components/common/motion";
 
 /** The latest offers as compact cards on a warm band. */
 export function FeaturedJobsSection() {
