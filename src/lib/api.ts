@@ -4,6 +4,7 @@ import axios, {
 } from "axios";
 
 import { useAuthStore } from "@/stores/auth";
+import { resolveApiBase } from "@/lib/apiBase";
 import {
   getCsrfHeaderName,
   getCsrfToken,
@@ -21,7 +22,7 @@ export interface ApiEnvelope<T> {
   data: T;
 }
 
-const baseURL = import.meta.env.VITE_API_PROXY_TARGET ?? "";
+const baseURL = resolveApiBase(import.meta.env.VITE_API_PROXY_TARGET);
 
 // Dev-mode diagnostic: prints once on startup so you can verify which
 // API mode is active. If baseURL is non-empty in dev, you're going

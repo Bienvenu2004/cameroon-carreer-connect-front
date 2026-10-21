@@ -1,5 +1,6 @@
 import type { Client, IMessage } from "@stomp/stompjs";
 
+import { resolveApiBase } from "@/lib/apiBase";
 import type { NotificationDto } from "@/types/api";
 
 /**
@@ -43,7 +44,7 @@ let connected = false;
 function baseUrl(): string {
   // Same resolution as the axios client: empty in proxy mode (dev and
   // same-origin deployments), an absolute origin when the API is elsewhere.
-  return import.meta.env.VITE_API_PROXY_TARGET ?? "";
+  return resolveApiBase(import.meta.env.VITE_API_PROXY_TARGET);
 }
 
 function notify(message: IMessage) {
