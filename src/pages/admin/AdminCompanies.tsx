@@ -91,7 +91,7 @@ export function AdminCompanies() {
 
       <div className="space-y-3">
         {data?.content.map((c) => (
-          <div key={c.id} className="flex flex-wrap items-center justify-between gap-4 rounded-xl border border-border/60 bg-card p-4 elev-1">
+          <div key={c.id} className="flex flex-wrap items-center justify-between gap-4 rounded-xl border border-border/60 bg-card p-4">
             <div className="min-w-0 flex-1">
               <div className="flex flex-wrap items-center gap-2">
                 <h3 className="font-display text-base font-semibold">{c.name}</h3>

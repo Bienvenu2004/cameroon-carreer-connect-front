@@ -236,7 +236,7 @@ export function CandidateSearchPage() {
 
           <ul className="grid gap-3 sm:grid-cols-2">
             {results.map((c) => (
-              <li key={c.profileId} className="rounded-xl border border-border/60 bg-card p-4 elev-1">
+              <li key={c.profileId} className="rounded-xl border border-border/60 bg-card p-4">
                 <div className="flex items-start gap-3">
                   {c.profilePhoto?.id ? (
                     <img

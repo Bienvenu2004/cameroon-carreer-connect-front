@@ -44,10 +44,10 @@ export function EmployerBand() {
               height={720}
               loading="lazy"
               decoding="async"
-              className="relative aspect-square w-full rounded-[2rem] object-cover shadow-2xl"
+              className="relative aspect-square w-full rounded-[2rem] object-cover"
             />
             <div className="absolute -bottom-6 -right-3 sm:-right-8 motion-safe:animate-float">
-              <div className="rounded-2xl bg-card p-4 shadow-xl">
+              <div className="rounded-2xl bg-card p-4">
                 <div className="flex items-center gap-2 text-xs text-muted-foreground">
                   <BadgeCheck className="h-4 w-4 text-primary" aria-hidden="true" />
                   {t("home.stats.companies")}
@@ -62,11 +62,10 @@ export function EmployerBand() {
           </div>
         </Reveal>
 
+        {/* No eyebrow above the heading: a small capitalised label there reads
+            as a category tag and takes the first glance from the title. */}
         <Reveal delay={120}>
-          <span className="inline-flex items-center rounded-full bg-white/10 px-3 py-1 text-xs font-semibold uppercase tracking-wider text-gold">
-            {t("home.employers.eyebrow")}
-          </span>
-          <h2 className="mt-4 font-display text-3xl font-bold tracking-tight text-white sm:text-4xl">
+          <h2 className="font-display text-3xl font-bold tracking-tight text-white sm:text-4xl">
             {t("home.employers.title")}
           </h2>
           <p className="mt-4 text-lg leading-relaxed text-white/75">{t("home.employers.body")}</p>
@@ -85,7 +84,7 @@ export function EmployerBand() {
           <div className="mt-8 flex flex-wrap gap-3">
             <Link
               to="/register?role=RECRUITER"
-              className="group inline-flex items-center gap-2 rounded-full bg-gold px-6 py-3 text-sm font-semibold text-gold-foreground shadow-lg transition hover:-translate-y-0.5 hover:brightness-105"
+              className="group inline-flex items-center gap-2 rounded-full bg-gold px-6 py-3 text-sm font-semibold text-gold-foreground transition hover:-translate-y-0.5 hover:brightness-105"
             >
               {t("home.employers.cta")}
               <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" aria-hidden="true" />

@@ -102,7 +102,7 @@ export function AiSearchPanel({
   return (
     <div className="space-y-4">
       {/* Query form */}
-      <form onSubmit={submit} className="rounded-2xl border border-border/60 bg-card p-5 elev-1">
+      <form onSubmit={submit} className="rounded-2xl border border-border/60 bg-card p-5">
         <label
           htmlFor="ai-search-query"
           className="flex items-center gap-2 text-sm font-semibold text-foreground"
@@ -124,7 +124,7 @@ export function AiSearchPanel({
             rows={2}
             maxLength={500}
             placeholder={t("aiSearch.placeholder")}
-            className="flex-1 resize-none rounded-md border border-input bg-background px-3 py-2 text-sm shadow-sm placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-primary"
+            className="flex-1 resize-none rounded-md border border-input bg-background px-3 py-2 text-sm placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-primary"
           />
           <div className="flex gap-2">
             <Button

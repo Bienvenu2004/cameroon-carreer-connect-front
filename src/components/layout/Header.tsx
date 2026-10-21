@@ -197,7 +197,7 @@ export function Header() {
           />
           <nav
             id="mobile-nav-sheet"
-            className="fixed inset-x-0 top-16 z-40 max-h-[calc(100vh-4rem)] overflow-y-auto border-b border-border/60 bg-background shadow-lg"
+            className="fixed inset-x-0 top-16 z-40 max-h-[calc(100vh-4rem)] overflow-y-auto border-b border-border/60 bg-background"
           >
             <div className="container flex flex-col gap-1 py-4">
               <MobileLink to="/jobs" label={t("nav.jobs")} />

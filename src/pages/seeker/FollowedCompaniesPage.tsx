@@ -57,7 +57,7 @@ export function FollowedCompaniesPage() {
             {rows.map((c) => (
               <li
                 key={c.companyId}
-                className="rounded-xl border border-border/60 bg-card p-4 elev-1"
+                className="rounded-xl border border-border/60 bg-card p-4"
               >
                 <div className="flex items-start gap-3">
                   {c.logo?.id ? (

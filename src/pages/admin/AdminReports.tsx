@@ -91,7 +91,7 @@ export function AdminReports() {
 
       <ul className="space-y-3">
         {reports.map((r) => (
-          <li key={r.id} className="rounded-xl border border-border/60 bg-card p-4 elev-1">
+          <li key={r.id} className="rounded-xl border border-border/60 bg-card p-4">
             <div className="flex flex-wrap items-start justify-between gap-3">
               <div className="min-w-0">
                 <div className="flex flex-wrap items-center gap-2">

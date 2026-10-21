@@ -131,7 +131,7 @@ export function ConcoursPage() {
                   <Reveal key={job.id} delay={Math.min(index, 6) * 45}>
                     <div className="relative">
                       {closingSoon && (
-                        <span className="absolute -top-2 right-4 z-10 inline-flex items-center gap-1 rounded-full bg-amber-500 px-2.5 py-0.5 text-[11px] font-semibold text-white shadow-sm">
+                        <span className="absolute -top-2 right-4 z-10 inline-flex items-center gap-1 rounded-full bg-amber-500 px-2.5 py-0.5 text-[11px] font-semibold text-white">
                           <AlarmClock className="h-3 w-3" aria-hidden="true" />
                           {t("concours.closingSoon")}
                         </span>

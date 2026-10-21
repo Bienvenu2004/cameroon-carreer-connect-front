@@ -77,7 +77,7 @@ export function RecruiterCompanyDetailPage() {
 
       {/* Banner ------------------------------------------------------------ */}
       {c.banner?.url && (
-        <div className="overflow-hidden rounded-2xl border border-border/60 elev-1">
+        <div className="overflow-hidden rounded-2xl border border-border/60">
           <img
             src={c.banner.url}
             alt={c.name}
@@ -87,7 +87,7 @@ export function RecruiterCompanyDetailPage() {
       )}
 
       {/* Identity ---------------------------------------------------------- */}
-      <div className="rounded-2xl border border-border/60 bg-card p-6 elev-1">
+      <div className="rounded-2xl border border-border/60 bg-card p-6">
         <div className="flex flex-wrap items-start justify-between gap-4">
           <div className="flex items-start gap-4">
             {/* Real logo image, falling back to a placeholder icon. */}
@@ -171,7 +171,7 @@ export function RecruiterCompanyDetailPage() {
 
       {/* About ------------------------------------------------------------- */}
       {c.about && (
-        <section className="rounded-2xl border border-border/60 bg-card p-6 elev-1">
+        <section className="rounded-2xl border border-border/60 bg-card p-6">
           <h2 className="font-display text-lg font-semibold">{t("company.about")}</h2>
           <p className="mt-3 max-w-3xl whitespace-pre-line leading-relaxed text-foreground/85">
             {c.about}
@@ -180,7 +180,7 @@ export function RecruiterCompanyDetailPage() {
       )}
 
       {/* Jobs -------------------------------------------------------------- */}
-      <section className="rounded-2xl border border-border/60 bg-card p-6 elev-1">
+      <section className="rounded-2xl border border-border/60 bg-card p-6">
         <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
           <h2 className="font-display text-lg font-semibold">{t("company.postedJobs")}</h2>
           {c.status === "APPROVED" && (

@@ -122,18 +122,31 @@
     background: hsl(var(--primary) / 0.2);
     color: hsl(var(--primary-900));
   }
+  /* No colour here on purpose: headings inherit it. Forcing text-foreground
+     made every title on a coloured surface (the sign-in panel, any brand
+     band) keep the page ink instead of the panel's, which read at 2.4:1. */
   h1, h2, h3, h4 {
-    @apply font-display tracking-tight text-foreground;
+    @apply font-display tracking-tight;
+  }
+
+  /* One guarantee for the whole interface: a visitor who asks their system
+     for less movement gets none, including from the overlay animations that
+     ship with the component library and from any keyframes added later. */
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
   }
 }
 
 /* utility: subtle elevation reusable on cards */
 @layer components {
-  .elev-1 {
-    box-shadow:
-      0 1px 2px hsl(222 47% 11% / 0.04),
-      0 1px 3px hsl(222 47% 11% / 0.06);
-  }
+  /* No .elev-1: surfaces carry no shadow at rest. A card is told apart by its
+     own background and outline; elevation is reserved for what actually lifts
+     off the page, which is hover feedback and floating overlays. */
   .elev-2 {
     box-shadow:
       0 4px 12px hsl(222 47% 11% / 0.06),

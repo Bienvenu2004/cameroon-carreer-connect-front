@@ -62,7 +62,10 @@ export function Reveal({
       ref={ref}
       style={{ transitionDelay: `${delay}ms` }}
       className={cn(
-        "transition-all duration-700 ease-out motion-reduce:transition-none",
+        // min-w-0: a grid child defaults to min-width:auto, so a long title or
+        // an unbreakable word stretches the track past the viewport. Reveal
+        // wraps grid items on most pages, so the fix belongs here.
+        "min-w-0 transition duration-500 ease-out motion-reduce:transition-none",
         inView
           ? "translate-y-0 opacity-100"
           : "translate-y-6 opacity-0 motion-reduce:translate-y-0 motion-reduce:opacity-100",

@@ -62,7 +62,7 @@ export function SavedJobsPage() {
         {data?.content.map((s) => (
           <article
             key={s.jobId}
-            className="group flex flex-col gap-3 rounded-xl border border-border/60 bg-card p-5 elev-1 transition-all hover:elev-2"
+            className="group flex flex-col gap-3 rounded-xl border border-border/60 bg-card p-5 transition hover:elev-2"
           >
             <div className="flex items-start gap-3">
               <div className="grid h-10 w-10 shrink-0 place-items-center rounded-lg bg-primary/10 text-primary">

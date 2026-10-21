@@ -78,7 +78,7 @@ export function RecruiterDashboard() {
           <h2 className="font-display text-xl font-semibold">{t("nav.myJobs")}</h2>
           <Button variant="ghost" size="sm" asChild><Link to="/recruiter/jobs">{t("common.viewAll")} <ArrowRight className="h-3.5 w-3.5" /></Link></Button>
         </div>
-        <div className="mt-4 overflow-hidden rounded-2xl border border-border/60 bg-card elev-1">
+        <div className="mt-4 overflow-hidden rounded-2xl border border-border/60 bg-card">
           <table className="w-full text-sm">
             <thead className="border-b border-border/60 bg-muted/40 text-xs uppercase tracking-wider text-muted-foreground">
               <tr>
@@ -108,7 +108,7 @@ export function RecruiterDashboard() {
 
 function KPI({ icon: Icon, label, value }: { icon: typeof Briefcase; label: string; value: number }) {
   return (
-    <div className="rounded-2xl border border-border/60 bg-card p-5 elev-1">
+    <div className="rounded-2xl border border-border/60 bg-card p-5">
       <div className="flex items-center justify-between">
         <span className="text-xs font-medium uppercase tracking-wider text-muted-foreground">{label}</span>
         <Icon className="h-4 w-4 text-primary" />
@@ -120,7 +120,7 @@ function KPI({ icon: Icon, label, value }: { icon: typeof Briefcase; label: stri
 
 function ChartCard({ title, children }: { title: string; children: React.ReactNode }) {
   return (
-    <div className="rounded-2xl border border-border/60 bg-card p-6 elev-1">
+    <div className="rounded-2xl border border-border/60 bg-card p-6">
       <h3 className="font-display text-lg font-semibold">{title}</h3>
       <div className="mt-4">{children}</div>
     </div>

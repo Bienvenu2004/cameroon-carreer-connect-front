@@ -140,7 +140,7 @@ export function CompanyEditor({ mode }: { mode: "create" | "edit" }) {
 
       <form
         onSubmit={(e) => { e.preventDefault(); save.mutate(); }}
-        className="mt-6 space-y-5 rounded-2xl border border-border/60 bg-card p-6 elev-1"
+        className="mt-6 space-y-5 rounded-2xl border border-border/60 bg-card p-6"
       >
         <div className="space-y-2">
           <Label>{t("company.name")}</Label>

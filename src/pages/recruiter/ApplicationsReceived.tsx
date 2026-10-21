@@ -135,7 +135,7 @@ export function ApplicationsReceived() {
 
       {isLoading && <div className="text-muted-foreground">{t("common.loading")}</div>}
 
-      <div className="overflow-hidden rounded-2xl border border-border/60 bg-card elev-1">
+      <div className="overflow-hidden rounded-2xl border border-border/60 bg-card">
         <table className="w-full text-sm">
           <thead className="border-b border-border/60 bg-muted/40 text-xs uppercase tracking-wider text-muted-foreground">
             <tr>
@@ -148,7 +148,7 @@ export function ApplicationsReceived() {
           </thead>
           <tbody>
             {data?.content.map((a) => (
-              <tr key={a.id} className={`border-b border-border/40 last:border-0 hover:bg-accent/30${a.id === focusedId ? " bg-primary/5" : ""}`}>
+              <tr key={a.id} className={`border-b border-border/40 last:border-0 hover:bg-accent/30${a.id === focusedId ?" bg-primary/5" : ""}`}>
                 <td className="p-4">
                   {a.jobId
                     ? <Link to={`/jobs/${a.jobId}`} className="font-medium hover:text-primary">{a.jobTitle ?? "—"}</Link>

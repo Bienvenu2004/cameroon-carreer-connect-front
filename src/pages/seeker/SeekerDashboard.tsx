@@ -68,7 +68,7 @@ export function SeekerDashboard() {
 
 function StatCard({ icon: Icon, label, value, link }: { icon: typeof FileText; label: string; value: number; link: string }) {
   return (
-    <Link to={link} className="group rounded-2xl border border-border/60 bg-card p-5 elev-1 transition-all hover:elev-2">
+    <Link to={link} className="group rounded-2xl border border-border/60 bg-card p-5 transition hover:elev-2">
       <div className="flex items-center justify-between">
         <span className="text-xs font-medium uppercase tracking-wider text-muted-foreground">{label}</span>
         <Icon className="h-4 w-4 text-primary" />

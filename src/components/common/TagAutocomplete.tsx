@@ -149,7 +149,7 @@ export function TagAutocomplete({
           autoComplete="off"
         />
         {dropdownVisible && (
-          <div className="absolute left-0 right-0 z-20 mt-1 overflow-hidden rounded-md border border-border bg-popover shadow-md">
+          <div className="absolute left-0 right-0 z-20 mt-1 overflow-hidden rounded-md border border-border bg-popover">
             {loading && remainingOptions.length === 0 ? (
               <div className="flex items-center gap-2 px-3 py-2 text-sm text-muted-foreground">
                 <Loader2 className="h-3.5 w-3.5 animate-spin" />

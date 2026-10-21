@@ -30,7 +30,7 @@ export function ProfileCompleteness({
   const tone = complete ? "bg-success" : score >= 50 ? "bg-primary" : "bg-warning";
 
   return (
-    <div className="rounded-2xl border border-border/60 bg-card p-5 elev-1">
+    <div className="rounded-2xl border border-border/60 bg-card p-5">
       <div className="flex items-baseline justify-between">
         <div className="font-display text-sm font-semibold text-foreground">
           {t("profile.completeness")}
@@ -48,7 +48,7 @@ export function ProfileCompleteness({
         aria-valuemax={100}
       >
         <div
-          className={`h-full rounded-full transition-all duration-500 ${tone}`}
+          className={`h-full rounded-full transition duration-500 ${tone}`}
           style={{ width: `${Math.min(100, Math.max(0, score))}%` }}
         />
       </div>

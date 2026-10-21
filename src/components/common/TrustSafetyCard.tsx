@@ -51,7 +51,7 @@ export function TrustSafetyCard({ jobId }: { jobId: string }) {
   });
 
   return (
-    <div className="mt-4 rounded-2xl border border-border/60 bg-card p-5 elev-1">
+    <div className="mt-4 rounded-2xl border border-border/60 bg-card p-5">
       <div className="flex items-start gap-2.5">
         <ShieldCheck className="mt-0.5 h-5 w-5 shrink-0 text-success" />
         <div>

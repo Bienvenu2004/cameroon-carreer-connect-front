@@ -59,7 +59,7 @@ export function MyCompaniesPage() {
         {companies.map((c) => (
           <article
             key={c.id}
-            className="group flex flex-col gap-3 rounded-2xl border border-border/60 bg-card p-5 elev-1 transition-all hover:elev-2"
+            className="group flex flex-col gap-3 rounded-2xl border border-border/60 bg-card p-5 transition hover:elev-2"
           >
             <div className="flex items-start justify-between gap-3">
               <div className="flex items-center gap-3 min-w-0">

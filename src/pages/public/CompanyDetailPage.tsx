@@ -42,7 +42,7 @@ export function CompanyDetailPage() {
           employer brand imagery. object-cover crops to a consistent ratio
           regardless of source aspect. */}
       {c.banner?.url && (
-        <div className="mb-6 overflow-hidden rounded-2xl border border-border/60 elev-1">
+        <div className="mb-6 overflow-hidden rounded-2xl border border-border/60">
           <img
             src={c.banner.url}
             alt={c.name}
@@ -51,7 +51,7 @@ export function CompanyDetailPage() {
         </div>
       )}
 
-      <div className="rounded-2xl border border-border/60 bg-card p-8 elev-1">
+      <div className="rounded-2xl border border-border/60 bg-card p-8">
         <div className="flex flex-wrap items-start justify-between gap-4">
           <div className="flex items-start gap-4">
             <div className="grid h-16 w-16 place-items-center rounded-xl bg-primary/10 text-primary">
@@ -103,7 +103,7 @@ export function CompanyDetailPage() {
       </div>
 
       {c.about && (
-        <section className="mt-6 rounded-2xl border border-border/60 bg-card p-8 elev-1">
+        <section className="mt-6 rounded-2xl border border-border/60 bg-card p-8">
           <h2 className="font-display text-xl font-semibold">{t("company.about")}</h2>
           <p className="mt-3 max-w-3xl whitespace-pre-line text-foreground/85 leading-relaxed">
             {c.about}

@@ -19,7 +19,7 @@ export function JobCard({ job }: { job: JobDto }) {
   return (
     <Link
       to={`/jobs/${job.id}`}
-      className="group block rounded-xl border border-border/60 bg-card p-5 elev-1 transition-all hover:-translate-y-0.5 hover:border-primary/40 hover:elev-2"
+      className="group block rounded-xl border border-border/60 bg-card p-5 transition hover:-translate-y-0.5 hover:border-primary/40 hover:elev-2"
     >
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0">

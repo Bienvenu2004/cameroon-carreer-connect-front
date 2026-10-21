@@ -115,7 +115,7 @@ export function SavedSearchesPage() {
 
       <div className="space-y-3">
         {list.data?.map((s) => (
-          <div key={s.id} className="flex items-center justify-between gap-4 rounded-xl border border-border/60 bg-card p-4 elev-1">
+          <div key={s.id} className="flex items-center justify-between gap-4 rounded-xl border border-border/60 bg-card p-4">
             <div className="min-w-0">
               <div className="flex items-center gap-2">
                 <h3 className="truncate font-medium">{s.label}</h3>

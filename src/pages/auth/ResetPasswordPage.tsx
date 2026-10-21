@@ -27,7 +27,10 @@ export function ResetPasswordPage() {
   const stateEmail = (location.state as { email?: string } | null)?.email;
   const email = stateEmail ?? params.get("email") ?? "";
 
-  const [code, setCode] = useState("");
+  // The reset email links here with both the address and the code, so someone
+  // opening it on their phone only has to type the new password. Anyone who
+  // typed the code by hand still starts from an empty field.
+  const [code, setCode] = useState(params.get("code") ?? "");
   const [password, setPassword] = useState("");
   const [confirm, setConfirm] = useState("");
   const { toast } = useToast();

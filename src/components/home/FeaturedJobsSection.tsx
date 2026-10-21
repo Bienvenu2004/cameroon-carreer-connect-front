@@ -54,7 +54,7 @@ export function FeaturedJobsSection() {
         <Reveal className="mt-12 flex justify-center">
           <Link
             to="/jobs"
-            className="group inline-flex items-center gap-2 rounded-full bg-primary px-6 py-3 text-sm font-semibold text-primary-foreground shadow-lg shadow-primary/20 transition hover:-translate-y-0.5 hover:bg-primary-700 hover:shadow-xl"
+            className="group inline-flex items-center gap-2 rounded-full bg-primary px-6 py-3 text-sm font-semibold text-primary-foreground shadow-primary/20 transition hover:-translate-y-0.5 hover:bg-primary-700 hover:shadow-xl"
           >
             {t("home.allJobOffers")}
             <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" aria-hidden="true" />
@@ -75,7 +75,7 @@ function FeaturedJobCard({ job, locale }: { job: JobDto; locale: string }) {
   return (
     <Link
       to={`/jobs/${job.id}`}
-      className="group flex h-full flex-col rounded-2xl border border-border/60 bg-card p-5 shadow-sm transition duration-300 hover:-translate-y-1.5 hover:border-primary/30 hover:shadow-xl hover:shadow-primary/10"
+      className="group flex h-full flex-col rounded-2xl border border-border/60 bg-card p-5 transition duration-200 hover:-translate-y-1.5 hover:border-primary/30 hover:shadow-xl hover:shadow-primary/10 ease-out"
     >
       <div className="flex items-center gap-2 text-xs text-muted-foreground">
         <span className="grid h-7 w-7 shrink-0 place-items-center rounded-lg bg-primary/10 text-primary">
@@ -122,14 +122,16 @@ function FeaturedJobCard({ job, locale }: { job: JobDto; locale: string }) {
 const TILE_TONES = [
   "bg-primary text-primary-foreground",
   "bg-gold text-gold-foreground",
-  "bg-primary-700 text-white",
+  // Not text-white: primary-700 is dark in the light theme but a pale mint in
+  // the dark one, where white on it falls to 1.6:1. primary-50 inverts with it.
+  "bg-primary-700 text-primary-50",
   "bg-foreground text-background",
 ];
 
 /** The company logo, or a coloured initial chosen stably from the name. */
 function CompanyTile({ name, logoId }: { name?: string; logoId?: string }) {
   const tile =
-    "grid h-12 w-12 shrink-0 place-items-center rounded-xl transition-transform duration-300 group-hover:-rotate-6 group-hover:scale-110";
+    "grid h-12 w-12 shrink-0 place-items-center rounded-xl transition-transform duration-200 group-hover:-rotate-6 group-hover:scale-110 ease-out";
 
   if (logoId) {
     return (

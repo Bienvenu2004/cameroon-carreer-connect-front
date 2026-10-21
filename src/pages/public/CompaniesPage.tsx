@@ -106,7 +106,7 @@ export function CompaniesPage() {
       />
 
       <div className="container py-10">
-      <div className="rounded-2xl border border-border/60 bg-card p-5 elev-1">
+      <div className="rounded-2xl border border-border/60 bg-card p-5">
         {/* Filters first — they set the scope. Search refines within. */}
         <div className="flex items-center gap-2">
           <Filter className="h-4 w-4 text-muted-foreground" />
@@ -204,11 +204,11 @@ export function CompaniesPage() {
           <Reveal key={c.id} delay={Math.min(index, 8) * 45}>
             <Link
               to={`/companies/${c.id}`}
-              className="group relative flex h-full flex-col overflow-hidden rounded-2xl border border-border/60 bg-card p-5 elev-1 transition-all hover:-translate-y-0.5 hover:border-primary/40 hover:elev-2"
+              className="group relative flex h-full flex-col overflow-hidden rounded-2xl border border-border/60 bg-card p-5 transition hover:-translate-y-0.5 hover:border-primary/40 hover:elev-2"
             >
               <span
                 aria-hidden="true"
-                className="pointer-events-none absolute -right-12 -top-12 h-28 w-28 rounded-full bg-primary/5 transition-transform duration-500 group-hover:scale-150"
+                className="pointer-events-none absolute -right-12 -top-12 h-28 w-28 rounded-full bg-primary/5 transition-transform duration-500 group-hover:scale-150 ease-out"
               />
               <div className="relative flex items-center gap-3">
                 {/* The employer's own logo where there is one: a wall of

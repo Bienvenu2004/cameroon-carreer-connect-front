@@ -15,7 +15,7 @@ export function AboutPage() {
           { icon: Users, title: t("home.joinAsSeeker"), text: t("home.joinAsSeekerSub") },
           { icon: Building2, title: t("home.joinAsRecruiter"), text: t("home.joinAsRecruiterSub") },
         ].map((b, i) => (
-          <div key={i} className="rounded-xl border border-border/60 bg-card p-5 elev-1">
+          <div key={i} className="rounded-xl border border-border/60 bg-card p-5">
             <div className="grid h-10 w-10 place-items-center rounded-lg bg-primary/10 text-primary">
               <b.icon className="h-5 w-5" />
             </div>

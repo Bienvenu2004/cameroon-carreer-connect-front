@@ -72,11 +72,11 @@ export function IndustriesPage() {
                 <Reveal key={industry} delay={Math.min(index, 8) * 45}>
                   <Link
                     to={`/companies?industry=${industry}`}
-                    className="group relative flex h-full items-center gap-4 overflow-hidden rounded-2xl border border-border/60 bg-card p-5 transition-all hover:-translate-y-0.5 hover:border-primary/40 hover:elev-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                    className="group relative flex h-full items-center gap-4 overflow-hidden rounded-2xl border border-border/60 bg-card p-5 transition hover:-translate-y-0.5 hover:border-primary/40 hover:elev-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
                   >
                     <span
                       aria-hidden="true"
-                      className="pointer-events-none absolute -right-10 -top-10 h-24 w-24 rounded-full bg-primary/5 transition-transform duration-500 group-hover:scale-150"
+                      className="pointer-events-none absolute -right-10 -top-10 h-24 w-24 rounded-full bg-primary/5 transition-transform duration-500 group-hover:scale-150 ease-out"
                     />
                     <span
                       className={
@@ -106,7 +106,7 @@ export function IndustriesPage() {
                           className="mt-2 block h-1 w-full overflow-hidden rounded-full bg-muted"
                         >
                           <span
-                            className="block h-full rounded-full bg-primary/60 transition-all duration-700"
+                            className="block h-full rounded-full bg-primary/60 transition duration-500 ease-out"
                             style={{ width: `${share}%` }}
                           />
                         </span>
@@ -115,7 +115,7 @@ export function IndustriesPage() {
 
                     <ArrowRight
                       aria-hidden="true"
-                      className="relative h-4 w-4 shrink-0 -translate-x-1 text-primary opacity-0 transition-all group-hover:translate-x-0 group-hover:opacity-100"
+                      className="relative h-4 w-4 shrink-0 -translate-x-1 text-primary opacity-0 transition group-hover:translate-x-0 group-hover:opacity-100"
                     />
                   </Link>
                 </Reveal>
@@ -124,7 +124,7 @@ export function IndustriesPage() {
           </div>
 
           <Reveal delay={120}>
-            <aside className="mt-12 overflow-hidden rounded-3xl border border-border/60 bg-card elev-1">
+            <aside className="mt-12 overflow-hidden rounded-3xl border border-border/60 bg-card">
               <div className="grid items-center gap-6 sm:grid-cols-[1fr_0.8fr]">
                 <div className="p-7">
                   <h2 className="font-display text-xl font-bold tracking-tight">

@@ -69,7 +69,7 @@ export function RecommendationCard({
 
   return (
     <article
-      className="group relative flex flex-col rounded-xl border border-border/50 bg-card p-4 shadow-[0_1px_2px_0_rgb(0_0_0_/_0.03)] transition-all duration-200 hover:-translate-y-0.5 hover:border-primary/30 hover:shadow-[0_10px_24px_-12px_rgba(0,0,0,0.18)]"
+      className="group relative flex flex-col rounded-xl border border-border/50 bg-card p-4 shadow-[0_1px_2px_0_rgb(0_0_0_/_0.03)] transition duration-200 hover:-translate-y-0.5 hover:border-primary/30 hover:shadow-[0_10px_24px_-12px_rgba(0,0,0,0.18)] ease-out"
     >
       {/* Top row: match pill + verified mark on the right when present */}
       <div className="flex items-start justify-between gap-2">

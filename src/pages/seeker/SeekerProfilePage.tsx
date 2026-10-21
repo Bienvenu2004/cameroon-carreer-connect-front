@@ -1063,7 +1063,7 @@ function ProfileEditForm({
  * ==========================================================================*/
 function Card({ children }: { children: React.ReactNode }) {
   return (
-    <div className="rounded-2xl border border-border/60 bg-card p-6 elev-1">
+    <div className="rounded-2xl border border-border/60 bg-card p-6">
       {children}
     </div>
   );
@@ -1429,7 +1429,7 @@ function ExperiencesEditor({
                 onChange={(e) => update(i, { description: e.target.value })}
                 rows={3}
                 placeholder={t("profile.xp.descriptionPlaceholder")}
-                className="w-full resize-y rounded-md border border-input bg-background px-3 py-2 text-sm shadow-sm placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-primary"
+                className="w-full resize-y rounded-md border border-input bg-background px-3 py-2 text-sm placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-primary"
               />
             </div>
           </div>

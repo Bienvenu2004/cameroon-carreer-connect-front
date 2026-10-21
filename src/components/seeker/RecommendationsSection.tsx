@@ -128,7 +128,7 @@ export function RecommendationsSection() {
                       aria-label={`Page ${i + 1}`}
                       onClick={() => setPage(i)}
                       className={
-                        "h-2 rounded-full transition-all " +
+                        "h-2 rounded-full transition " +
                         (i === safePage
                           ? "w-6 bg-primary"
                           : "w-2 bg-border hover:bg-muted-foreground/40")

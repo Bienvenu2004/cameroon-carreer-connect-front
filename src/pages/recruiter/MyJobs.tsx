@@ -93,7 +93,7 @@ export function MyJobs() {
 
       <div className="space-y-3">
         {data?.content.map((j) => (
-          <div key={j.id} className="flex flex-wrap items-center justify-between gap-4 rounded-xl border border-border/60 bg-card p-4 elev-1">
+          <div key={j.id} className="flex flex-wrap items-center justify-between gap-4 rounded-xl border border-border/60 bg-card p-4">
             <div className="min-w-0 flex-1">
               <div className="flex flex-wrap items-center gap-2">
                 <Link to={`/jobs/${j.id}`} className="font-display text-base font-semibold hover:text-primary">{j.title}</Link>

@@ -150,7 +150,7 @@ export function JobDetailPage() {
 
       <div className="grid gap-8 lg:grid-cols-[1fr_320px]">
         <div>
-          <div className="rounded-2xl border border-border/60 bg-card p-8 elev-1">
+          <div className="rounded-2xl border border-border/60 bg-card p-8">
             <div className="flex flex-wrap items-center gap-2">
               {job.type && <Badge variant="default">{t(`jobTypes.${job.type}`)}</Badge>}
               {job.site && <Badge variant="outline">{t(`jobSites.${job.site}`)}</Badge>}
@@ -202,7 +202,7 @@ export function JobDetailPage() {
                   this morning. */}
               {job.applicationDeadline && !job.expired && (
                 <span className={`inline-flex items-center gap-1.5 font-medium ${
-                  (job.daysUntilDeadline ?? 99) <= 3 ? "text-destructive" : "text-foreground/90"
+ (job.daysUntilDeadline ?? 99) <= 3 ?"text-destructive" : "text-foreground/90"
                 }`}>
                   <CalendarClock className="h-3.5 w-3.5" />
                   {job.daysUntilDeadline === 0
@@ -218,7 +218,7 @@ export function JobDetailPage() {
             </div>
           </div>
 
-          <article className="mt-6 rounded-2xl border border-border/60 bg-card p-8 elev-1">
+          <article className="mt-6 rounded-2xl border border-border/60 bg-card p-8">
             <h2 className="font-display text-xl font-semibold">{t("jobs.description")}</h2>
             <p className="mt-3 whitespace-pre-line text-foreground/85 leading-relaxed">
               {job.description ?? "—"}
@@ -233,7 +233,7 @@ export function JobDetailPage() {
         </div>
 
         <aside className="lg:sticky lg:top-24 lg:self-start">
-          <div className="rounded-2xl border border-border/60 bg-card p-6 elev-1">
+          <div className="rounded-2xl border border-border/60 bg-card p-6">
             {isJobClosed ? (
               // Position filled / job closed: no actions available at all.
               // Takes precedence over the "already applied" state so even
@@ -291,7 +291,7 @@ export function JobDetailPage() {
               badge says the company is real; this says whether applying is worth
               a candidate's evening and their data bundle. */}
           {responsiveness.data?.enoughData && (
-            <div className="mt-4 rounded-2xl border border-border/60 bg-card p-5 elev-1">
+            <div className="mt-4 rounded-2xl border border-border/60 bg-card p-5">
               <div className="font-display text-sm font-semibold text-foreground">
                 {t("responsiveness.title")}
               </div>
@@ -310,7 +310,7 @@ export function JobDetailPage() {
           )}
 
           {company && (
-            <Link to={`/companies/${company.id}`} className="mt-4 block rounded-2xl border border-border/60 bg-card p-6 elev-1 transition-all hover:elev-2">
+            <Link to={`/companies/${company.id}`} className="mt-4 block rounded-2xl border border-border/60 bg-card p-6 transition hover:elev-2">
               <div className="text-xs uppercase tracking-wider text-muted-foreground">{t("nav.companies")}</div>
               <div className="mt-1 font-display text-lg font-semibold">{company.name}</div>
               {company.industry && (

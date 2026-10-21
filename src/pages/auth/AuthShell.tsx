@@ -15,7 +15,7 @@ export function AuthShell({ children }: { children: React.ReactNode }) {
           <Logo light />
         </div>
         <div className="relative space-y-6 p-10">
-          <h2 className="font-display text-3xl font-bold tracking-tight leading-tight">
+          <h2 className="font-display text-2xl font-bold tracking-tight leading-tight">
             {t("home.heroTitle")}
           </h2>
           <p className="max-w-md text-primary-foreground/80">
@@ -36,7 +36,7 @@ export function AuthShell({ children }: { children: React.ReactNode }) {
             </div>
           </div>
         </div>
-        <div className="relative p-10 text-xs text-primary-foreground/60">
+        <div className="relative p-10 text-xs text-primary-foreground/80">
           © {new Date().getFullYear()} {t("brand.name")}
         </div>
       </aside>
@@ -54,7 +54,7 @@ export function AuthShell({ children }: { children: React.ReactNode }) {
           <div className="w-full max-w-md">{children}</div>
         </div>
         <div className="p-6 text-center text-xs text-muted-foreground lg:hidden">
-          <Link to="/" className="hover:text-foreground">{t("nav.home")}</Link>
+          <Link to="/" className="inline-flex min-h-[44px] items-center hover:text-foreground sm:min-h-0">{t("nav.home")}</Link>
         </div>
       </main>
     </div>

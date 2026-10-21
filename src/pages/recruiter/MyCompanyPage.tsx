@@ -92,7 +92,7 @@ export function MyCompanyPage() {
         <Notice icon={XCircle} tone="destructive">{t("company.suspendedNotice", { reason: company.rejectionReason ?? "—" })}</Notice>
       )}
 
-      <form onSubmit={(e) => { e.preventDefault(); save.mutate(); }} className="mt-6 space-y-5 rounded-2xl border border-border/60 bg-card p-6 elev-1">
+      <form onSubmit={(e) => { e.preventDefault(); save.mutate(); }} className="mt-6 space-y-5 rounded-2xl border border-border/60 bg-card p-6">
         <div className="space-y-2">
           <Label>{t("company.name")}</Label>
           <Input required value={name} onChange={(e) => setName(e.target.value)} />
@@ -164,7 +164,7 @@ function Notice({ icon: Icon, tone, children }: {
   }[tone];
   return (
     <div className={`flex items-start gap-3 rounded-xl border p-4 ${cls}`}>
-      <Icon className={`mt-0.5 h-5 w-5 ${tone === "success" ? "text-success" : tone === "warning" ? "text-warning-foreground" : "text-destructive"}`} />
+      <Icon className={`mt-0.5 h-5 w-5 ${tone ==="success" ? "text-success" : tone === "warning" ? "text-warning-foreground" : "text-destructive"}`} />
       <div className="text-sm">{children}</div>
     </div>
   );

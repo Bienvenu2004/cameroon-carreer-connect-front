@@ -135,7 +135,7 @@ export function JobEditor({ mode }: { mode: "create" | "edit" }) {
           {mode === "create" ? t("jobEditor.createTitle") : t("jobEditor.editTitle")}
         </h1>
       </header>
-      <form onSubmit={(e) => { e.preventDefault(); m.mutate(); }} className="space-y-5 rounded-2xl border border-border/60 bg-card p-6 elev-1">
+      <form onSubmit={(e) => { e.preventDefault(); m.mutate(); }} className="space-y-5 rounded-2xl border border-border/60 bg-card p-6">
         <div className="space-y-2">
           <Label>{t("jobEditor.title")}</Label>
           <Input required value={title} onChange={(e) => setTitle(e.target.value)} />

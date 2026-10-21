@@ -34,7 +34,7 @@ export function HomePage() {
       <section className="container mx-auto max-w-6xl py-20">
         <div className="grid gap-10 lg:grid-cols-[1fr_1.1fr]">
           <Reveal>
-            <div className="h-full rounded-3xl border border-border/60 bg-card p-6 shadow-sm">
+            <div className="h-full rounded-3xl border border-border/60 bg-card p-6">
               <div className="flex items-center gap-2">
                 <span className="relative flex h-2.5 w-2.5">
                   <span className="absolute inline-flex h-full w-full rounded-full bg-primary opacity-60 motion-safe:animate-ping" />
@@ -56,7 +56,7 @@ export function HomePage() {
                 <Link
                   key={region}
                   to={`/jobs?region=${region}`}
-                  className="group flex items-center gap-3 rounded-2xl border border-border/60 bg-card p-3 transition duration-300 hover:-translate-y-0.5 hover:border-primary hover:bg-primary hover:shadow-lg hover:shadow-primary/20"
+                  className="group flex items-center gap-3 rounded-2xl border border-border/60 bg-card p-3 transition duration-200 hover:-translate-y-0.5 hover:border-primary hover:bg-primary hover:shadow-lg hover:shadow-primary/20 ease-out"
                 >
                   <span className="grid h-9 w-9 shrink-0 place-items-center rounded-xl bg-primary/10 text-primary transition group-hover:bg-white/15 group-hover:text-primary-foreground">
                     <MapPin className="h-4 w-4" aria-hidden="true" />

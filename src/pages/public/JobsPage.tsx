@@ -251,7 +251,7 @@ export function JobsPage() {
       {mode === "classic" && <>
       <form
         onSubmit={submitSearch}
-        className="mt-6 rounded-2xl border border-border/60 bg-card p-5 elev-1"
+        className="mt-6 rounded-2xl border border-border/60 bg-card p-5"
       >
         {/* Filters first — they set the scope. Search refines within. */}
         <div className="flex items-center gap-2">
@@ -516,7 +516,7 @@ function ModeToggle({
         className={
           "inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 transition " +
           (mode === "classic"
-            ? "bg-primary text-primary-foreground shadow-sm"
+            ? "bg-primary text-primary-foreground "
             : "text-muted-foreground hover:text-foreground")
         }
       >
@@ -530,7 +530,7 @@ function ModeToggle({
         className={
           "inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 transition " +
           (mode === "ai"
-            ? "bg-primary text-primary-foreground shadow-sm"
+            ? "bg-primary text-primary-foreground "
             : "text-muted-foreground hover:text-foreground")
         }
       >

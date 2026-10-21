@@ -68,7 +68,7 @@ export function PageHero({
 
       <div className="container relative mx-auto max-w-6xl py-10 lg:py-14">
         <div className="grid items-center gap-10 lg:grid-cols-[1.1fr_0.9fr]">
-          <div>
+          <div className="min-w-0">
             <Reveal>
               <span className="inline-flex items-center gap-2 rounded-full border border-primary/20 bg-card/80 px-3 py-1 text-xs font-semibold text-primary backdrop-blur">
                 {Icon && <Icon className="h-3.5 w-3.5" aria-hidden="true" />}
@@ -98,7 +98,7 @@ export function PageHero({
                       <dt className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
                         {stat.label}
                       </dt>
-                      <dd className="mt-1 font-display text-2xl font-bold text-foreground sm:text-3xl">
+                      <dd className="mt-1 font-display text-2xl font-bold text-foreground">
                         {"value" in stat ? (
                           <CountUp value={stat.value} locale={locale} />
                         ) : (
@@ -125,7 +125,7 @@ export function PageHero({
                 alt={imageAlt}
                 loading="lazy"
                 decoding="async"
-                className="relative aspect-[4/3] w-full rounded-3xl object-cover shadow-2xl shadow-primary/10 ring-1 ring-border/60"
+                className="relative aspect-[4/3] w-full rounded-3xl object-cover shadow-primary/10 ring-1 ring-border/60"
               />
             </div>
           </Reveal>

@@ -62,7 +62,7 @@ export function HeroSection() {
 
       <div className="container relative mx-auto max-w-6xl py-14 lg:py-20">
         <div className="grid items-center gap-14 lg:grid-cols-[1.15fr_0.85fr]">
-          <div>
+          <div className="min-w-0">
             <Reveal>
               <span className="inline-flex items-center gap-2 rounded-full border border-primary/20 bg-card/80 px-3 py-1 text-xs font-semibold text-primary backdrop-blur">
                 <BadgeCheck className="h-3.5 w-3.5" aria-hidden="true" />
@@ -91,7 +91,7 @@ export function HeroSection() {
               <form
                 role="search"
                 onSubmit={submit}
-                className="mt-8 flex flex-col gap-2 rounded-3xl border border-border/60 bg-card p-2 shadow-xl shadow-primary/5 sm:flex-row sm:items-center sm:rounded-full"
+                className="mt-8 flex flex-col gap-2 rounded-3xl border border-border/60 bg-card p-2 shadow-primary/5 sm:flex-row sm:items-center sm:rounded-full"
               >
                 <label className="relative flex flex-1 items-center">
                   <span className="sr-only">{t("home.searchPlaceholder")}</span>
@@ -197,11 +197,11 @@ function HeroVisual({
         height={626}
         loading="eager"
         decoding="async"
-        className="relative aspect-[414/560] w-full rounded-[2rem] object-cover object-top shadow-2xl"
+        className="relative aspect-[414/560] w-full rounded-[2rem] object-cover object-top"
       />
 
       <div className="absolute -right-3 top-8 sm:-right-12 motion-safe:animate-float">
-        <div className="w-48 divide-y divide-border/60 rounded-2xl border border-border/60 bg-card/95 px-4 py-2 shadow-xl backdrop-blur">
+        <div className="w-48 divide-y divide-border/60 rounded-2xl border border-border/60 bg-card/95 px-4 py-2 backdrop-blur">
           <StatRow value={openJobs} label={t("home.stats.jobs")} locale={locale} />
           <StatRow value={verifiedEmployers} label={t("home.stats.companies")} locale={locale} />
           <StatRow value={10} label={t("home.stats.regions")} locale={locale} />
@@ -209,7 +209,7 @@ function HeroVisual({
       </div>
 
       <div className="absolute -left-3 bottom-10 sm:-left-12 motion-safe:animate-float [animation-delay:1.5s]">
-        <div className="flex items-center gap-3 rounded-2xl border border-border/60 bg-card/95 px-4 py-3 shadow-xl backdrop-blur">
+        <div className="flex items-center gap-3 rounded-2xl border border-border/60 bg-card/95 px-4 py-3 backdrop-blur">
           <span className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-primary text-primary-foreground">
             <BadgeCheck className="h-5 w-5" aria-hidden="true" />
           </span>

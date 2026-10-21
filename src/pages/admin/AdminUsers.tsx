@@ -89,7 +89,7 @@ export function AdminUsers() {
 
       {isLoading && <div className="text-muted-foreground">{t("common.loading")}</div>}
 
-      <div className="overflow-hidden rounded-2xl border border-border/60 bg-card elev-1">
+      <div className="overflow-hidden rounded-2xl border border-border/60 bg-card">
         <table className="w-full text-sm">
           <thead className="border-b border-border/60 bg-muted/40 text-xs uppercase tracking-wider text-muted-foreground">
             <tr>

@@ -54,8 +54,10 @@ export function CategoriesSection() {
     el.scrollTo({ left: clamped * el.clientWidth, behavior: "smooth" });
   };
 
+  // pt-24 on large screens: at 900px tall the next heading used to peek over
+  // the fold by a few pixels, putting two titles in the first view.
   return (
-    <section className="py-20">
+    <section className="py-20 lg:pt-24">
       <div className="container mx-auto max-w-6xl">
         <Reveal>
           <div className="flex flex-wrap items-end justify-between gap-4">
@@ -96,9 +98,9 @@ export function CategoriesSection() {
                 <Link
                   key={industry}
                   to={`/jobs?industry=${industry}`}
-                  className="group flex shrink-0 basis-[calc(50%-0.5rem)] snap-start flex-col items-center rounded-2xl border border-transparent bg-primary-50 px-4 py-6 text-center transition duration-300 hover:-translate-y-1.5 hover:border-primary/20 hover:bg-card hover:shadow-xl hover:shadow-primary/10 dark:bg-card sm:basis-[calc(33.333%-0.667rem)] lg:basis-[calc(16.666%-0.834rem)]"
+                  className="group flex shrink-0 basis-[calc(50%-0.5rem)] snap-start flex-col items-center rounded-2xl border border-transparent bg-primary-50 px-4 py-6 text-center transition duration-200 hover:-translate-y-1.5 hover:border-primary/20 hover:bg-card hover:shadow-xl hover:shadow-primary/10 dark:bg-card sm:basis-[calc(33.333%-0.667rem)] lg:basis-[calc(16.666%-0.834rem)] ease-out"
                 >
-                  <span className="grid h-14 w-14 place-items-center rounded-2xl bg-card text-primary shadow-sm transition duration-300 group-hover:rotate-6 group-hover:scale-110 group-hover:bg-primary group-hover:text-primary-foreground dark:bg-primary-50">
+                  <span className="grid h-14 w-14 place-items-center rounded-2xl bg-card text-primary transition duration-200 group-hover:rotate-6 group-hover:scale-110 group-hover:bg-primary group-hover:text-primary-foreground dark:bg-primary-50 ease-out">
                     <Icon className="h-6 w-6" aria-hidden="true" />
                   </span>
                   <span className="mt-4 flex min-h-[2.5rem] items-center font-display text-sm font-semibold leading-tight text-foreground">
@@ -123,7 +125,7 @@ export function CategoriesSection() {
                 aria-current={i === page ? "true" : undefined}
                 onClick={() => scrollToPage(i)}
                 className={cn(
-                  "h-2 rounded-full transition-all duration-300",
+                  "h-2 rounded-full transition duration-200 ease-out",
                   i === page ? "w-8 bg-primary" : "w-2 bg-primary/25 hover:bg-primary/50",
                 )}
               />

@@ -17,8 +17,8 @@ export function Footer() {
               {t("nav.jobs")}
             </h4>
             <ul className="mt-3 space-y-2 text-sm">
-              <li><Link to="/jobs" className="text-foreground/80 hover:text-primary">{t("nav.jobs")}</Link></li>
-              <li><Link to="/companies" className="text-foreground/80 hover:text-primary">{t("nav.companies")}</Link></li>
+              <li><Link to="/jobs" className="inline-flex min-h-[44px] items-center text-foreground/80 hover:text-primary sm:min-h-0">{t("nav.jobs")}</Link></li>
+              <li><Link to="/companies" className="inline-flex min-h-[44px] items-center text-foreground/80 hover:text-primary sm:min-h-0">{t("nav.companies")}</Link></li>
             </ul>
           </div>
           <div>
@@ -26,8 +26,8 @@ export function Footer() {
               {t("nav.register")}
             </h4>
             <ul className="mt-3 space-y-2 text-sm">
-              <li><Link to="/register?role=JOB_SEEKER" className="text-foreground/80 hover:text-primary">{t("auth.jobSeeker")}</Link></li>
-              <li><Link to="/register?role=RECRUITER" className="text-foreground/80 hover:text-primary">{t("auth.recruiter")}</Link></li>
+              <li><Link to="/register?role=JOB_SEEKER" className="inline-flex min-h-[44px] items-center text-foreground/80 hover:text-primary sm:min-h-0">{t("auth.jobSeeker")}</Link></li>
+              <li><Link to="/register?role=RECRUITER" className="inline-flex min-h-[44px] items-center text-foreground/80 hover:text-primary sm:min-h-0">{t("auth.recruiter")}</Link></li>
             </ul>
           </div>
           <div>
@@ -35,7 +35,7 @@ export function Footer() {
               {t("nav.about")}
             </h4>
             <ul className="mt-3 space-y-2 text-sm">
-              <li><Link to="/about" className="text-foreground/80 hover:text-primary">{t("nav.about")}</Link></li>
+              <li><Link to="/about" className="inline-flex min-h-[44px] items-center text-foreground/80 hover:text-primary sm:min-h-0">{t("nav.about")}</Link></li>
             </ul>
           </div>
         </div>

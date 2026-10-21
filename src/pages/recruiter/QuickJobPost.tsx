@@ -97,7 +97,7 @@ export function QuickJobPost() {
 
       <form
         onSubmit={(e) => { e.preventDefault(); m.mutate(); }}
-        className="space-y-5 rounded-2xl border border-border/60 bg-card p-6 elev-1"
+        className="space-y-5 rounded-2xl border border-border/60 bg-card p-6"
       >
         <p className="rounded-lg border border-border/50 bg-muted/30 p-3 text-xs text-muted-foreground">
           {t("quickPost.intro")}

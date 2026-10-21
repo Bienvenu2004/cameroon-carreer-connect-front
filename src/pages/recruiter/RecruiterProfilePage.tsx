@@ -310,7 +310,7 @@ function RecruiterProfileEditForm({
  * ==========================================================================*/
 function Card({ children }: { children: React.ReactNode }) {
   return (
-    <div className="rounded-2xl border border-border/60 bg-card p-6 elev-1">{children}</div>
+    <div className="rounded-2xl border border-border/60 bg-card p-6">{children}</div>
   );
 }
 

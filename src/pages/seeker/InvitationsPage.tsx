@@ -58,7 +58,7 @@ export function InvitationsPage() {
             {invitations.map((inv) => (
               <li
                 key={inv.id}
-                className="rounded-xl border border-border/60 bg-card p-4 elev-1"
+                className="rounded-xl border border-border/60 bg-card p-4"
               >
                 <div className="flex flex-wrap items-start justify-between gap-3">
                   <div className="min-w-0">

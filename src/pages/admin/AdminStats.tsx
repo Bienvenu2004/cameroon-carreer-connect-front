@@ -245,7 +245,7 @@ function EmptyHint() {
 function KPI({ icon: Icon, label, value, accent }: { icon: typeof Users; label: string; value: number; accent?: "success" | "warning" | "destructive" }) {
   const tone = accent === "success" ? "text-success" : accent === "warning" ? "text-warning-foreground" : accent === "destructive" ? "text-destructive" : "text-primary";
   return (
-    <div className="rounded-2xl border border-border/60 bg-card p-5 elev-1">
+    <div className="rounded-2xl border border-border/60 bg-card p-5">
       <div className="flex items-center justify-between">
         <span className="text-xs font-medium uppercase tracking-wider text-muted-foreground">{label}</span>
         <Icon className={`h-4 w-4 ${tone}`} />
@@ -257,7 +257,7 @@ function KPI({ icon: Icon, label, value, accent }: { icon: typeof Users; label: 
 
 function ChartCard({ title, children }: { title: string; children: React.ReactNode }) {
   return (
-    <div className="rounded-2xl border border-border/60 bg-card p-6 elev-1">
+    <div className="rounded-2xl border border-border/60 bg-card p-6">
       <h3 className="font-display text-lg font-semibold">{title}</h3>
       <div className="mt-4">{children}</div>
     </div>

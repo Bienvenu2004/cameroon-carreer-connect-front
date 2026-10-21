@@ -116,7 +116,7 @@ function RoleCard({ active, icon: Icon, label, onClick }: {
       type="button"
       onClick={onClick}
       className={cn(
-        "flex flex-col items-start gap-2 rounded-xl border p-4 text-left transition-all",
+        "flex flex-col items-start gap-2 rounded-xl border p-4 text-left transition",
         active ? "border-primary bg-primary/5 ring-2 ring-primary/30" : "border-border bg-card hover:border-primary/40"
       )}
     >
