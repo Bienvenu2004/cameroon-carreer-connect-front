@@ -7,7 +7,7 @@
 // static files Vite writes to dist/.
 {
   // Must match the Worker's name in the Cloudflare dashboard, or the upload is refused.
-  "name": "cameroon-carreer-connect-front",
+  "name": "jobs-connectcmr-front",
   "compatibility_date": "2026-08-28",
   "assets": {
     "directory": "./dist",
