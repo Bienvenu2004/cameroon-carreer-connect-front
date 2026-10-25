@@ -296,6 +296,7 @@
     "orContinueWith": "ou",
     "continueWithGoogle": "Continuer avec Google",
     "googleUnavailable": "La connexion Google n'est pas configurée.",
+    "googleLoadFailed": "La connexion Google n’a pas pu se charger. Vérifiez votre connexion ou votre bloqueur de contenu.",
     "googleFailed": "Échec de la connexion Google. Veuillez réessayer."
   },
   "applications": {

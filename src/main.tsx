@@ -10,7 +10,7 @@ import { queryClient } from "@/lib/queryClient";
 import { i18n } from "@/i18n/config";
 import { ToastProvider } from "@/components/ui/toast-provider";
 import { initTheme } from "@/stores/theme";
-import { GOOGLE_CLIENT_ID } from "@/lib/googleAuth";
+import { GOOGLE_CLIENT_ID, markGsiFailed, markGsiReady, watchGsiLoad } from "@/lib/googleAuth";
 import { registerServiceWorker } from "@/lib/registerServiceWorker";
 import "./index.css";
 
@@ -34,12 +34,20 @@ const tree = (
   </React.StrictMode>
 );
 
+if (GOOGLE_CLIENT_ID) watchGsiLoad();
+
 ReactDOM.createRoot(document.getElementById("root")!).render(
   // Only mount the Google provider when a client id is configured. Without
   // one the provider would try to load Google's SDK and log errors; instead
-  // we render the app plainly and the Google buttons hide themselves.
+  // we render the app plainly and the Google button shows its fallback.
   GOOGLE_CLIENT_ID ? (
-    <GoogleOAuthProvider clientId={GOOGLE_CLIENT_ID}>{tree}</GoogleOAuthProvider>
+    <GoogleOAuthProvider
+      clientId={GOOGLE_CLIENT_ID}
+      onScriptLoadSuccess={markGsiReady}
+      onScriptLoadError={markGsiFailed}
+    >
+      {tree}
+    </GoogleOAuthProvider>
   ) : (
     tree
   ),

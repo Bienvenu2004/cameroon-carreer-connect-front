@@ -4,9 +4,22 @@ import react from "@vitejs/plugin-react";
 import path from "path";
 
 // https://vitejs.dev/config/
-export default defineConfig(({ mode }) => {
+export default defineConfig(({ mode, command }) => {
   const env = loadEnv(mode, process.cwd(), "");
   const proxyTarget = env.VITE_API_PROXY_TARGET || "http://localhost:8080";
+
+  /**
+   * A production build without the Google client id ships auth pages with no
+   * working Google button, and nothing fails to say so: that is how the
+   * Cloudflare deploy lost it (.env is gitignored, so the build never saw it).
+   * The id is public and committed in .env.production; refuse to build without it.
+   */
+  if (command === "build" && mode === "production" && !env.VITE_GOOGLE_CLIENT_ID?.trim()) {
+    throw new Error(
+      "VITE_GOOGLE_CLIENT_ID is empty. Set it in .env.production (or as a build variable) " +
+        "so the Google Sign-In button works in this build.",
+    );
+  }
 
   /**
    * Proxy config for /api, /storage, and the STOMP websocket.
@@ -75,7 +88,11 @@ export default defineConfig(({ mode }) => {
       },
     },
     server: {
+      // Google only renders its button on origins listed for the client id. If
+      // 5173 is busy Vite would quietly move to 5174, an unlisted origin, and the
+      // button would stop working; fail loudly instead.
       port: 5173,
+      strictPort: true,
       proxy: {
         "/api": apiProxy,
         "/storage": apiProxy,
