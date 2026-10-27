@@ -297,7 +297,8 @@
     "continueWithGoogle": "Continuer avec Google",
     "googleUnavailable": "La connexion Google n'est pas configurée.",
     "googleLoadFailed": "La connexion Google n’a pas pu se charger. Vérifiez votre connexion ou votre bloqueur de contenu.",
-    "googleFailed": "Échec de la connexion Google. Veuillez réessayer."
+    "googleFailed": "Échec de la connexion Google. Veuillez réessayer.",
+    "googleRoleHint": "Continuer avec Google crée un compte {{role}}."
   },
   "applications": {
     "title": "Mes candidatures",
@@ -913,5 +914,18 @@
     "wasVerified": "a été vérifié en tant qu'employeur",
     "filled": "a pourvu un poste via JobsConnect",
     "filledNamed": "a pourvu le poste {{job}} via JobsConnect"
+  },
+  "account": {
+    "deleteTitle": "Supprimer mon compte",
+    "deleteIntro": "Supprime définitivement votre profil et vos données personnelles. Votre adresse e-mail redevient libre : vous pourrez vous réinscrire avec elle, par exemple avec un autre rôle. Cette action est irréversible.",
+    "deleteButton": "Supprimer mon compte",
+    "confirmTitle": "Supprimer votre compte ?",
+    "confirmBody": "Votre profil, votre CV, vos offres sauvegardées et vos alertes sont effacés et vos candidatures en cours sont retirées. Si vous êtes recruteur, vos offres sont retirées et vos entreprises quittent l’annuaire.",
+    "confirmPasswordLabel": "Saisissez votre mot de passe pour confirmer",
+    "confirmEmailLabel": "Saisissez votre adresse e-mail ({{email}}) pour confirmer",
+    "confirmButton": "Supprimer définitivement",
+    "deleted": "Votre compte a été supprimé",
+    "deletedHint": "Vous pouvez créer un nouveau compte avec la même adresse e-mail.",
+    "deleteFailed": "Le compte n’a pas pu être supprimé"
   }
 }

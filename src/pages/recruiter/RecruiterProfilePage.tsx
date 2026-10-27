@@ -15,6 +15,7 @@ import { useAuthStore } from "@/stores/auth";
 import { apiErrorMessage } from "@/lib/api";
 import { initials } from "@/lib/utils";
 import type { RecruiterProfileDto } from "@/types/api";
+import { DeleteAccountCard } from "@/components/common/DeleteAccountCard";
 
 /* ============================================================================
  *  Recruiter Profile page
@@ -76,6 +77,8 @@ export function RecruiterProfilePage() {
       ) : (
         <RecruiterProfileView profile={profile} />
       )}
+
+      {!editing && <DeleteAccountCard />}
     </div>
   );
 }

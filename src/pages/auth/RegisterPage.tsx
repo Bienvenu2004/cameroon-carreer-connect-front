@@ -95,6 +95,9 @@ export function RegisterPage() {
       </div>
       {/* The role selected above is applied when Google creates the account. */}
       <GoogleAuthButton role={role} text="signup_with" />
+      <p className="mt-2 text-center text-xs text-muted-foreground">
+        {t("auth.googleRoleHint", { role: role === "RECRUITER" ? t("auth.recruiter") : t("auth.jobSeeker") })}
+      </p>
 
       <p className="mt-6 text-center text-sm text-muted-foreground">
         {t("auth.haveAccount")} <Link to="/login" className="font-medium text-primary hover:underline">{t("auth.signIn")}</Link>

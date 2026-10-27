@@ -145,6 +145,8 @@ export interface UserDto {
   email: string;
   active: boolean;
   role: UserRole;
+  /** How the account signs in: password accounts confirm with their password, Google ones with their email. */
+  authProvider?: "LOCAL" | "GOOGLE";
   jobSeekerProfile?: JobSeekerProfileDto | null;
   recruiterProfile?: RecruiterProfileDto | null;
 }

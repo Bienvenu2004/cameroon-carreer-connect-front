@@ -89,6 +89,9 @@ export const AuthApi = {
 export const UserApi = {
   me: () => unwrap<UserDto>(api.get("/api/hjp/users/me")),
   myProfile: () => unwrap<JobSeekerProfileDto | RecruiterProfileDto>(api.get("/api/hjp/users/me/profile")),
+  /** Deletes the signed-in account and ends the session. Releases the email for a new sign-up. */
+  deleteMe: (body: { password?: string; confirmEmail?: string }) =>
+    unwrap<void>(api.delete("/api/hjp/users/me", { data: body })),
 };
 
 /* ---------------- JOBS ----------------

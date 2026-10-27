@@ -297,7 +297,8 @@
     "continueWithGoogle": "Continue with Google",
     "googleUnavailable": "Google Sign-In is not configured.",
     "googleLoadFailed": "Google Sign-In could not load. Check your connection or any content blocker.",
-    "googleFailed": "Google Sign-In failed. Please try again."
+    "googleFailed": "Google Sign-In failed. Please try again.",
+    "googleRoleHint": "Continuing with Google creates a {{role}} account."
   },
   "applications": {
     "title": "My applications",
@@ -913,5 +914,18 @@
     "wasVerified": "was verified as an employer",
     "filled": "filled a position through JobsConnect",
     "filledNamed": "filled the {{job}} role through JobsConnect"
+  },
+  "account": {
+    "deleteTitle": "Delete my account",
+    "deleteIntro": "Permanently removes your profile and personal data. Your email address becomes free again, so you can sign up with it later, for example with a different role. This cannot be undone.",
+    "deleteButton": "Delete my account",
+    "confirmTitle": "Delete your account?",
+    "confirmBody": "Your profile, CV, saved jobs and alerts are erased and open applications are withdrawn. If you are a recruiter, your job offers are taken down and your companies leave the directory.",
+    "confirmPasswordLabel": "Enter your password to confirm",
+    "confirmEmailLabel": "Type your email address ({{email}}) to confirm",
+    "confirmButton": "Delete permanently",
+    "deleted": "Your account has been deleted",
+    "deletedHint": "You can create a new account with the same email address.",
+    "deleteFailed": "The account could not be deleted"
   }
 }
