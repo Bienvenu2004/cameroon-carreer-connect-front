@@ -235,6 +235,9 @@ async function refreshSession(): Promise<boolean> {
       // The browser sends the refresh_token HttpOnly cookie automatically;
       // we send an empty body. On success the backend rotates the cookies.
       await api.post("/api/hjp/auth/refresh-token", {});
+      // The refresh also rotates the XSRF-TOKEN cookie. Drop the cached token
+      // so the replayed request fetches the new one instead of being refused.
+      invalidateCsrfToken();
       return true;
     } catch {
       return false;
